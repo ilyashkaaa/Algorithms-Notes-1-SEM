@@ -1,0 +1,253 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 27 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Дерево отрезков: Точечные запросы</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Область применимости (ассоциативные моноиды). Линейное построение за $O(n)$ и оценка памяти $4n$. Точечное изменение за $O(\log n)$. Ответ на диапазонный запрос за $O(\log n)$ без групповых обновлений.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">27</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-segtree-def" class="nav-item nav-def">1. Концепция и область применимости</a>
+                        <a href="#sec-segtree-build" class="nav-item nav-alg">2. Построение дерева $O(n)$ и память $4n$</a>
+                        <a href="#sec-segtree-point" class="nav-item nav-thm">3. Точечное изменение за $O(\log n)$</a>
+                        <a href="#sec-segtree-query" class="nav-item nav-proof">4. Ответ на запрос за $O(\log n)$</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Концепция и область применимости -->
+                    <section id="sec-segtree-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Дерево отрезков (Segment Tree)</span>
+                        <p>
+                            <strong>Дерево отрезков</strong> — двоичное дерево, каждый узел которого отвечает за некоторый подотрезок массива $[tl, tr]$.
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li>Корень дерева отвечает за весь диапазон массива $[0, n - 1]$.</li>
+                            <li>Узел с диапазоном $[tl, tr]$ при $tl < tr$ имеет двух детей:
+                                <br>• Левый сын отвечает за первую половину: $[tl, tm]$, где $tm = \lfloor (tl + tr) / 2 \rfloor$.
+                                <br>• Правый сын отвечает за вторую половину: $[tm + 1, tr]$.
+                            </li>
+                            <li>Листья дерева ($tl == tr$) соответствуют одиночным элементам исходного массива $A[tl]$.</li>
+                        </ul>
+                        <div style="background: rgba(56,189,248,0.06); border-left: 3px solid #38bdf8; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Алгебраическая область применимости:</strong>
+                            Любая <strong>ассоциативная операция</strong> $\circ$ с нейтральным элементом $e$ (алгебраический моноид):
+                            $$(a \circ b) \circ c = a \circ (b \circ c), \quad a \circ e = e \circ a = a$$
+                            <em>Не требуется</em> ни коммутативности (можно перемножать матрицы), ни обратимости (можно искать минимум $\min$, максимум $\max$, $\gcd$), ни идемпотентности!
+                        </div>
+                    </section>
+
+                    <!-- 2. Построение дерева и память 4n -->
+                    <section id="sec-segtree-build" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Массивное представление, оценка памяти $4n$ и построение $O(n)$</span>
+                        <p>
+                            Дерево отрезков размещается в одном плоском массиве <code>tree[]</code> с 0-индексацией:
+                        </p>
+                        $$\mathrm{root} = 0, \quad \mathrm{left}(v) = 2v + 1, \quad \mathrm{right}(v) = 2v + 2$$
+                        <div style="margin-top: 8px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">Оценка размера массива: ровно $4n$</h4>
+                            <p>
+                                Если длина массива $n$ является точной степенью двойки ($n = 2^k$), то дерево является идеальным полным двоичным деревом: в нем $n$ листьев и $n - 1$ внутренних узлов, итого $2n - 1 < 2n$ ячеек.
+                                Если $n$ не является степенью двойки, дополним $n$ до ближайшей степени двойки $2^{\lceil \log_2 n \rceil} < 2n$. Дерево над таким массивом потребует не более $2 \cdot (2n) = 4n$ ячеек. Массива размера $4n$ гарантированно хватает без динамических аллокаций.
+                            </p>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">Построение снизу вверх за $O(n)$:</h4>
+                            <p>
+                                Функция $\mathrm{build}(v, tl, tr)$:
+                            </p>
+                            <ul style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если $tl == tr$ (лист): $\mathrm{tree}[v] = A[tl]$.</li>
+                                <li>Иначе: строим детей $\mathrm{build}(2v+1, tl, tm)$ и $\mathrm{build}(2v+2, tm+1, tr)$, после чего объединяем их агрегаты:
+                                    $$\mathrm{tree}[v] = \mathrm{tree}[2v + 1] \circ \mathrm{tree}[2v + 2]$$
+                                </li>
+                            </ul>
+                            <p style="margin-top: 6px; font-size: 12.5px;">
+                                Так как каждый узел посещается один раз за $O(1)$, а число узлов $< 4n$, время построения строго равно <strong>$O(n)$</strong>.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- 3. Точечное изменение -->
+                    <section id="sec-segtree-point" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Алгоритм] Точечное изменение за $O(\log n)$</span>
+                        <p>
+                            Запрос: обновить значение в ячейке $A[\mathrm{pos}] = \mathrm{new\_val}$.
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li>Спускаемся от корня вниз к листу с индексом $\mathrm{pos}$. На каждом шаге переходим либо только в левого ребенка (если $\mathrm{pos} \le tm$), либо только в правого (если $\mathrm{pos} > tm$).</li>
+                            <li>В листе ($tl == tr == \mathrm{pos}$) обновляем значение: $\mathrm{tree}[v] = \mathrm{new\_val}$.</li>
+                            <li>При возврате из рекурсии снизу вверх пересчитываем значение в каждом предке вдоль пути спуска:
+                                $$\mathrm{tree}[v] = \mathrm{tree}[2v + 1] \circ \mathrm{tree}[2v + 2]$$
+                            </li>
+                        </ol>
+                        <p style="margin-top: 6px; font-size: 13px;">
+                            Глубина дерева равна $\lceil \log_2 n \rceil$. На каждом уровне обрабатывается ровно 1 узел. Время точечного обновления: <strong>$O(\log n)$</strong>.
+                        </p>
+                    </section>
+
+                    <!-- 4. Ответ на запрос -->
+                    <section id="sec-segtree-query" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Алгоритм и Теорема] Ответ на запрос на отрезке за $O(\log n)$</span>
+                        <p>
+                            Функция $\mathrm{query}(v, tl, tr, l, r)$ для отрезка запроса $[l, r]$:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>Случай 1 (Нет пересечения):</strong> $l > tr$ или $r < tl$. Диапазон узла лежит полностью вне запроса — возвращаем нейтральный элемент $\mathrm{neutral}$ ($+\infty$ для минимума, $0$ для суммы).</li>
+                            <li><strong>Случай 2 (Полное включение):</strong> $l \le tl \le tr \le r$. Диапазон узла целиком покрыт запросом — сразу возвращаем предподсчитанное значение $\mathrm{tree}[v]$ за $O(1)$!</li>
+                            <li><strong>Случай 3 (Частичное пересечение):</strong> Делим запрос серединой $tm$ и рекурсивно обращаемся к обоим сыновьям:
+                                $$\mathrm{ans} = \mathrm{query}(2v+1, tl, tm, l, r) \circ \mathrm{query}(2v+2, tm+1, tr, l, r)$$
+                            </li>
+                        </ol>
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Доказательство сложности $O(\log n)$:</strong>
+                            На любом фиксированном уровне дерева отрезков отрезок запроса $[l, r]$ может <em>частично пересекать</em> (вызывая ветвление) не более двух узлов: один узел, содержащий левую границу $l$, и один узел, содержащий правую границу $r$. Все узлы между ними попадут в Случай 2 (полное включение) и мгновенно вернут ответ без спуска в детей.
+                            Следовательно, на каждом из $O(\log n)$ уровней обрабатывается не более 4 узлов. Суммарное число операций строго равно <strong>$O(\log n)$</strong>.
+                        </div>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Базовое дерево отрезков</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Операция</th>
+                                    <th style="padding: 6px 8px;">Временная сложность</th>
+                                    <th style="padding: 6px 8px;">Суть</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Build</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(n)$</strong></td>
+                                    <td style="padding: 6px 8px;">Рекурсивная инициализация снизу вверх</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Point Update</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(\log n)$</strong></td>
+                                    <td style="padding: 6px 8px;">Спуск в лист и пересчет вдоль одной ветви</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Range Query</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(\log n)$</strong></td>
+                                    <td style="padding: 6px 8px;">Разбиение отрезка не более чем на $2 \log n$ блоков</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Память</strong></td>
+                                    <td style="padding: 6px 8px;">$4n$ ячеек</td>
+                                    <td style="padding: 6px 8px;">Один линейный массив без указателей</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация дерева отрезков на минимум (RMQ) на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">SegmentTree</span> {
+    <span class="tok-kw">private int</span>[] tree;
+    <span class="tok-kw">private int</span> n;
+    <span class="tok-kw">private static final int</span> INF = <span class="tok-type">Integer</span>.MAX_VALUE;
+
+    <span class="tok-func">SegmentTree</span>(<span class="tok-kw">int</span>[] a) {
+        <span class="tok-kw">this</span>.n = a.length;
+        <span class="tok-kw">this</span>.tree = <span class="tok-kw">new int</span>[<span class="tok-num">4</span> * n];
+        <span class="tok-func">build</span>(a, <span class="tok-num">0</span>, <span class="tok-num">0</span>, n - <span class="tok-num">1</span>);
+    }
+
+    <span class="tok-com">// Построение дерева за O(n)</span>
+    <span class="tok-kw">private void</span> <span class="tok-func">build</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> v, <span class="tok-kw">int</span> tl, <span class="tok-kw">int</span> tr) {
+        <span class="tok-kw">if</span> (tl == tr) {
+            tree[v] = a[tl];
+            <span class="tok-kw">return</span>;
+        }
+        <span class="tok-kw">int</span> tm = (tl + tr) / <span class="tok-num">2</span>;
+        <span class="tok-func">build</span>(a, <span class="tok-num">2</span> * v + <span class="tok-num">1</span>, tl, tm);
+        <span class="tok-func">build</span>(a, <span class="tok-num">2</span> * v + <span class="tok-num">2</span>, tm + <span class="tok-num">1</span>, tr);
+        tree[v] = <span class="tok-type">Math</span>.<span class="tok-func">min</span>(tree[<span class="tok-num">2</span> * v + <span class="tok-num">1</span>], tree[<span class="tok-num">2</span> * v + <span class="tok-num">2</span>]);
+    }
+
+    <span class="tok-com">// Точечное обновление A[pos] = val за O(log n)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">update</span>(<span class="tok-kw">int</span> pos, <span class="tok-kw">int</span> val) {
+        <span class="tok-func">updateRec</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>, n - <span class="tok-num">1</span>, pos, val);
+    }
+
+    <span class="tok-kw">private void</span> <span class="tok-func">updateRec</span>(<span class="tok-kw">int</span> v, <span class="tok-kw">int</span> tl, <span class="tok-kw">int</span> tr, <span class="tok-kw">int</span> pos, <span class="tok-kw">int</span> val) {
+        <span class="tok-kw">if</span> (tl == tr) {
+            tree[v] = val;
+            <span class="tok-kw">return</span>;
+        }
+        <span class="tok-kw">int</span> tm = (tl + tr) / <span class="tok-num">2</span>;
+        <span class="tok-kw">if</span> (pos &lt;= tm) {
+            <span class="tok-func">updateRec</span>(<span class="tok-num">2</span> * v + <span class="tok-num">1</span>, tl, tm, pos, val);
+        } <span class="tok-kw">else</span> {
+            <span class="tok-func">updateRec</span>(<span class="tok-num">2</span> * v + <span class="tok-num">2</span>, tm + <span class="tok-num">1</span>, tr, pos, val);
+        }
+        tree[v] = <span class="tok-type">Math</span>.<span class="tok-func">min</span>(tree[<span class="tok-num">2</span> * v + <span class="tok-num">1</span>], tree[<span class="tok-num">2</span> * v + <span class="tok-num">2</span>]);
+    }
+
+    <span class="tok-com">// Запрос минимума на [l, r] за O(log n)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">query</span>(<span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">return</span> <span class="tok-func">queryRec</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>, n - <span class="tok-num">1</span>, l, r);
+    }
+
+    <span class="tok-kw">private int</span> <span class="tok-func">queryRec</span>(<span class="tok-kw">int</span> v, <span class="tok-kw">int</span> tl, <span class="tok-kw">int</span> tr, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">if</span> (l &gt; tr || r &lt; tl) <span class="tok-kw">return</span> INF;
+        <span class="tok-kw">if</span> (l &lt;= tl &amp;&amp; tr &lt;= r) <span class="tok-kw">return</span> tree[v];
+        <span class="tok-kw">int</span> tm = (tl + tr) / <span class="tok-num">2</span>;
+        <span class="tok-kw">return</span> <span class="tok-type">Math</span>.<span class="tok-func">min</span>(
+            <span class="tok-func">queryRec</span>(<span class="tok-num">2</span> * v + <span class="tok-num">1</span>, tl, tm, l, r),
+            <span class="tok-func">queryRec</span>(<span class="tok-num">2</span> * v + <span class="tok-num">2</span>, tm + <span class="tok-num">1</span>, tr, l, r)
+        );
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-segtree-def" class="nav-item nav-def">1. Концепция и моноид</a>
+                        <a href="#sec-segtree-build" class="nav-item nav-alg">2. Построение $O(n)$ и $4n$</a>
+                        <a href="#sec-segtree-point" class="nav-item nav-thm">3. Точечное изменение</a>
+                        <a href="#sec-segtree-query" class="nav-item nav-proof">4. Запрос на отрезке</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
