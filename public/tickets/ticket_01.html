@@ -1,0 +1,272 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 01 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Сложность алгоритма, время и память, $O, \Omega, \Theta$</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Понятие временной и пространственной сложности. Ресурсы алгоритма и модель памяти. Определения асимптотических сравнений $O, \Omega, \Theta$, свойства и примеры из лекции.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">01</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-resources" class="nav-item nav-def">1. Ресурсы и модель памяти</a>
+                        <a href="#sec-o-notation" class="nav-item nav-def">2. $O$-нотация</a>
+                        <a href="#sec-omega-notation" class="nav-item nav-def">3. $\Omega$-нотация</a>
+                        <a href="#sec-theta-notation" class="nav-item nav-thm">4. $\Theta$-нотация</a>
+                        <a href="#sec-properties" class="nav-item nav-proof">5. Свойства сравнений</a>
+                        <a href="#sec-examples" class="nav-item nav-alg">6. Примеры из лекции</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Примеры на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Ресурсы программы и модель памяти (Лекция 1, Слайд 4) -->
+                    <section id="sec-resources" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Ресурсы алгоритма и модель памяти</span>
+                        <p>
+                            При анализе алгоритмов рассматриваются два ключевых ресурса:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 8px;">
+                            <li style="margin-bottom: 6px;">
+                                <strong>Время исполнения (временная сложность):</strong> Количество элементарных операций, выполняемых алгоритмом для решения задачи на входе размера $n$.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                <strong>Потребляемая память (пространственная сложность):</strong> Объем памяти, требуемый алгоритму для работы при обработке входа размера $n$ (сверх исходных данных).
+                            </li>
+                        </ol>
+                        <p style="margin-top: 10px;">
+                            <strong>Модель памяти (из лекции):</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li style="margin-bottom: 4px;">Память вычислителя предполагается <strong>безграничной</strong>.</li>
+                            <li>Доступ к любой ячейке памяти на <strong>чтение или запись</strong> требует пренебрежимо малого, константного времени $O(1)$.</li>
+                        </ul>
+                    </section>
+
+                    <!-- Зачем нужен асимптотический анализ -->
+                    <div class="vcard vcard-geo">
+                        <span class="vcard-title-pill">♦ Идея асимптотического анализа</span>
+                        <p style="font-size: 13.5px;">
+                            Разные вычислители имеют разную производительность, а точное время в секундах зависит от процессора и компилятора. <strong>Асимптотический анализ</strong> исследует скорость роста функции сложности при неограниченном росте размера входных данных ($n \to \infty$), отбрасывая константные множители и слагаемые младшего порядка.
+                        </p>
+                    </div>
+
+                    <!-- 2. O-нотация (Лекция 1, Слайд 5) -->
+                    <section id="sec-o-notation" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] O-нотация (Верхняя оценка)</span>
+                        <p>
+                            Пусть имеются две функции $f(n)$ и $g(n)$, при этом $f, g: \mathbb{N} \to \mathbb{N}$ (или $\mathbb{R}^+$). Говорят, что <strong>$f(n) = O(g(n))$</strong>, если:
+                        </p>
+                        $$\exists C > 0, \; \exists N_0 : \forall n > N_0 \implies f(n) \le C \cdot g(n)$$
+                        <p style="margin-top: 8px; font-size: 13.5px; color: var(--text-muted);">
+                            Смысл: функция $f(n)$ растет не быстрее, чем $g(n)$, начиная с некоторого порога $N_0$, с точностью до постоянного множителя $C$.
+                        </p>
+                    </section>
+
+                    <!-- 3. Omega-нотация (Лекция 1, Слайд 6) -->
+                    <section id="sec-omega-notation" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] $\Omega$-нотация (Нижняя оценка)</span>
+                        <p>
+                            Пусть имеются две функции $f, g: \mathbb{N} \to \mathbb{N}$. Говорят, что <strong>$f(n) = \Omega(g(n))$</strong>, если:
+                        </p>
+                        $$\exists C > 0, \; \exists N_0 : \forall n > N_0 \implies f(n) \ge C \cdot g(n)$$
+                        <p style="margin-top: 8px; font-size: 13.5px;">
+                            Смысл: функция $f(n)$ растет не медленнее, чем $g(n)$, начиная с порога $N_0$. Заметим, что $f(n) = \Omega(g(n)) \iff g(n) = O(f(n))$.
+                        </p>
+                    </section>
+
+                    <!-- 4. Theta-нотация (Лекция 1, Слайд 6) -->
+                    <section id="sec-theta-notation" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Определение и Теорема] $\Theta$-нотация (Точный порядок роста)</span>
+                        <p>
+                            Пусть имеются две функции $f, g: \mathbb{N} \to \mathbb{N}$. Говорят, что <strong>$f(n) = \Theta(g(n))$</strong>, если:
+                        </p>
+                        $$\exists C_1, C_2 > 0, \; \exists N_0 : \forall n > N_0 \implies C_1 \cdot g(n) \le f(n) \le C_2 \cdot g(n)$$
+                        <p style="margin-top: 8px;">
+                            <strong>Критерий эквивалентности:</strong>
+                        </p>
+                        $$f(n) = \Theta(g(n)) \iff \Big( f(n) = O(g(n)) \quad \text{и} \quad f(n) = \Omega(g(n)) \Big)$$
+                    </section>
+
+                    <!-- 5. Свойства асимптотических сравнений -->
+                    <section id="sec-properties" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Свойства] Алгебра асимптотических оценок</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Транзитивность:</strong> Если $f(n) = O(g(n))$ и $g(n) = O(h(n))$, то $f(n) = O(h(n))$. Аналогично для $\Omega$ и $\Theta$.
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                <strong>Рефлексивность:</strong> $f(n) = O(f(n))$, $f(n) = \Omega(f(n))$, $f(n) = \Theta(f(n))$.
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                <strong>Правило суммы (доминирование):</strong> Если $f_1(n) = O(g_1(n))$ и $f_2(n) = O(g_2(n))$, то:
+                                $$f_1(n) + f_2(n) = O(\max(g_1(n), g_2(n)))$$
+                                <em>Следствие:</em> При сложении функций порядок роста определяется самым быстрорастущим слагаемым.
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                <strong>Правило произведения:</strong> Если $f_1(n) = O(g_1(n))$ и $f_2(n) = O(g_2(n))$, то $f_1(n) \cdot f_2(n) = O(g_1(n) \cdot g_2(n))$.
+                            </li>
+                            <li>
+                                <strong>Константы:</strong> Для любого $k > 0$ имеем $O(k \cdot g(n)) = O(g(n))$.
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- 6. Примеры из лекции с явным подбором констант -->
+                    <section id="sec-examples" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Примеры] Примеры из лекции с подбором констант</span>
+                        
+                        <p><strong>Пример 1 (из лекции 1, слайд 5): Доказать, что $f(n) = n = O(n^2)$.</strong></p>
+                        <p style="font-size: 13.5px; margin-top: 4px;">
+                            Пусть $f(n) = n$, а $g(n) = n^2$. Выберем константы <strong>$C = 1$</strong> и <strong>$N_0 = 2$</strong>.
+                            Тогда для всех $n > N_0$ (то есть $n \ge 2$):
+                            $$f(n) = n \le 1 \cdot n^2 = C \cdot g(n)$$
+                            Неравенство $n \le n^2$ верно для всех $n \ge 2$, следовательно, по определению $n = O(n^2)$.
+                        </p>
+                        <hr style="border: none; border-top: 1px dashed var(--border-color); margin: 12px 0;">
+
+                        <p><strong>Пример 2 (из лекции 1, слайд 5): Многочлены степеней $k$ и $k + \alpha$.</strong></p>
+                        <p style="font-size: 13.5px; margin-top: 4px;">
+                            Пусть $f(n) = P_k(n)$, а $g(n) = P_{k+\alpha}(n)$, где $P_r(n)$ — произвольный многочлен степени $r$, при этом $k \in \mathbb{N}, \alpha \in \mathbb{N}_0$.
+                            Так как при $n \to \infty$ поведение многочлена определяется старшей степенью $n^{k+\alpha} \ge n^k$, существует $C > 0$ и $N_0$, такие что для всех $n > N_0$:
+                            $$P_k(n) \le C \cdot P_{k+\alpha}(n) \implies P_k(n) = O(P_{k+\alpha}(n))$$
+                        </p>
+                        <hr style="border: none; border-top: 1px dashed var(--border-color); margin: 12px 0;">
+
+                        <p><strong>Пример 3 (Подбор констант для $\Theta$): Доказать, что $3n^2 + 5n = \Theta(n^2)$.</strong></p>
+                        <p style="font-size: 13.5px; margin-top: 4px;">
+                            При $n \ge 1$:
+                            $$3n^2 \le 3n^2 + 5n \le 3n^2 + 5n^2 = 8n^2$$
+                            Положив $C_1 = 3, C_2 = 8, N_0 = 1$, получаем $C_1 n^2 \le 3n^2 + 5n \le C_2 n^2$, откуда $3n^2 + 5n = \Theta(n^2)$.
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ К БИЛЕТУ
+                         ===================================================== -->
+
+                    <div id="sec-extra" class="extra-divider-banner">
+                        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Часть II: Дополнительные материалы к билету
+                        </div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">
+                            Summary билета и примеры анализа кода на Java++
+                        </div>
+                    </div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">★ Summary билета (ключевые факты)</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Сравнительная таблица кванторных определений:</strong>
+                                <div style="overflow-x: auto; margin-top: 6px;">
+                                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1.5px solid var(--border-color); color: var(--text-muted);">
+                                                <th style="padding: 6px 8px;">Обозначение</th>
+                                                <th style="padding: 6px 8px;">Неравенство $\forall n > N_0$</th>
+                                                <th style="padding: 6px 8px;">Смысл оценки</th>
+                                                <th style="padding: 6px 8px;">Числовая аналогия</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">$f(n) = O(g(n))$</td>
+                                                <td style="padding: 6px 8px;">$f(n) \le C \cdot g(n)$</td>
+                                                <td style="padding: 6px 8px;">Верхняя грань (не быстрее $g$)</td>
+                                                <td style="padding: 6px 8px;">$a \le b$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">$f(n) = \Omega(g(n))$</td>
+                                                <td style="padding: 6px 8px;">$f(n) \ge C \cdot g(n)$</td>
+                                                <td style="padding: 6px 8px;">Нижняя грань (не медленнее $g$)</td>
+                                                <td style="padding: 6px 8px;">$a \ge b$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">$f(n) = \Theta(g(n))$</td>
+                                                <td style="padding: 6px 8px;">$C_1 g(n) \le f(n) \le C_2 g(n)$</td>
+                                                <td style="padding: 6px 8px;">Точный порядок роста</td>
+                                                <td style="padding: 6px 8px;">$a = b$</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                            <li>
+                                <strong>Основание логарифма:</strong> Внутри $O(\log_a n)$ основание не пишется, так как по формуле перехода $\log_a n = \frac{\log_b n}{\log_b a} = C \cdot \log_b n$. Все логарифмы отличаются лишь постоянным множителем.
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Примеры анализа кода на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Примеры анализа сложности фрагментов кода на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-com">// 1. O(1) - константное время: доступ по индексу и элементарные операции</span>
+<span class="tok-kw">int</span> <span class="tok-func">getMiddle</span>(<span class="tok-kw">int</span>[] arr, <span class="tok-kw">int</span> n) {
+    <span class="tok-kw">return</span> arr[n / <span class="tok-num">2</span>]; <span class="tok-com">// 1 операция обращения к памяти</span>
+}
+
+<span class="tok-com">// 2. O(log n) - логарифмическое время: деление размера задачи пополам</span>
+<span class="tok-kw">int</span> <span class="tok-func">countHalves</span>(<span class="tok-kw">int</span> n) {
+    <span class="tok-kw">int</span> steps = <span class="tok-num">0</span>;
+    <span class="tok-kw">while</span> (n &gt; <span class="tok-num">1</span>) {
+        n /= <span class="tok-num">2</span>;
+        steps++;
+    }
+    <span class="tok-kw">return</span> steps;
+}
+
+<span class="tok-com">// 3. O(n^2) - квадратичное время: два вложенных цикла</span>
+<span class="tok-kw">long</span> <span class="tok-func">sumPairs</span>(<span class="tok-kw">int</span>[] arr, <span class="tok-kw">int</span> n) {
+    <span class="tok-kw">long</span> sum = <span class="tok-num">0</span>;
+    <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; n; i++) {
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> j = i + <span class="tok-num">1</span>; j &lt; n; j++) {
+            sum += arr[i] * (<span class="tok-kw">long</span>)arr[j]; <span class="tok-com">// n*(n-1)/2 итераций = Theta(n^2)</span>
+        }
+    }
+    <span class="tok-kw">return</span> sum;
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-resources" class="nav-item nav-def">1. Ресурсы и память</a>
+                        <a href="#sec-o-notation" class="nav-item nav-def">2. O-нотация</a>
+                        <a href="#sec-omega-notation" class="nav-item nav-def">3. $\Omega$-нотация</a>
+                        <a href="#sec-theta-notation" class="nav-item nav-thm">4. $\Theta$-нотация</a>
+                        <a href="#sec-properties" class="nav-item nav-proof">5. Свойства сравнений</a>
+                        <a href="#sec-examples" class="nav-item nav-alg">6. Примеры из лекции</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Примеры на Java++</a>
+                    </nav>
+                </aside>
