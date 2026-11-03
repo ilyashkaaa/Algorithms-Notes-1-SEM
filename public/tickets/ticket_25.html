@@ -1,0 +1,245 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 25 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Задачи RMQ и RSQ: Постановки и Сравнение</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Постановки задач Range Minimum Query и Range Sum Query. Классификация режимов: Static vs Dynamic, Online vs Offline. Алгебраические свойства операций (обратимость, ассоциативность, идемпотентность) и сравнительный анализ структур данных.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">25</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-rq-defs" class="nav-item nav-def">1. Постановки RMQ и RSQ</a>
+                        <a href="#sec-classifications" class="nav-item nav-alg">2. Static/Dynamic, Online/Offline</a>
+                        <a href="#sec-algebraic-diff" class="nav-item nav-geo">3. Алгебра: обратимость и идемпотентность</a>
+                        <a href="#sec-comparison-matrix" class="nav-item nav-thm">4. Сводная матрица подходов</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Постановки RMQ и RSQ -->
+                    <section id="sec-rq-defs" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определения] Задачи диапазонных запросов (Range Queries)</span>
+                        <p>
+                            Дан числовой массив $A[0 \dots n-1]$. Поступают запросы, задающие полуинтервалы $[l, r)$ (или отрезки $[l, r]$):
+                        </p>
+                        <div style="margin-top: 8px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. RMQ (Range Minimum Query) — минимум на отрезке</h4>
+                            $$\mathrm{RMQ}(l, r) = \min_{l \le i \le r} A[i]$$
+                            <p style="margin-top: 4px; font-size: 13px;">
+                                Задача: эффективно находить наименьший элемент на заданном подотрезке.
+                            </p>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. RSQ (Range Sum Query) — сумма на отрезке</h4>
+                            $$\mathrm{RSQ}(l, r) = \sum_{i=l}^r A[i]$$
+                            <p style="margin-top: 4px; font-size: 13px;">
+                                Задача: находить сумму элементов подотрезка.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- 2. Static/Dynamic, Online/Offline -->
+                    <section id="sec-classifications" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Классификация] Режимы исполнения: Static/Dynamic и Online/Offline</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
+                                <strong style="color: var(--accent-color); font-size: 13px;">Static (Статическая)</strong>
+                                <p style="font-size: 12.5px; margin-top: 4px;">
+                                    Массив фиксирован раз и навсегда. Элементы не изменяются. Допустим долгий предподсчет (Preprocessing), чтобы запросы обрабатывались мгновенно (например, за $O(1)$).
+                                </p>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
+                                <strong style="color: var(--accent-color); font-size: 13px;">Dynamic (Динамическая)</strong>
+                                <p style="font-size: 12.5px; margin-top: 4px;">
+                                    Между запросами происходят изменения массива:
+                                    <br>• Точечное: $A[i] = x$
+                                    <br>• Групповое: $A[i] += x \ \forall i \in [l, r]$.
+                                </p>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
+                                <strong style="color: var(--accent-color); font-size: 13px;">Online (Интерактивная)</strong>
+                                <p style="font-size: 12.5px; margin-top: 4px;">
+                                    Запросы приходят по одному. Алгоритм обязан выдать ответ на текущий запрос до того, как получит следующий (следующий запрос может зависеть от ответа на предыдущий).
+                                </p>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px;">
+                                <strong style="color: var(--accent-color); font-size: 13px;">Offline (Пакетная)</strong>
+                                <p style="font-size: 12.5px; margin-top: 4px;">
+                                    Все $q$ запросов известны заранее. Алгоритм имеет право перемешать и отсортировать их (сканирующая прямая, алгоритм Мо, сжатие координат) для ускорения.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 3. Алгебра: обратимость и идемпотентность -->
+                    <section id="sec-algebraic-diff" class="vcard vcard-geo">
+                        <span class="vcard-title-pill">[Алгебра] Почему RSQ и RMQ требуют принципиально разных структур?</span>
+                        <p>
+                            Возможность быстрого ответа на запрос за $O(1)$ или $O(\log n)$ определяется алгебраическими свойствами операции:
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>Обратимость (Группа):</strong> Сложение обратимо ($+ \to -$).
+                                <br>Благодаря этому для статического RSQ работают <strong>префиксные суммы</strong>:
+                                $$\mathrm{sum}(l, r) = \mathrm{pref}[r] - \mathrm{pref}[l - 1] \implies O(1) \text{ времени и } O(n) \text{ памяти}$$
+                                Но операция взятия минимума $\min(a, b)$ <strong>необратима</strong>! Если из множества $\{3, 7, 5\}$ убрать 3, зная только минимум 3, восстановить новый минимум невозможно. Поэтому префиксные суммы не применимы для RMQ.
+                            </li>
+                            <li><strong>Идемпотентность (Idempotency):</strong>
+                                Операция называется идемпотентной, если повторное применение к тому же элементу не меняет результат:
+                                $$x \circ x = x \implies \min(x, x) = x, \quad \gcd(x, x) = x, \quad \mathrm{or}(x, x) = x$$
+                                Идемпотентность позволяет разбивать отрезок на <strong>два перекрывающихся блока</strong>:
+                                $$\min(A \cup B) = \min(\min(A), \min(B))$$
+                                Именно на этом свойстве строится <strong>Sparse Table (Разреженная таблица)</strong>, отвечающая на статический RMQ за строго <strong>$O(1)$</strong>!
+                            </li>
+                            <li><strong>Ассоциативность (Полугруппа):</strong>
+                                $(a \circ b) \circ c = a \circ (b \circ c)$. Не требует ни обратимости, ни идемпотентности.
+                                Поддерживается универсальной структурой — <strong>Деревом отрезков (Segment Tree)</strong> за $O(\log n)$.
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- 4. Сводная матрица подходов -->
+                    <section id="sec-comparison-matrix" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Матрица структур] Сравнение всех подходов к RMQ и RSQ</span>
+                        <p>
+                            Сводная таблица эффективности структур данных для массива размера $n$ и $q$ запросов:
+                        </p>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 6px;">Структура данных</th>
+                                    <th style="padding: 6px 6px;">Построение</th>
+                                    <th style="padding: 6px 6px;">Память</th>
+                                    <th style="padding: 6px 6px;">Запрос</th>
+                                    <th style="padding: 6px 6px;">Точечное обновление</th>
+                                    <th style="padding: 6px 6px;">Групповое обновление</th>
+                                    <th style="padding: 6px 6px;">Область применения</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 6px;"><strong>Наивный массив</strong></td>
+                                    <td style="padding: 6px 6px;">$O(1)$</td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;">$O(1)$</td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;">Мало запросов ($q \ll n$)</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 6px;"><strong>Префиксные суммы</strong></td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;"><strong style="color: #4ade80;">$O(1)$</strong></td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;">Статический RSQ (группы)</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 6px;"><strong>Sparse Table</strong></td>
+                                    <td style="padding: 6px 6px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 6px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 6px;"><strong style="color: #4ade80;">$O(1)$</strong></td>
+                                    <td style="padding: 6px 6px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 6px;">—</td>
+                                    <td style="padding: 6px 6px;">Статический RMQ, GCD</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 6px;"><strong>Дерево отрезков</strong></td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;">$4n = O(n)$</td>
+                                    <td style="padding: 6px 6px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 6px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 6px;"><strong style="color: #4ade80;">$O(\log n)$ (Lazy)</strong></td>
+                                    <td style="padding: 6px 6px;">Универсально: любые полугруппы</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 6px;"><strong>Неявный Treap</strong></td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;">$O(n)$</td>
+                                    <td style="padding: 6px 6px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 6px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 6px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 6px;">Вставка/вырезание/reverse подотрезка</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Ключевой выбор структуры для RMQ и RSQ</span>
+                        <ul style="margin-left: 20px; margin-top: 6px; font-size: 13px;">
+                            <li><strong>Статический RSQ:</strong> Префиксные суммы ($O(n)$ препроцессинг, $O(1)$ запрос, $O(n)$ память).</li>
+                            <li><strong>Статический RMQ:</strong> Sparse Table ($O(n \log n)$ препроцессинг, $O(1)$ запрос благодаря идемпотентности $\min(a, a) = a$).</li>
+                            <li><strong>Динамический RMQ / RSQ с точечным или групповым обновлением:</strong> Дерево отрезков ($O(n)$ построение, $O(\log n)$ запрос и обновление).</li>
+                            <li><strong>Динамический массив с изменением порядка элементов:</strong> Декартово дерево по неявному ключу.</li>
+                        </ul>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Статический RSQ через префиксные суммы на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">StaticRSQ</span> {
+    <span class="tok-kw">private long</span>[] pref;
+
+    <span class="tok-com">// Построение префиксных сумм за O(n)</span>
+    <span class="tok-func">StaticRSQ</span>(<span class="tok-kw">int</span>[] a) {
+        pref = <span class="tok-kw">new long</span>[a.length + <span class="tok-num">1</span>];
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; a.length; i++) {
+            pref[i + <span class="tok-num">1</span>] = pref[i] + a[i];
+        }
+    }
+
+    <span class="tok-com">// Запрос суммы на отрезке [l, r] за O(1)</span>
+    <span class="tok-kw">long</span> <span class="tok-func">query</span>(<span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">return</span> pref[r + <span class="tok-num">1</span>] - pref[l];
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-rq-defs" class="nav-item nav-def">1. Постановки RMQ/RSQ</a>
+                        <a href="#sec-classifications" class="nav-item nav-alg">2. Режимы исполнения</a>
+                        <a href="#sec-algebraic-diff" class="nav-item nav-geo">3. Алгебра операций</a>
+                        <a href="#sec-comparison-matrix" class="nav-item nav-thm">4. Сводная матрица</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
