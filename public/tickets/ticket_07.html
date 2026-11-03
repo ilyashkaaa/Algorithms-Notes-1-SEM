@@ -1,0 +1,237 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 07 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Сортировка слиянием и подсчет числа инверсий</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Алгоритм Merge Sort. Анализ рекуррентности $T(n) = 2T(n/2) + O(n)$. Подсчет числа инверсий за $O(n \log n)$.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">07</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-mergesort" class="nav-item nav-alg">1. Алгоритм Merge Sort</a>
+                        <a href="#sec-recurrence" class="nav-item nav-proof">2. Рекуррентность $O(n \log n)$</a>
+                        <a href="#sec-inversions" class="nav-item nav-def">3. Понятие инверсии</a>
+                        <a href="#sec-count-inv" class="nav-item nav-alg">4. Подсчет инверсий</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Алгоритм Merge Sort -->
+                    <section id="sec-mergesort" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Сортировка слиянием (Merge Sort)</span>
+                        <p>
+                            Алгоритм основан на парадигме <strong>«разделяй и властвуй»</strong> (<em>Divide and Conquer</em>):
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li style="margin-bottom: 6px;">
+                                <strong>Разделение (Divide):</strong> Отрезок массива $A[l \dots r]$ делится пополам точкой $m = \lfloor (l + r) / 2 \rfloor$. База рекурсии: при $l \ge r$ массив из $\le 1$ элемента уже отсортирован.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                <strong>Властвование (Conquer):</strong> Рекурсивно вызывается сортировка левой половины $A[l \dots m]$ и правой половины $A[m+1 \dots r]$.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                <strong>Слияние (Combine):</strong> Процедура $\mathrm{Merge}$ сливает две отсортированные половины в один упорядоченный массив с помощью двух указателей за $O(n)$ времени и $O(n)$ дополнительной памяти.
+                            </li>
+                        </ol>
+                        <p style="margin-top: 8px;">
+                            <strong>Обеспечение стабильности:</strong> При сравнении элементов $Left[i]$ и $Right[j]$, если $Left[i] \le Right[j]$, первым в результирующий массив всегда записывается элемент из левой половины. Это гарантирует строгое сохранение взаимного порядка равных элементов.
+                        </p>
+                    </section>
+
+                    <!-- 2. Анализ рекуррентности -->
+                    <section id="sec-recurrence" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема] Анализ времени работы через дерево рекурсии</span>
+                        <p>
+                            Время работы сортировки $n$ элементов описывается рекуррентным соотношением:
+                        </p>
+                        $$T(n) = 2 \cdot T\left(\left\lfloor \frac{n}{2} \right\rfloor\right) + \Theta(n), \qquad T(1) = \Theta(1)$$
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство через уровни дерева рекурсии:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li style="margin-bottom: 6px;">На уровне $k$ дерева рекурсии находится ровно $2^k$ подзадач, каждая из которых имеет размер $\frac{n}{2^k}$.</li>
+                            <li style="margin-bottom: 6px;">Суммарное время работы слияния на уровне $k$ равно:
+                                $$2^k \cdot O\left(\frac{n}{2^k}\right) = O(n)$$
+                            </li>
+                            <li style="margin-bottom: 6px;">Глубина дерева рекурсии до базового случая размера $1$ составляет $h = \lceil \log_2 n \rceil + 1$.</li>
+                            <li>
+                                Суммируя по всем $\log_2 n$ уровням, получаем:
+                                $$T(n) = \sum_{k=0}^{\lceil \log_2 n \rceil} O(n) = O(n \log n)$$
+                            </li>
+                        </ul>
+                        <p style="margin-top: 6px;">
+                            Время работы составляет $\Theta(n \log n)$ <strong>гарантированно</strong> во всех случаях (лучший, средний, худший).
+                        </p>
+                    </section>
+
+                    <!-- 3. Понятие инверсии -->
+                    <section id="sec-inversions" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Инверсия в массиве</span>
+                        <p>
+                            Пусть дан числовой массив $A[0 \dots n-1]$. <strong>Инверсией</strong> называется пара индексов $(i, j)$ такая, что:
+                        </p>
+                        $$i < j \quad \text{и} \quad A[i] > A[j]$$
+                        <p style="margin-top: 8px;">
+                            <em>Свойства:</em>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>В отсортированном по неубыванию массиве число инверсий равно $0$.</li>
+                            <li>В массиве, отсортированном по невозрастанию, число инверсий максимально и равно $\frac{n(n-1)}{2} = \Theta(n^2)$.</li>
+                            <li>Каждый обмен соседних элементов в пузырьковой сортировке устраняет ровно одну инверсию.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 4. Подсчет числа инверсий за O(n log n) -->
+                    <section id="sec-count-inv" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Подсчет числа инверсий за $O(n \log n)$</span>
+                        <p>
+                            Разобьем массив на левую половину $A[l \dots m]$ и правую половину $A[m+1 \dots r]$. Любая инверсия $(i, j)$ относится ровно к одной из трех категорий:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li>Оба индекса в левой половине: $l \le i < j \le m$ (число таких инверсий $\mathrm{inv}_{left}$).</li>
+                            <li>Оба индекса в правой половине: $m+1 \le i < j \le r$ (число таких инверсий $\mathrm{inv}_{right}$).</li>
+                            <li>Разделенная инверсия (Cross-inversion): $l \le i \le m < j \le r$, где $A[i] > A[j]$.</li>
+                        </ol>
+                        <p style="margin-top: 8px;">
+                            <strong>Ключевая идея в процедуре слияния:</strong>
+                            <br>Пусть обе половины $Left$ и $Right$ уже отсортированы. Если при слиянии элемент $Right[j] < Left[i]$, то поскольку левая половина отсортирована, $Right[j]$ меньше не только $Left[i]$, но и <strong>всех последующих элементов левой половины</strong> от $i$ до $m$!
+                            <br>Следовательно, к счетчику инверсий прибавляется:
+                            $$\Delta = m - i + 1$$
+                            Таким образом, все разделенные инверсии подсчитываются на лету за время $O(n)$ без дополнительных циклов!
+                            $$\text{Итоговое время: } O(n \log n), \quad \text{Память: } O(n)$$
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ К БИЛЕТУ
+                         ===================================================== -->
+
+                    <div id="sec-extra" class="extra-divider-banner">
+                        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Часть II: Дополнительные материалы к билету
+                        </div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">
+                            Summary билета и реализация на Java++
+                        </div>
+                    </div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">★ Summary билета (ключевые факты)</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Сводная таблица параметров Merge Sort:</strong>
+                                <div style="overflow-x: auto; margin-top: 6px;">
+                                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1.5px solid var(--border-color); color: var(--text-muted);">
+                                                <th style="padding: 6px 8px;">Параметр</th>
+                                                <th style="padding: 6px 8px;">Значение</th>
+                                                <th style="padding: 6px 8px;">Примечание</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Худшее время</td>
+                                                <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                                <td style="padding: 6px 8px;">Строго гарантировано (в отличие от QuickSort)</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Лучшее / Среднее</td>
+                                                <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                                <td style="padding: 6px 8px;">Одинаково во всех случаях</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Доп. память</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                                <td style="padding: 6px 8px;">Требуется вспомогательный буфер для слияния</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Стабильность</td>
+                                                <td style="padding: 6px 8px; color: #10b981; font-weight: 700;">Да (при $Left[i] \le Right[j]$)</td>
+                                                <td style="padding: 6px 8px;">Сохраняет порядок равных ключей</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Реализация на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация MergeSort с подсчетом инверсий на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">MergeSortInv</span> {
+    <span class="tok-kw">long</span> <span class="tok-func">mergeAndCount</span>(<span class="tok-kw">int</span>[] arr, <span class="tok-kw">int</span>[] temp, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> m, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">int</span> i = l, j = m + <span class="tok-num">1</span>, k = l;
+        <span class="tok-kw">long</span> invCount = <span class="tok-num">0</span>;
+
+        <span class="tok-kw">while</span> (i &lt;= m &amp;&amp; j &lt;= r) {
+            <span class="tok-kw">if</span> (arr[i] &lt;= arr[j]) { <span class="tok-com">// знак &lt;= обеспечивает стабильность</span>
+                temp[k++] = arr[i++];
+            } <span class="tok-kw">else</span> {
+                temp[k++] = arr[j++];
+                invCount += (m - i + <span class="tok-num">1</span>); <span class="tok-com">// все оставшиеся в левой половине образуют инверсию</span>
+            }
+        }
+        <span class="tok-kw">while</span> (i &lt;= m) temp[k++] = arr[i++];
+        <span class="tok-kw">while</span> (j &lt;= r) temp[k++] = arr[j++];
+        <span class="tok-kw">for</span> (i = l; i &lt;= r; i++) arr[i] = temp[i];
+
+        <span class="tok-kw">return</span> invCount;
+    }
+
+    <span class="tok-kw">long</span> <span class="tok-func">sortAndCount</span>(<span class="tok-kw">int</span>[] arr, <span class="tok-kw">int</span>[] temp, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">long</span> invCount = <span class="tok-num">0</span>;
+        <span class="tok-kw">if</span> (l &lt; r) {
+            <span class="tok-kw">int</span> m = l + (r - l) / <span class="tok-num">2</span>;
+            invCount += <span class="tok-func">sortAndCount</span>(arr, temp, l, m);
+            invCount += <span class="tok-func">sortAndCount</span>(arr, temp, m + <span class="tok-num">1</span>, r);
+            invCount += <span class="tok-func">mergeAndCount</span>(arr, temp, l, m, r);
+        }
+        <span class="tok-kw">return</span> invCount;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-mergesort" class="nav-item nav-alg">1. Merge Sort</a>
+                        <a href="#sec-recurrence" class="nav-item nav-proof">2. Рекуррентность</a>
+                        <a href="#sec-inversions" class="nav-item nav-def">3. Понятие инверсии</a>
+                        <a href="#sec-count-inv" class="nav-item nav-alg">4. Подсчет инверсий</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
