@@ -1,0 +1,237 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 15 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Сортировка подсчетом и LSD Radix Sort</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Сортировка подсчетом (Counting Sort): базовая и стабильная с префиксными суммами. Алгоритм поразрядной сортировки LSD (Least Significant Digit). Доказательство корректности по индукции.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">15</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-simple-count" class="nav-item nav-def">1. Базовая сортировка подсчетом</a>
+                        <a href="#sec-stable-count" class="nav-item nav-alg">2. Стабильный Counting Sort</a>
+                        <a href="#sec-lsd-alg" class="nav-item nav-thm">3. Алгоритм LSD Radix Sort</a>
+                        <a href="#sec-lsd-proof" class="nav-item nav-proof">4. Доказательство корректности</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Базовая сортировка подсчетом -->
+                    <section id="sec-simple-count" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Базовая сортировка подсчетом (Counting Sort)</span>
+                        <p>
+                            Пусть элементы массива $A[0 \dots n-1]$ принадлежат небольшому целочисленному универсуму $[0, K-1]$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Базовый алгоритм:</strong>
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 4px;">
+                            <li>Выделяем массив счетчиков $cnt$ длины $K$, инициализированный нулями.</li>
+                            <li>Проходим по массиву $A$ и подсчитываем частоту каждого ключа: $cnt[A[i]]++$.</li>
+                            <li>Последовательно выводим каждый ключ $x \in [0, K-1]$ ровно $cnt[x]$ раз обратно в массив $A$.</li>
+                        </ol>
+                        <p style="margin-top: 8px;">
+                            <strong>Сложность:</strong> Время $O(n + K)$, память $O(K)$.
+                        </p>
+                        <div style="background: rgba(248,113,113,0.06); border-left: 3px solid #f87171; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Главный недостаток базового варианта:</strong> Он <em>нестабилен</em> и применим только если сортируются «голые» числа без ассоциированных данных. Если элементы являются структурами с ключом и значением (satellite data), базовая сортировка просто уничтожит исходные объекты.
+                        </div>
+                    </section>
+
+                    <!-- 2. Стабильный вариант Counting Sort -->
+                    <section id="sec-stable-count" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Стабильная сортировка подсчетом (Stable Counting Sort)</span>
+                        <p>
+                            <strong>Стабильность:</strong> Элементы с равными ключами обязаны сохранить взаимный порядок следования, который был у них в исходном массиве.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Лекционный алгоритм с префиксными суммами:</strong>
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li>Заводим массив частот $P[0 \dots K-1]$ и выходной буфер $B[0 \dots n-1]$.</li>
+                            <li>Подсчитываем количество элементов каждого ключа: для каждого $x \in A$ делаем $P[x.\mathrm{key}]++$.</li>
+                            <li><strong>Префиксные суммы:</strong> Заменяем значения в $P$ их префиксными суммами:
+                                $$P[i] = P[i] + P[i - 1] \quad (\text{для } i \text{ от } 1 \text{ до } K - 1)$$
+                                Теперь $P[i]$ указывает общее число элементов с ключом $\le i$, то есть правую границу сегмента для ключа $i$ в выходном массиве $B$.
+                            </li>
+                            <li><strong>Проход справа налево (гарантия стабильности):</strong>
+                                Итерируемся по массиву $A$ в обратном порядке от $n-1$ до $0$:
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li>Берем элемент $x = A[i]$ с ключом $k = x.\mathrm{key}$.</li>
+                                    <li>Помещаем его на позицию $P[k] - 1$ в массиве $B$: $B[P[k] - 1] = x$.</li>
+                                    <li>Уменьшаем счетчик: $P[k]--$.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Почему справа налево?</strong> Элемент, стоящий правее всех среди дубликатов с ключом $k$, получит самый большой доступный индекс в группе ключа $k$, сохранив исходный порядок следования!
+                        </div>
+                    </section>
+
+                    <!-- 3. Алгоритм LSD Radix Sort -->
+                    <section id="sec-lsd-alg" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Алгоритм] Поразрядная сортировка LSD (Least Significant Digit)</span>
+                        <p>
+                            <strong>LSD Radix Sort</strong> позволяет сортировать целые беззнаковые числа (или строки одинаковой длины), выходящие за пределы малого диапазона, за <strong>строго линейное время $O(n)$</strong>.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Идея алгоритма:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>Представим каждое число в системе счисления с основанием $R$ (radix). Например, для 32-битных чисел удобно взять основание байта $R = 256 = 2^8$, тогда каждое число разбивается ровно на $d = 4$ разряда (байта).</li>
+                            <li>Сортируем числа последовательно по разрядам, двигаясь <strong>от младшего разряда к старшему</strong> (от 0-го байта к 3-му).</li>
+                            <li>На каждой из $d$ фаз сортировка по текущему разряду производится с помощью <strong>стабильной сортировки подсчетом</strong> (Stable Counting Sort) с размером алфавита $K = R$.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 4. Доказательство корректности LSD -->
+                    <section id="sec-lsd-proof" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема и Доказательство] Корректность LSD Radix Sort</span>
+                        <p>
+                            <strong>Теорема:</strong> После $d$ фаз стабильной сортировки подсчетом по разрядам от младшего к старшему массив будет полностью упорядочен.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство по математической индукции:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>База индукции ($i = 1$):</strong> После сортировки по 0-му (младшему) разряду все элементы упорядочены по своему младшему разряду.</li>
+                            <li><strong>Индукционный переход ($i - 1 \to i$):</strong>
+                                Предположим, что после $(i-1)$ шагов элементы массива упорядочены по своим младшим $i-1$ разрядам.
+                                <p style="margin-top: 4px;">
+                                    Рассмотрим шаг $i$, где происходит стабильная сортировка по $i$-му разряду. Пусть сравниваются два произвольных числа $x$ и $y$:
+                                </p>
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li><em>Случай 1:</em> У чисел разные $i$-е разряды. Тогда сортировка подсчетом на шаге $i$ расставит их в соответствии со значением $i$-го разряда. Так как более старший разряд важнее всех младших, порядок чисел корректен.</li>
+                                    <li><em>Случай 2:</em> У чисел одинаковые $i$-е разряды. В силу <strong>стабильности</strong> фазы сортировки их относительный порядок <em>не изменится</em>. А по предположению индукции их взаимный порядок уже был правильным по младшим $(i-1)$ разрядам!</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p style="margin-top: 8px;">
+                            Следовательно, после $d$ шагов числа будут полностью упорядочены по всем разрядам.
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные параметры Counting Sort и LSD</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Алгоритм</th>
+                                    <th style="padding: 6px 8px;">Время работы</th>
+                                    <th style="padding: 6px 8px;">Память</th>
+                                    <th style="padding: 6px 8px;">Стабильность</th>
+                                    <th style="padding: 6px 8px;">Ключевое применение</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Базовый Counting</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n + K)$</td>
+                                    <td style="padding: 6px 8px;">$O(K)$</td>
+                                    <td style="padding: 6px 8px;">Нет</td>
+                                    <td style="padding: 6px 8px;">Массив скаляров в малом диапазоне</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Стабильный Counting</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n + K)$</td>
+                                    <td style="padding: 6px 8px;">$O(n + K)$</td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">Да</strong></td>
+                                    <td style="padding: 6px 8px;">Сортировка объектов со спутниковыми данными</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>LSD Radix Sort</strong></td>
+                                    <td style="padding: 6px 8px;">$O(d(n + R)) = O(n)$</td>
+                                    <td style="padding: 6px 8px;">$O(n + R)$</td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">Да</strong></td>
+                                    <td style="padding: 6px 8px;">Быстрая сортировка 32/64-битных целых чисел</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация 4-байтового LSD Radix Sort на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">RadixSortLSD</span> {
+    <span class="tok-com">// Побайтовая сортировка LSD 32-битных беззнаковых чисел за 4 прохода</span>
+    <span class="tok-kw">void</span> <span class="tok-func">radixSort</span>(<span class="tok-kw">int</span>[] a) {
+        <span class="tok-kw">int</span> n = a.length;
+        <span class="tok-kw">int</span>[] buffer = <span class="tok-kw">new int</span>[n];
+        <span class="tok-kw">int</span> R = <span class="tok-num">256</span>; <span class="tok-com">// Основание: 1 байт = 8 бит (256 возможных значений)</span>
+
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> byteIdx = <span class="tok-num">0</span>; byteIdx &lt; <span class="tok-num">4</span>; byteIdx++) {
+            <span class="tok-kw">int</span> shift = byteIdx * <span class="tok-num">8</span>;
+            <span class="tok-kw">int</span>[] count = <span class="tok-kw">new int</span>[R];
+
+            <span class="tok-com">// 1. Подсчет частоты байта</span>
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; n; i++) {
+                <span class="tok-kw">int</span> b = (a[i] &gt;&gt;&gt; shift) &amp; <span class="tok-num">0xFF</span>;
+                count[b]++;
+            }
+
+            <span class="tok-com">// 2. Префиксные суммы (правые границы сегментов)</span>
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">1</span>; i &lt; R; i++) {
+                count[i] += count[i - <span class="tok-num">1</span>];
+            }
+
+            <span class="tok-com">// 3. Стабильное распределение: проход справа налево!</span>
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = n - <span class="tok-num">1</span>; i &gt;= <span class="tok-num">0</span>; i--) {
+                <span class="tok-kw">int</span> b = (a[i] &gt;&gt;&gt; shift) &amp; <span class="tok-num">0xFF</span>;
+                buffer[count[b] - <span class="tok-num">1</span>] = a[i];
+                count[b]--;
+            }
+
+            <span class="tok-com">// Копируем отсортированные данные обратно в массив a</span>
+            <span class="tok-type">System</span>.<span class="tok-func">arraycopy</span>(buffer, <span class="tok-num">0</span>, a, <span class="tok-num">0</span>, n);
+        }
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-simple-count" class="nav-item nav-def">1. Базовый Counting Sort</a>
+                        <a href="#sec-stable-count" class="nav-item nav-alg">2. Стабильный вариант</a>
+                        <a href="#sec-lsd-alg" class="nav-item nav-thm">3. Алгоритм LSD</a>
+                        <a href="#sec-lsd-proof" class="nav-item nav-proof">4. Доказательство по индукции</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
