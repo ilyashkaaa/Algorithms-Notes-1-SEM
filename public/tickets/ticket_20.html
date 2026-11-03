@@ -1,0 +1,260 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 20 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>BST: Порядковая статистика и LowerBound</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Расширение дерева полем размера поддерева size(x). Поиск $k$-й порядковой статистики и ранга ключа за $O(h)$. Операции LowerBound и UpperBound.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">20</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-tree-aug" class="nav-item nav-def">1. Аннотация деревьев: поле size</a>
+                        <a href="#sec-kth-stat" class="nav-item nav-alg">2. Поиск $k$-й порядковой статистики</a>
+                        <a href="#sec-rank" class="nav-item nav-thm">3. Ранг элемента Rank(x)</a>
+                        <a href="#sec-lowerbound" class="nav-item nav-proof">4. Операция LowerBound</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Аннотация деревьев: поле size -->
+                    <section id="sec-tree-aug" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Структура] Расширение дерева поиска полем size (Order Statistic Tree)</span>
+                        <p>
+                            В обычном бинарном дереве поиска нахождение $k$-го по величине элемента требует полного симметричного обхода (in-order) и занимает $O(n)$ времени.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            Чтобы выполнять поиск $k$-й порядковой статистики за <strong>время высоты дерева $O(h)$</strong> (а на сбалансированных деревьях за $O(\log n)$), каждый узел $x$ снабжается дополнительным полем <code>size</code>:
+                        </p>
+                        $$\mathrm{size}(x) = 1 + \mathrm{size}(x.\mathrm{left}) + \mathrm{size}(x.\mathrm{right}), \quad \text{где } \mathrm{size}(\mathrm{null}) = 0$$
+                        <div style="background: rgba(56,189,248,0.06); border-left: 3px solid #38bdf8; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Поддержка инварианта размера:</strong> Поле <code>size</code> легко пересчитывается при возврате из рекурсии во время операций $\mathrm{Insert}$ и $\mathrm{Erase}$ (а также при поворотах дерева), не ухудшая их асимптотику $O(h)$.
+                        </div>
+                    </section>
+
+                    <!-- 2. Поиск k-й порядковой статистики -->
+                    <section id="sec-kth-stat" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Поиск $k$-й порядковой статистики: getKth(x, k)</span>
+                        <p>
+                            Пусть требуется найти элемент с порядковым индексом $k$ (0-индексация: $0 \le k < n$). Находясь в узле $x$:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li>Вычисляем размер левого поддерева: $L = \mathrm{size}(x.\mathrm{left})$.
+                                Величина $L$ в точности равна количеству элементов в дереве $x$, которые строго меньше $x.\mathrm{key}$.
+                            </li>
+                            <li><strong>Ветвление:</strong>
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li><strong>Если $k < L$:</strong> Искомый элемент строго меньше $x.\mathrm{key}$ и лежит в левом поддереве.
+                                        Рекурсивно спускаемся влево с тем же $k$:
+                                        $$\mathrm{getKth}(x.\mathrm{left}, k)$$
+                                    </li>
+                                    <li><strong>Если $k == L$:</strong> В левом поддереве находится ровно $k$ элементов. Следовательно, сам текущий узел $x$ является искомой $k$-й порядковой статистикой! Возвращаем $x.\mathrm{key}$.</li>
+                                    <li><strong>Если $k > L$:</strong> Искомый элемент строго больше $x.\mathrm{key}$ и лежит в правом поддереве.
+                                        Мы уже отбросили $L$ элементов левого поддерева и сам узел $x$ (всего $L + 1$ элемент).
+                                        В правом поддереве нужно искать элемент с относительным индексом $k - L - 1$:
+                                        $$\mathrm{getKth}(x.\mathrm{right}, k - L - 1)$$
+                                    </li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <p style="margin-top: 6px; font-size: 13px;">
+                            Время работы алгоритма пропорционально длине пути от корня до целевого узла: <strong>$O(h)$</strong>.
+                        </p>
+                    </section>
+
+                    <!-- 3. Ранг элемента Rank(x) -->
+                    <section id="sec-rank" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Алгоритм] Ранг ключа в дереве: Rank(key)</span>
+                        <p>
+                            <strong>Ранг ключа $\mathrm{Rank}(\mathrm{key})$:</strong> Количество элементов в дереве, которые строго меньше заданного значения $\mathrm{key}$ (то есть порядковый номер элемента, если бы он находился в дереве).
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Алгоритм вычисления:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>Начинаем в корне с накапливаемым счетчиком $\mathrm{count} = 0$.</li>
+                            <li>Если текущий узел $\mathrm{null}$ — возвращаем $\mathrm{count}$.</li>
+                            <li>Если $\mathrm{key} \le x.\mathrm{key}$: искомый ключ не превосходит текущего узла, значит ни $x$, ни его правое поддерево не могут быть меньше $\mathrm{key}$ — просто идем влево ($x = x.\mathrm{left}$).</li>
+                            <li>Если $\mathrm{key} > x.\mathrm{key}$: весь левый ребенок и сам узел $x$ гарантированно меньше $\mathrm{key}$. Прибавляем к счетчику $\mathrm{size}(x.\mathrm{left}) + 1$ и идем вправо ($x = x.\mathrm{right}$).</li>
+                        </ul>
+                        <p style="margin-top: 6px; font-size: 13px;">
+                            Сложность: ровно один спуск от корня к листу за время <strong>$O(h)$</strong>.
+                        </p>
+                    </section>
+
+                    <!-- 4. LowerBound и UpperBound -->
+                    <section id="sec-lowerbound" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Алгоритм] Поиск LowerBound и UpperBound</span>
+                        <p>
+                            <strong>$\mathrm{LowerBound}(\mathrm{key})$:</strong> Поиск наименьшего элемента дерева, большего или равного $\mathrm{key}$ ($\min \{ y \in \mathrm{Tree} \mid y.\mathrm{key} \ge \mathrm{key} \}$).
+                        </p>
+                        <div style="background: rgba(255,255,255,0.03); border-left: 3px solid var(--accent-color); padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 13px;">
+                            <strong>Пошаговая логика LowerBound:</strong>
+                            <ol style="margin-left: 18px; margin-top: 4px;">
+                                <li>Храним указатель на лучший найденный кандидат: $\mathrm{ans} = \mathrm{null}$.</li>
+                                <li>Пока текущий узел $x \ne \mathrm{null}$:
+                                    <ul style="margin-left: 18px; margin-top: 2px;">
+                                        <li>Если $x.\mathrm{key} \ge \mathrm{key}$: узел $x$ подходит под условие! Запоминаем его: $\mathrm{ans} = x$, но в его <em>левом поддереве</em> могут найтись еще более близкие (меньшие) ключи, которые всё еще $\ge \mathrm{key}$ — идем влево: $x = x.\mathrm{left}$.</li>
+                                        <li>Если $x.\mathrm{key} < \mathrm{key}$: узел $x$ строго меньше $\mathrm{key}$ (и все его левое поддерево тем более меньше) — кандидатов здесь нет, идем вправо: $x = x.\mathrm{right}$.</li>
+                                    </ul>
+                                </li>
+                                <li>Возвращаем сохраненный $\mathrm{ans}$.</li>
+                            </ol>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 12.5px;">
+                            <em>Аналогично для $\mathrm{UpperBound}(\mathrm{key})$:</em> ищется строго больший элемент ($x.\mathrm{key} > \mathrm{key}$), логика спусков полностью совпадает с заменой условия на строгое неравенство.
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Операции расширенного BST</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Операция</th>
+                                    <th style="padding: 6px 8px;">Сложность</th>
+                                    <th style="padding: 6px 8px;">Требование к структуре</th>
+                                    <th style="padding: 6px 8px;">Результат</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>getKth(k)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(h)$</td>
+                                    <td style="padding: 6px 8px;">Поле size в узлах</td>
+                                    <td style="padding: 6px 8px;">Ключ с порядковым номером $k$</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Rank(key)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(h)$</td>
+                                    <td style="padding: 6px 8px;">Поле size в узлах</td>
+                                    <td style="padding: 6px 8px;">Число элементов строго меньших key</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>LowerBound(key)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(h)$</td>
+                                    <td style="padding: 6px 8px;">Только ключи (стандартный BST)</td>
+                                    <td style="padding: 6px 8px;">Минимальный элемент $\ge key$</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация Order Statistic Tree и LowerBound на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">OrderStatisticBST</span> {
+    <span class="tok-kw">static class</span> <span class="tok-type">Node</span> {
+        <span class="tok-kw">int</span> key;
+        <span class="tok-kw">int</span> size = <span class="tok-num">1</span>;
+        <span class="tok-type">Node</span> left, right;
+        <span class="tok-func">Node</span>(<span class="tok-kw">int</span> key) { <span class="tok-kw">this</span>.key = key; }
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> root = <span class="tok-kw">null</span>;
+
+    <span class="tok-kw">private int</span> <span class="tok-func">sz</span>(<span class="tok-type">Node</span> node) {
+        <span class="tok-kw">return</span> node == <span class="tok-kw">null</span> ? <span class="tok-num">0</span> : node.size;
+    }
+
+    <span class="tok-kw">private void</span> <span class="tok-func">updateSize</span>(<span class="tok-type">Node</span> node) {
+        <span class="tok-kw">if</span> (node != <span class="tok-kw">null</span>) {
+            node.size = <span class="tok-num">1</span> + <span class="tok-func">sz</span>(node.left) + <span class="tok-func">sz</span>(node.right);
+        }
+    }
+
+    <span class="tok-com">// Поиск k-й порядковой статистики (0 <= k < n) за O(h)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">getKth</span>(<span class="tok-kw">int</span> k) {
+        <span class="tok-type">Node</span> cur = root;
+        <span class="tok-kw">while</span> (cur != <span class="tok-kw">null</span>) {
+            <span class="tok-kw">int</span> leftSize = <span class="tok-func">sz</span>(cur.left);
+            <span class="tok-kw">if</span> (k == leftSize) {
+                <span class="tok-kw">return</span> cur.key;
+            } <span class="tok-kw">else if</span> (k &lt; leftSize) {
+                cur = cur.left;
+            } <span class="tok-kw">else</span> {
+                k -= (leftSize + <span class="tok-num">1</span>);
+                cur = cur.right;
+            }
+        }
+        <span class="tok-kw">throw new</span> <span class="tok-type">IndexOutOfBoundsException</span>();
+    }
+
+    <span class="tok-com">// Подсчет количества элементов < key за O(h)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">rank</span>(<span class="tok-kw">int</span> key) {
+        <span class="tok-type">Node</span> cur = root;
+        <span class="tok-kw">int</span> count = <span class="tok-num">0</span>;
+        <span class="tok-kw">while</span> (cur != <span class="tok-kw">null</span>) {
+            <span class="tok-kw">if</span> (key &lt;= cur.key) {
+                cur = cur.left;
+            } <span class="tok-kw">else</span> {
+                count += <span class="tok-func">sz</span>(cur.left) + <span class="tok-num">1</span>;
+                cur = cur.right;
+            }
+        }
+        <span class="tok-kw">return</span> count;
+    }
+
+    <span class="tok-com">// Поиск наименьшего элемента >= key за O(h)</span>
+    <span class="tok-type">Integer</span> <span class="tok-func">lowerBound</span>(<span class="tok-kw">int</span> key) {
+        <span class="tok-type">Node</span> cur = root;
+        <span class="tok-type">Node</span> candidate = <span class="tok-kw">null</span>;
+        <span class="tok-kw">while</span> (cur != <span class="tok-kw">null</span>) {
+            <span class="tok-kw">if</span> (cur.key &gt;= key) {
+                candidate = cur; <span class="tok-com">// Подходит, ищем еще меньший слева</span>
+                cur = cur.left;
+            } <span class="tok-kw">else</span> {
+                cur = cur.right; <span class="tok-com">// Мал, ищем больше справа</span>
+            }
+        }
+        <span class="tok-kw">return</span> candidate == <span class="tok-kw">null</span> ? <span class="tok-kw">null</span> : candidate.key;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-tree-aug" class="nav-item nav-def">1. Поле size</a>
+                        <a href="#sec-kth-stat" class="nav-item nav-alg">2. $k$-я статистика</a>
+                        <a href="#sec-rank" class="nav-item nav-thm">3. Ранг элемента Rank</a>
+                        <a href="#sec-lowerbound" class="nav-item nav-proof">4. Поиск LowerBound</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
