@@ -1,0 +1,233 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 26 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Разреженная таблица (Sparse Table)</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Область применимости: статический RMQ и идемпотентные полугруппы. Построение таблицы за $O(n \log n)$ через ДП степеней двойки. Ответ на диапазонный запрос за $O(1)$ через два перекрывающихся блока.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">26</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-st-applicability" class="nav-item nav-def">1. Область применимости</a>
+                        <a href="#sec-st-build" class="nav-item nav-alg">2. Построение таблицы (ДП)</a>
+                        <a href="#sec-st-query" class="nav-item nav-proof">3. Ответ на запрос за $O(1)$</a>
+                        <a href="#sec-non-idempotent" class="nav-item nav-thm">4. Неидемпотентные операции $O(\log n)$</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Область применимости -->
+                    <section id="sec-st-applicability" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Применимость] Область применимости Sparse Table</span>
+                        <p>
+                            <strong>Разреженная таблица (Sparse Table)</strong> предназначена для обслуживания диапазонных запросов на <strong>статических массивах</strong> (где элементы никогда не меняются).
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Ключевые алгебраические условия:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li><strong>Ассоциативность операции $\circ$:</strong> $(a \circ b) \circ c = a \circ (b \circ c)$. Необходима для корректности объединения блоков.</li>
+                            <li><strong>Идемпотентность операции $\circ$ ($x \circ x = x$):</strong>
+                                Позволяет отвечать на запрос за <strong>строго $O(1)$</strong>! Примеры:
+                                $$\min(x, x) = x \ (\mathrm{RMQ}), \quad \max(x, x) = x, \quad \gcd(x, x) = x, \quad (x \mid x) = x \ (\mathrm{bit\ OR})$$
+                            </li>
+                        </ul>
+                        <div style="background: rgba(248,113,113,0.06); border-left: 3px solid #f87171; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Почему массив обязан быть статическим:</strong> При точечной модификации элемента $A[i]$ необходимо пересчитать все покрывающие его блоки на всех уровнях. На уровне $k$ это $2^k$ ячеек, суммарно $\sum_{k=0}^{\log n} 2^k = O(n)$ времени на обновление! Поэтому любая динамика разрушает эффективность таблицы.
+                        </div>
+                    </section>
+
+                    <!-- 2. Построение таблицы -->
+                    <section id="sec-st-build" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Построение Sparse Table через ДП за $O(n \log n)$</span>
+                        <p>
+                            Определим двумерный массив $st[k][i]$ как результат операции на отрезке длины $2^k$, начинающемся в индексе $i$:
+                        </p>
+                        $$st[k][i] = \bigoplus_{j = i}^{i + 2^k - 1} A[j] \quad (\text{где } i + 2^k \le n)$$
+                        <div style="margin-top: 8px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">Динамическое программирование по степеням двойки:</h4>
+                            <ul style="margin-left: 20px; margin-top: 4px;">
+                                <li><strong>База ДП ($k = 0$):</strong> Блоки длины $2^0 = 1$ — это сами элементы массива:
+                                    $$st[0][i] = A[i] \quad \forall i \in [0, n - 1]$$
+                                </li>
+                                <li><strong>Переход ДП ($k - 1 \to k$):</strong> Блок длины $2^k$ разбивается на два соседних блока вдвое меньшей длины $2^{k-1}$:
+                                    $$st[k][i] = st[k - 1][i] \circ st[k - 1][i + 2^{k - 1}]$$
+                                </li>
+                            </ul>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 13px;">
+                            <strong>Сложность построения и память:</strong>
+                            Число уровней $K = \lfloor \log_2 n \rfloor + 1$. На каждом уровне вычисляется не более $n$ ячеек за константное время $O(1)$.
+                            Итого время построения: <strong>$O(n \log n)$</strong>, память: <strong>$O(n \log n)$</strong>.
+                        </p>
+                    </section>
+
+                    <!-- 3. Ответ на запрос за O(1) -->
+                    <section id="sec-st-query" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Алгоритм и Теорема] Ответ на идемпотентный запрос за $O(1)$</span>
+                        <p>
+                            Пусть требуется вычислить $\mathrm{RMQ}(l, r)$ на отрезке $[l, r]$ длины $\mathrm{len} = r - l + 1$.
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li>Находим максимальную степень двойки $k$, не превосходящую длину отрезка:
+                                $$k = \lfloor \log_2(\mathrm{len}) \rfloor = \lfloor \log_2(r - l + 1) \rfloor$$
+                                <em>Свойство:</em> $2^k \le \mathrm{len} < 2^{k+1}$.
+                            </li>
+                            <li>Берем два перекрывающихся блока длины $2^k$:
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li>Левый блок: начинается в $l$ $\implies [l, l + 2^k - 1] \implies st[k][l]$.</li>
+                                    <li>Правый блок: заканчивается в $r$ $\implies [r - 2^k + 1, r] \implies st[k][r - 2^k + 1]$.</li>
+                                </ul>
+                            </li>
+                            <li>Так как $2^k > \mathrm{len} / 2$, эти два блока полностью покрывают весь отрезок $[l, r]$!</li>
+                            <li><strong>Идемпотентность устраняет дублирование:</strong>
+                                Элементы на пересечении блоков учитываются дважды, но в силу идемпотентности $\min(A \cup B) = \min(\min(A), \min(B))$:
+                                $$\mathrm{ans} = \min\left(st[k][l], \ st[k][r - 2^k + 1]\right)$$
+                            </li>
+                        </ol>
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Время ответа:</strong> Вычисление $k$ занимает $O(1)$ (через предпосчитанную таблицу логарифмов или битовую операцию <code>31 - numberOfLeadingZeros(len)</code>), обращение к двум ячейкам таблицы — $O(1)$. Итого ответ на запрос за <strong>строго $O(1)$</strong>!
+                        </div>
+                    </section>
+
+                    <!-- 4. Неидемпотентные операции -->
+                    <section id="sec-non-idempotent" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Обобщение] Что делать, если операция не идемпотентна (например, сумма)?</span>
+                        <p>
+                            Для неидемпотентных операций (сложение, умножение матриц) перекрытие недопустимо: элементы на пересечении войдут в сумму повторно!
+                        </p>
+                        <p style="margin-top: 6px;">
+                            <strong>Решение через бинарное разложение:</strong>
+                            Длина любого отрезка $\mathrm{len}$ представляется суммой степеней двойки (своими единичными битами в двоичной записи):
+                            $$\mathrm{len} = 2^{k_1} + 2^{k_2} + \dots + 2^{k_m}, \quad m \le \log_2 n$$
+                            Отрезок разбивается на $m$ непересекающихся блоков, которые последовательно объединяются слева направо.
+                        </p>
+                        <p style="margin-top: 6px; font-size: 12.5px; opacity: 0.9;">
+                            Время ответа составит $O(\log n)$. Однако для статических сумм гораздо эффективнее использовать префиксные суммы ($O(1)$ запрос и $O(n)$ память), а для динамических ассоциативных операций — дерево отрезков.
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные параметры Sparse Table</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Характеристика</th>
+                                    <th style="padding: 6px 8px;">Значение</th>
+                                    <th style="padding: 6px 8px;">Комментарий</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Время построения</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 8px;">$\log n$ слоев по $n$ элементов через ДП</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Память</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 8px;">Таблица размера $[\log n + 1][n]$</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Время RMQ (минимум/максимум/GCD)</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(1)$</strong></td>
+                                    <td style="padding: 6px 8px;">Два перекрывающихся блока длины $2^k$</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Поддержка модификаций</strong></td>
+                                    <td style="padding: 6px 8px;">Нет ($O(n)$)</td>
+                                    <td style="padding: 6px 8px;">Строго статический массив</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация Sparse Table для RMQ на Java++ ($O(1)$ запрос)
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">SparseTableRMQ</span> {
+    <span class="tok-kw">private int</span>[][] st;
+    <span class="tok-kw">private int</span>[] lg;
+
+    <span class="tok-func">SparseTableRMQ</span>(<span class="tok-kw">int</span>[] a) {
+        <span class="tok-kw">int</span> n = a.length;
+        <span class="tok-com">// Предподсчет логарифмов за O(n)</span>
+        lg = <span class="tok-kw">new int</span>[n + <span class="tok-num">1</span>];
+        lg[<span class="tok-num">1</span>] = <span class="tok-num">0</span>;
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">2</span>; i &lt;= n; i++) {
+            lg[i] = lg[i / <span class="tok-num">2</span>] + <span class="tok-num">1</span>;
+        }
+
+        <span class="tok-kw">int</span> maxLog = lg[n] + <span class="tok-num">1</span>;
+        st = <span class="tok-kw">new int</span>[maxLog][n];
+
+        <span class="tok-com">// База ДП: блоки длины 2^0 = 1</span>
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; n; i++) {
+            st[<span class="tok-num">0</span>][i] = a[i];
+        }
+
+        <span class="tok-com">// Переход ДП: объединение двух блоков размера 2^(k-1)</span>
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> k = <span class="tok-num">1</span>; k &lt; maxLog; k++) {
+            <span class="tok-kw">int</span> len = <span class="tok-num">1</span> &lt;&lt; (k - <span class="tok-num">1</span>);
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i + (<span class="tok-num">1</span> &lt;&lt; k) &lt;= n; i++) {
+                st[k][i] = <span class="tok-type">Math</span>.<span class="tok-func">min</span>(st[k - <span class="tok-num">1</span>][i], st[k - <span class="tok-num">1</span>][i + len]);
+            }
+        }
+    }
+
+    <span class="tok-com">// Запрос минимума на отрезке [l, r] за строго O(1)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">queryMin</span>(<span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">int</span> len = r - l + <span class="tok-num">1</span>;
+        <span class="tok-kw">int</span> k = lg[len];
+        <span class="tok-kw">return</span> <span class="tok-type">Math</span>.<span class="tok-func">min</span>(st[k][l], st[k][r - (<span class="tok-num">1</span> &lt;&lt; k) + <span class="tok-num">1</span>]);
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-st-applicability" class="nav-item nav-def">1. Область применимости</a>
+                        <a href="#sec-st-build" class="nav-item nav-alg">2. Построение (ДП)</a>
+                        <a href="#sec-st-query" class="nav-item nav-proof">3. Ответ на запрос $O(1)$</a>
+                        <a href="#sec-non-idempotent" class="nav-item nav-thm">4. Неидемпотентные операции</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
