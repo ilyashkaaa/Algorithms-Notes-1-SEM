@@ -1,0 +1,252 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 03 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Префиксные суммы и обобщения</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Классические префиксные суммы. Обобщение на обратимые операции (группы) и ассоциативные необратимые операции (полугруппы).
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">03</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-classic-pref" class="nav-item nav-def">1. Классические суммы</a>
+                        <a href="#sec-group" class="nav-item nav-thm">2. Обратимые операции (Группы)</a>
+                        <a href="#sec-semigroup" class="nav-item nav-alg">3. Полугруппы (без обратного)</a>
+                        <a href="#sec-proof" class="nav-item nav-proof">4. Корректность и свойства</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Классические префиксные суммы -->
+                    <section id="sec-classic-pref" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Классические префиксные суммы</span>
+                        <p>
+                            Пусть дан числовой массив $A[0 \dots n-1]$. Массив <strong>префиксных сумм</strong> $P[0 \dots n]$ размера $n+1$ определяется соотношением:
+                        </p>
+                        $$P[0] = 0, \qquad P[k] = \sum_{i=0}^{k-1} A[i] \quad (1 \le k \le n)$$
+                        <p style="margin-top: 8px;">
+                            <strong>Построение (за один проход за $O(n)$):</strong>
+                            $$P[k] = P[k-1] + A[k-1]$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Ответ на запрос суммы на подотрезке $[L, R]$ за $O(1)$:</strong>
+                            $$\sum_{i=L}^{R} A[i] = P[R+1] - P[L]$$
+                        </p>
+                    </section>
+
+                    <!-- Идея вычитания префиксов -->
+                    <div class="vcard vcard-geo">
+                        <span class="vcard-title-pill">♦ Геометрическая идея принципа включений-исключений</span>
+                        <p style="font-size: 13.5px;">
+                            Сумма на подотрезке $[L, R]$ представляет собой разность двух вложенных префиксов: префикса длины $R+1$ (включает всё от начала до $R$) за вычетом лишнего начального префикса длины $L$ (включает элементы от $0$ до $L-1$).
+                        </p>
+                    </div>
+
+                    <!-- 2. Обобщение на обратимую операцию (Группы) -->
+                    <section id="sec-group" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теорема] Обобщение на произвольную обратимую операцию (Алгебраическая группа)</span>
+                        <p>
+                            Пусть на множестве $G$ задана бинарная операция $\circ$, образующая <strong>группу</strong> $\langle G, \circ, e, ^{-1} \rangle$:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>Ассоциативность:</strong> $(a \circ b) \circ c = a \circ (b \circ c)$.</li>
+                            <li><strong>Нейтральный элемент $e$:</strong> $\forall a \in G \implies a \circ e = e \circ a = a$.</li>
+                            <li><strong>Обратимость:</strong> $\forall a \in G \; \exists a^{-1} \in G$ такой, что $a \circ a^{-1} = a^{-1} \circ a = e$.</li>
+                        </ol>
+                        <p style="margin-top: 10px;">
+                            Определим массив префиксных произведений:
+                            $$P[0] = e, \qquad P[k] = P[k-1] \circ A[k-1] = A[0] \circ A[1] \circ \dots \circ A[k-1]$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            Тогда результат на отрезке $[L, R]$ вычисляется за $O(1)$ через умножение на обратный элемент:
+                            $$\prod_{i=L}^R A[i] = (P[L])^{-1} \circ P[R+1]$$
+                        </p>
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px 14px; margin-top: 10px; font-size: 13px;">
+                            <strong>Важнейшие примеры групп:</strong>
+                            <ul style="margin-left: 18px; margin-top: 4px;">
+                                <li><strong>Побитовый XOR ($\oplus$):</strong> Обратным к $x$ является сам элемент $x$ ($x \oplus x = 0$). Запрос XOR на отрезке $[L, R]$: $P[R+1] \oplus P[L]$ за $O(1)$.</li>
+                                <li><strong>Умножение по модулю простого числа $p$ в $\mathbb{F}_p^*$:</strong> Обратный элемент вычисляется за $O(\log p)$ через МТФ: $x^{-1} = x^{p-2} \pmod p$.</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- 3. Обобщение на произвольную ассоциативную операцию (Полугруппы) -->
+                    <section id="sec-semigroup" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритмы] Обобщение на необратимые ассоциативные операции (Полугруппы)</span>
+                        <p>
+                            Если операция $\circ$ ассоциативна, но <strong>необратима</strong> (полугруппа $\langle S, \circ \rangle$, например $\min, \max, \gcd$, умножение прямоугольных матриц), то «вычесть» префикс невозможно.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            Для вычисления запросов на подотрезках применяются следующие методы:
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Случай 1: Операция идемпотентна ($x \circ x = x$, например $\min, \max, \gcd$):</strong>
+                                <br>Применяется структура <strong>Sparse Table (Разреженная таблица)</strong>: предподсчет за $O(n \log n)$, ответ на любой запрос за $O(1)$ через объединение двух перекрывающихся подотрезков длины $2^k$.
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                <strong>Случай 2: Общая полугруппа (не идемпотентна, например умножение матриц):</strong>
+                                <br>Применяется <strong>Дерево отрезков (Segment Tree)</strong>: построение за $O(n)$, ответ на запрос на произвольном отрезке $[L, R]$ за $O(\log n)$.
+                            </li>
+                            <li>
+                                <strong>Случай 3: Блочные префиксы и суффиксы (корневая эвристика):</strong>
+                                <br>Массив разбивается на блоки размера $B = \sqrt{n}$. Для каждого блока считаются префиксные и суффиксные произведения: $pref[i]$ и $suff[i]$. Запрос, пересекающий границы блоков, вычисляется комбинированием суффикса левого блока, промежуточных блоков и префикса правого блока:
+                                $$A[L \dots R] = suff[L] \circ (\text{полные блоки}) \circ pref[R]$$
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- 4. Корректность и свойства -->
+                    <section id="sec-proof" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Доказательство] Корректность вычисления через обратный элемент</span>
+                        <p>
+                            Докажем, что $(P[L])^{-1} \circ P[R+1] = A[L] \circ \dots \circ A[R]$.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            По определению: $P[R+1] = A[0] \circ \dots \circ A[L-1] \circ A[L] \circ \dots \circ A[R] = P[L] \circ \left(\prod_{i=L}^R A[i]\right)$.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            Домножим обе части равенства слева на $(P[L])^{-1}$:
+                            $$(P[L])^{-1} \circ P[R+1] = (P[L])^{-1} \circ \left( P[L] \circ \prod_{i=L}^R A[i] \right)$$
+                            В силу ассоциативности переставим скобки:
+                            $$(P[L])^{-1} \circ P[R+1] = \left( (P[L])^{-1} \circ P[L] \right) \circ \prod_{i=L}^R A[i] = e \circ \prod_{i=L}^R A[i] = \prod_{i=L}^R A[i] \quad \blacksquare$$
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ К БИЛЕТУ
+                         ===================================================== -->
+
+                    <div id="sec-extra" class="extra-divider-banner">
+                        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Часть II: Дополнительные материалы к билету
+                        </div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">
+                            Summary билета и реализация на Java++
+                        </div>
+                    </div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">★ Summary билета (ключевые факты)</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Сравнительная таблица структур для запросов на подотрезках:</strong>
+                                <div style="overflow-x: auto; margin-top: 6px;">
+                                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1.5px solid var(--border-color); color: var(--text-muted);">
+                                                <th style="padding: 6px 8px;">Алгебраическая структура</th>
+                                                <th style="padding: 6px 8px;">Примеры операций</th>
+                                                <th style="padding: 6px 8px;">Метод решения</th>
+                                                <th style="padding: 6px 8px;">Время запроса</th>
+                                                <th style="padding: 6px 8px;">Время построения</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Абелева группа</td>
+                                                <td style="padding: 6px 8px;">$+, \oplus$ (XOR)</td>
+                                                <td style="padding: 6px 8px;">Префиксные суммы</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Идемпотентная полугруппа</td>
+                                                <td style="padding: 6px 8px;">$\min, \max, \gcd$</td>
+                                                <td style="padding: 6px 8px;">Sparse Table</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                                <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Произвольная полугруппа</td>
+                                                <td style="padding: 6px 8px;">Умножение матриц</td>
+                                                <td style="padding: 6px 8px;">Дерево отрезков</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Реализация на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация префиксных сумм и префиксного XOR на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">PrefixSum</span> {
+    <span class="tok-kw">long</span>[] pref;
+
+    <span class="tok-type">PrefixSum</span>(<span class="tok-kw">int</span>[] arr, <span class="tok-kw">int</span> n) {
+        pref = <span class="tok-kw">new</span> <span class="tok-kw">long</span>[n + <span class="tok-num">1</span>];
+        pref[<span class="tok-num">0</span>] = <span class="tok-num">0</span>;
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; n; i++) {
+            pref[i + <span class="tok-num">1</span>] = pref[i] + arr[i]; <span class="tok-com">// O(n) построение</span>
+        }
+    }
+
+    <span class="tok-com">// Сумма на отрезке [l, r] за O(1)</span>
+    <span class="tok-kw">long</span> <span class="tok-func">query</span>(<span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">return</span> pref[r + <span class="tok-num">1</span>] - pref[l];
+    }
+}
+
+<span class="tok-kw">class</span> <span class="tok-type">PrefixXor</span> {
+    <span class="tok-kw">int</span>[] pref;
+
+    <span class="tok-type">PrefixXor</span>(<span class="tok-kw">int</span>[] arr, <span class="tok-kw">int</span> n) {
+        pref = <span class="tok-kw">new</span> <span class="tok-kw">int</span>[n + <span class="tok-num">1</span>];
+        pref[<span class="tok-num">0</span>] = <span class="tok-num">0</span>;
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; n; i++) {
+            pref[i + <span class="tok-num">1</span>] = pref[i] ^ arr[i];
+        }
+    }
+
+    <span class="tok-com">// XOR на отрезке [l, r] за O(1)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">query</span>(<span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">return</span> pref[r + <span class="tok-num">1</span>] ^ pref[l];
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-classic-pref" class="nav-item nav-def">1. Префиксные суммы</a>
+                        <a href="#sec-group" class="nav-item nav-thm">2. Обратимые (Группы)</a>
+                        <a href="#sec-semigroup" class="nav-item nav-alg">3. Полугруппы</a>
+                        <a href="#sec-proof" class="nav-item nav-proof">4. Доказательство</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
