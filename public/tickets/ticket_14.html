@@ -1,0 +1,254 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 14 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Детерминированный поиск порядковой статистики</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Алгоритм поиска $k$-й порядковой статистики с использованием медианы медиан. Гарантия худшего времени $O(n)$ методом математической индукции. Анализ пространственной сложности.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">14</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-select-def" class="nav-item nav-def">1. Постановка задачи</a>
+                        <a href="#sec-select-alg" class="nav-item nav-alg">2. Алгоритм с медианой медиан</a>
+                        <a href="#sec-select-complexity" class="nav-item nav-thm">3. Оценка худшего времени $O(n)$</a>
+                        <a href="#sec-memory" class="nav-item nav-geo">4. Анализ памяти $O(\log n)$</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Постановка задачи -->
+                    <section id="sec-select-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Постановка задачи] Детерминированный линейный выбор</span>
+                        <p>
+                            <strong>Входные данные:</strong> Массив $A[0 \dots n-1]$ из $n$ сравнимых элементов и целое число $k$ ($0 \le k < n$).
+                        </p>
+                        <p style="margin-top: 4px;">
+                            <strong>Цель:</strong> Найти $k$-ю порядковую статистику (элемент, который находился бы на позиции $k$, если бы массив был отсортирован).
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Проблема рандомизированного QuickSelect:</strong> При неудачном выборе опорных элементов рандомизированный выбор работает за худшее время $O(n^2)$. Задача — построить <strong>строго детерминированный алгоритм</strong>, гарантирующий работу за время $O(n)$ в абсолютно наихудшем случае.
+                        </p>
+                    </section>
+
+                    <!-- 2. Алгоритм с медианой медиан -->
+                    <section id="sec-select-alg" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Детерминированный Select (с медианой медиан)</span>
+                        <p>
+                            Алгоритм $\mathrm{DeterministicSelect}(A, l, r, k)$ для поиска на отрезке $[l, r]$:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>База:</strong> Если длина отрезка $n = r - l + 1 \le 5$, сортируем отрезок на месте вставками и сразу возвращаем элемент $A[k]$ за $O(1)$.</li>
+                            <li><strong>Вычисление пивота (медианы медиан):</strong>
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li>Разбиваем отрезок на $\lceil n/5 \rceil$ блоков по 5 элементов.</li>
+                                    <li>Сортируем каждую пятерку за константное время и помещаем ее медиану в начало отрезка (in-place сборка медиан).</li>
+                                    <li>Рекурсивно находим медиану массива собранных медиан:
+                                        $$M = \mathrm{DeterministicSelect}\left(A, l, l + \lceil n/5 \rceil - 1, l + \lfloor \lceil n/5 \rceil / 2 \rfloor\right)$$
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><strong>Разбиение Partition:</strong> Выполняем процедуру разбиения массива $[l, r]$ по значению $M$. Пусть элемент $M$ встал на индекс $m$.</li>
+                            <li><strong>Шаг ветвления:</strong>
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li>Если $m = k$, опорный элемент $M$ занял свою окончательную позицию — возвращаем $A[m]$.</li>
+                                    <li>Если $k < m$, искомый элемент меньше $M$ — рекурсивно запускаемся от левой части: $\mathrm{DeterministicSelect}(A, l, m - 1, k)$.</li>
+                                    <li>Если $k > m$, искомый элемент больше $M$ — рекурсивно запускаемся от правой части: $\mathrm{DeterministicSelect}(A, m + 1, r, k)$.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </section>
+
+                    <!-- 3. Оценка худшего времени -->
+                    <section id="sec-select-complexity" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теорема и Доказательство] Линейная сложность в худшем случае</span>
+                        <p>
+                            <strong>Теорема:</strong> Алгоритм детерминированного выбора порядковой статистики с медианой медиан работает за время $O(n)$ в абсолютно худшем случае.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство:</strong>
+                            Время работы $T(n)$ складывается из четырех компонент:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 4px;">
+                            <li>Разбиение на пятерки и поиск их медиан: $\le c_1 n$.</li>
+                            <li>Рекурсивный поиск медианы среди $n/5$ медиан: $T(n/5)$.</li>
+                            <li>Процедура разбиения Partition на отрезке длины $n$: $\le c_2 n$.</li>
+                            <li>Рекурсивный поиск на следующем шаге: так как медиана медиан гарантированно превосходит не менее $3n/10$ элементов и не превосходит не менее $3n/10$ элементов, размер оставшейся подзадачи не превышает $\frac{7n}{10}$. Время этого шага: $T(7n/10)$.</li>
+                        </ol>
+                        <p style="margin-top: 8px;">
+                            Объединяя константы $c = c_1 + c_2$, получаем рекуррентность:
+                        </p>
+                        $$T(n) \le T\left(\frac{n}{5}\right) + T\left(\frac{7n}{10}\right) + cn$$
+                        <p style="margin-top: 6px;">
+                            Методом математической индукции с гипотезой $T(n) \le 10 c n$:
+                        </p>
+                        $$T(n) \le 10 c \left(\frac{n}{5}\right) + 10 c \left(\frac{7n}{10}\right) + cn = 2 c n + 7 c n + cn = 10 c n$$
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            Так как сумма коэффициентов $\frac{1}{5} + \frac{7}{10} = \frac{9}{10} < 1$, рекуррентное дерево сжимается экспоненциально, гарантируя строгое время $O(n)$ без вероятностных оговорок.
+                        </div>
+                    </section>
+
+                    <!-- 4. Память -->
+                    <section id="sec-memory" class="vcard vcard-geo">
+                        <span class="vcard-title-pill">[Память] Анализ пространственной сложности</span>
+                        <p>
+                            <strong>Дополнительная память алгоритма:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>Память под массив:</strong> При in-place перестановке медиан пятерок в начало рабочего диапазона дополнительная динамическая память не требуется: $O(1)$.</li>
+                            <li><strong>Стек вызовов:</strong> Рекурсивный спуск состоит из двух типов вызовов: первый вызов (нахождение медианы медиан) уменьшает размер задачи в 5 раз, а второй (спуск в нужную часть после Partition) уменьшает размер задачи как минимум в $10/7$ раз.</li>
+                            <li>Следовательно, максимальная глубина дерева вызовов ограничена $O(\log n)$, и требуемая память стека составляет <strong>$O(\log n)$</strong>.</li>
+                        </ul>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводная таблица алгоритмов поиска порядковой статистики</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Алгоритм</th>
+                                    <th style="padding: 6px 8px;">Среднее время</th>
+                                    <th style="padding: 6px 8px;">Худшее время</th>
+                                    <th style="padding: 6px 8px;">Доп. память</th>
+                                    <th style="padding: 6px 8px;">Детерминированность</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Полная сортировка</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 8px;">$O(1)$ или $O(n)$</td>
+                                    <td style="padding: 6px 8px;">Детерминирован</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Randomized QuickSelect</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(n)$</strong></td>
+                                    <td style="padding: 6px 8px; color: #f87171;">$O(n^2)$</td>
+                                    <td style="padding: 6px 8px;">$O(1)$</td>
+                                    <td style="padding: 6px 8px;">Рандомизирован, малая константа</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Детерминированный Select (Медиана медиан)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(n)$</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$ стек</td>
+                                    <td style="padding: 6px 8px;"><strong>Строго детерминирован в худшем случае</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация детерминированного поиска $k$-й статистики на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">DeterministicSelect</span> {
+    <span class="tok-com">// Поиск k-й порядковой статистики на отрезке [l, r] за гарантированное O(n)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">select</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r, <span class="tok-kw">int</span> k) {
+        <span class="tok-kw">while</span> (r - l + <span class="tok-num">1</span> &gt; <span class="tok-num">5</span>) {
+            <span class="tok-com">// 1. Находим медиану медиан</span>
+            <span class="tok-kw">int</span> numMedians = <span class="tok-num">0</span>;
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l; i &lt;= r; i += <span class="tok-num">5</span>) {
+                <span class="tok-kw">int</span> subR = <span class="tok-type">Math</span>.<span class="tok-func">min</span>(i + <span class="tok-num">4</span>, r);
+                <span class="tok-func">insertionSort</span>(a, i, subR);
+                <span class="tok-kw">int</span> medianIdx = i + (subR - i) / <span class="tok-num">2</span>;
+                <span class="tok-func">swap</span>(a, l + numMedians, medianIdx);
+                numMedians++;
+            }
+
+            <span class="tok-com">// Рекурсивно находим пивот M среди собранных медиан</span>
+            <span class="tok-kw">int</span> pivot = <span class="tok-func">select</span>(a, l, l + numMedians - <span class="tok-num">1</span>, l + numMedians / <span class="tok-num">2</span>);
+
+            <span class="tok-com">// 2. Partition вокруг pivot M</span>
+            <span class="tok-kw">int</span> m = <span class="tok-func">partitionValue</span>(a, l, r, pivot);
+
+            <span class="tok-com">// 3. Сужение рабочего диапазона</span>
+            <span class="tok-kw">if</span> (m == k) {
+                <span class="tok-kw">return</span> a[m];
+            } <span class="tok-kw">else if</span> (k &lt; m) {
+                r = m - <span class="tok-num">1</span>;
+            } <span class="tok-kw">else</span> {
+                l = m + <span class="tok-num">1</span>;
+            }
+        }
+
+        <span class="tok-com">// Для остатка <= 5 сортируем вставками</span>
+        <span class="tok-func">insertionSort</span>(a, l, r);
+        <span class="tok-kw">return</span> a[k];
+    }
+
+    <span class="tok-kw">int</span> <span class="tok-func">partitionValue</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r, <span class="tok-kw">int</span> pivot) {
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l; i &lt;= r; i++) {
+            <span class="tok-kw">if</span> (a[i] == pivot) { <span class="tok-func">swap</span>(a, i, r); <span class="tok-kw">break</span>; }
+        }
+        <span class="tok-kw">int</span> m = l;
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l; i &lt; r; i++) {
+            <span class="tok-kw">if</span> (a[i] &lt; pivot) { <span class="tok-func">swap</span>(a, m, i); m++; }
+        }
+        <span class="tok-func">swap</span>(a, m, r);
+        <span class="tok-kw">return</span> m;
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">insertionSort</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l + <span class="tok-num">1</span>; i &lt;= r; i++) {
+            <span class="tok-kw">int</span> cur = a[i], j = i - <span class="tok-num">1</span>;
+            <span class="tok-kw">while</span> (j &gt;= l &amp;&amp; a[j] &gt; cur) {
+                a[j + <span class="tok-num">1</span>] = a[j];
+                j--;
+            }
+            a[j + <span class="tok-num">1</span>] = cur;
+        }
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">swap</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> i, <span class="tok-kw">int</span> j) {
+        <span class="tok-kw">int</span> tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-select-def" class="nav-item nav-def">1. Постановка задачи</a>
+                        <a href="#sec-select-alg" class="nav-item nav-alg">2. Алгоритм с медианой</a>
+                        <a href="#sec-select-complexity" class="nav-item nav-thm">3. Оценка худшего времени $O(n)$</a>
+                        <a href="#sec-memory" class="nav-item nav-geo">4. Анализ памяти $O(\log n)$</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
