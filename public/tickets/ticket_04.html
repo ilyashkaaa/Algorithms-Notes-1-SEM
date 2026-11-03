@@ -1,0 +1,279 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 04 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Факторизация, функция Эйлера и арифметика в $\mathbb{Z}_m$</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Факторизация за $O(\sqrt{n})$. Функция Эйлера $\varphi(n)$. Арифметика в $\mathbb{Z}_m$, МТФ, теорема Эйлера и поиск обратного элемента.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">04</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-factor" class="nav-item nav-alg">1. Факторизация числа</a>
+                        <a href="#sec-euler" class="nav-item nav-def">2. Функция Эйлера $\varphi(n)$</a>
+                        <a href="#sec-zm" class="nav-item nav-def">3. Арифметика в $\mathbb{Z}_m$</a>
+                        <a href="#sec-theorems" class="nav-item nav-thm">4. МТФ и теорема Эйлера</a>
+                        <a href="#sec-inverse" class="nav-item nav-proof">5. Поиск обратного элемента</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Факторизация числа -->
+                    <section id="sec-factor" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Факторизация числа за $O(\sqrt{n})$</span>
+                        <p>
+                            По основной теореме арифметики любое целое число $n > 1$ единственным образом представляется в виде канонического произведения простых сомножителей:
+                            $$n = p_1^{a_1} \cdot p_2^{a_2} \cdots p_k^{a_k}, \quad p_1 < p_2 < \dots < p_k, \; a_i \ge 1$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Лемма о наименьшем делителе:</strong> Если у числа $n$ есть делитель $d > 1$, то наименьший нетривиальный делитель является простым и не превосходит $\lfloor \sqrt{n} \rfloor$.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            <em>Алгоритм:</em> Перебираем потенциальные делители $d$ от $2$ до $\lfloor \sqrt{n} \rfloor$. Если $d$ делит $n$, делим $n$ на $d$ до тех пор, пока оно делится, подсчитывая степень $a_i$. Если после цикла $n > 1$, оставшееся значение само является простым множителем в первой степени.
+                            $$\text{Временная сложность: } O(\sqrt{n}), \quad \text{Память: } O(1)$$
+                        </p>
+                    </section>
+
+                    <!-- 2. Функция Эйлера -->
+                    <section id="sec-euler" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Функция Эйлера $\varphi(n)$</span>
+                        <p>
+                            <strong>Функцией Эйлера $\varphi(n)$</strong> называется количество натуральных чисел от $1$ до $n$, взаимно простых с $n$:
+                            $$\varphi(n) = \big| \{ k \in \mathbb{N} \mid 1 \le k \le n, \; \gcd(k, n) = 1 \} \big|$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Базовые свойства:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>Для простого $p$: $\varphi(p) = p - 1$ (все числа $1, \dots, p-1$ взаимно просты с $p$).</li>
+                            <li>Для степени простого $p^a$: Числами от $1$ до $p^a$, не взаимно простыми с $p^a$, являются числа, кратные $p$: $1p, 2p, \dots, p^{a-1}p$. Их ровно $p^{a-1}$. Следовательно:
+                                $$\varphi(p^a) = p^a - p^{a-1} = p^a \left(1 - \frac{1}{p}\right)$$
+                            </li>
+                            <li><strong>Мультипликативность:</strong> Если $\gcd(a, b) = 1$, то $\varphi(ab) = \varphi(a) \cdot \varphi(b)$.</li>
+                        </ul>
+                        <div style="background: var(--bg-surface); border: 1.5px solid var(--card-def); border-radius: 6px; padding: 10px 14px; margin-top: 10px;">
+                            <strong>Сводимость к факторизации:</strong> Зная факторизацию $n = \prod_{i=1}^k p_i^{a_i}$, по мультипликативности получаем точную аналитическую формулу:
+                            $$\varphi(n) = \prod_{i=1}^k \varphi(p_i^{a_i}) = \prod_{i=1}^k p_i^{a_i}\left(1 - \frac{1}{p_i}\right) = n \prod_{p \mid n} \left(1 - \frac{1}{p}\right)$$
+                            <em>Сложность вычисления:</em> $O(\sqrt{n})$ времени (параллельно с факторизацией) и $O(1)$ памяти.
+                        </div>
+                    </section>
+
+                    <!-- 3. Арифметика в Z_m -->
+                    <section id="sec-zm" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Кольцо $\mathbb{Z}_m$ и обратимость (из лекции)</span>
+                        <p>
+                            <strong>Определение кольца (интуитивное из лекции):</strong> Набор из множества «чисел» и операций сложения и умножения, для которых верны классические свойства (ассоциативность, коммутативность, дистрибутивность), однако нет обратимости по умножению (нельзя делить).
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Кольцо $\mathbb{Z}_m$:</strong> Структура над числами $\{0, 1, \dots, m-1\}$, где все операции ведутся по модулю $m$.
+                        </p>
+                        <div class="vcard vcard-geo" style="margin: 8px 0;">
+                            <strong>Пример из лекции ($\mathbb{Z}_6$):</strong> Числа $\{0, 1, 2, 3, 4, 5\}$. Вычислим $5 \cdot 4 + 3 \cdot 2$:<br>
+                            $5 \cdot 4 = 20 \equiv 2 \pmod 6$, а $3 \cdot 2 = 6 \equiv 0 \pmod 6$, откуда результат равен $2$ в $\mathbb{Z}_6$.
+                        </div>
+                        <p style="margin-top: 8px;">
+                            <strong>Отрицательное число в $\mathbb{Z}_m$:</strong>
+                            $$-b = \begin{cases} 0, & b = 0 \\ m - b, & b \ne 0 \end{cases}$$
+                            Например, вычитание $2 - 4$ в $\mathbb{Z}_6$ интерпретируется как $2 + (-4) = 2 + (6 - 4) = 2 + 2 = 4$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Деление в $\mathbb{Z}_m$:</strong> По определению $a^{-1} = b$ в $\mathbb{Z}_m \iff a \cdot b \equiv 1 \pmod m$.
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>В $\mathbb{Z}_5$: $3^{-1} = 2$, так как $3 \cdot 2 = 6 \equiv 1 \pmod 5$.</li>
+                            <li>В $\mathbb{Z}_6$: для любого $k$ произведение $3 \cdot k \pmod 6 \in \{0, 3\} \ne 1$, то есть обратного к $3$ в $\mathbb{Z}_6$ <em>не существует</em>.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 4. МТФ и теорема Эйлера -->
+                    <section id="sec-theorems" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теоремы] Малая теорема Ферма и теорема Эйлера (б/д)</span>
+                        <p><strong>1. Теорема Эйлера:</strong> Пусть $m \in \mathbb{N}$, $a \in \mathbb{Z}$ и $\gcd(a, m) = 1$. Тогда:</p>
+                        $$a^{\varphi(m)} \equiv 1 \pmod m$$
+                        <p style="margin-top: 8px;"><strong>2. Малая теорема Ферма (частный случай при простом $m = p$):</strong> Пусть $p$ — простое число, $\gcd(a, p) = 1$. Так как $\varphi(p) = p - 1$, то:</p>
+                        $$a^{p-1} \equiv 1 \pmod p \implies a^p \equiv a \pmod p$$
+                    </section>
+
+                    <!-- 5. Поиск обратного по модулю -->
+                    <section id="sec-inverse" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Методы] Поиск обратного элемента по модулю</span>
+                        
+                        <p><strong>Метод 1: Через теорему Эйлера / МТФ (бинарное возведение в степень):</strong></p>
+                        <p style="font-size: 13.5px; margin-top: 4px;">
+                            Так как $a \cdot a^{\varphi(m) - 1} \equiv a^{\varphi(m)} \equiv 1 \pmod m$, то обратный элемент равен:
+                            $$a^{-1} \equiv a^{\varphi(m) - 1} \pmod m$$
+                            Если модуль $p$ — простое число:
+                            $$a^{-1} \equiv a^{p - 2} \pmod p$$
+                            Вычисляется за $O(\log m)$ умножений алгоритмом быстрого бинарного возведения в степень.
+                        </p>
+                        <hr style="border: none; border-top: 1px dashed var(--border-color); margin: 10px 0;">
+
+                        <p><strong>Метод 2: Расширенный алгоритм Евклида (вывод из лекции):</strong></p>
+                        <p style="font-size: 13.5px; margin-top: 4px;">
+                            Рассмотрим уравнение $a x + b y = \gcd(a, b)$. Пусть найдено решение $(x_1, y_1)$ для пары $(b \bmod a, a)$.<br>
+                            Так как $b \bmod a = b - \lfloor b/a \rfloor \cdot a$, подставим это в уравнение:
+                            $$\left(b - \left\lfloor \frac{b}{a} \right\rfloor \cdot a\right) x_1 + a y_1 = \gcd(a, b)$$
+                            Группируя слагаемые при $a$ и $b$:
+                            $$a \left(y_1 - \left\lfloor \frac{b}{a} \right\rfloor x_1\right) + b x_1 = \gcd(a, b)$$
+                            Откуда получаем рекуррентный переход:
+                            $$\begin{cases} x = y_1 - \left\lfloor \frac{b}{a} \right\rfloor x_1 \\ y = x_1 \end{cases}$$
+                        </p>
+                        <p style="font-size: 13.5px; margin-top: 8px;">
+                            <strong>Поиск обратного в $\mathbb{Z}_m$:</strong> Рассмотрим уравнение $a x + m y = 1$. Взяв обе части по модулю $m$, получаем $a x \equiv 1 \pmod m \implies x = a^{-1}$. Поиск обратного элемента в $\mathbb{Z}_m$ выполняется за $O(\log m)$ без знания $\varphi(m)$ и факторизации.
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ К БИЛЕТУ
+                         ===================================================== -->
+
+                    <div id="sec-extra" class="extra-divider-banner">
+                        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Часть II: Дополнительные материалы к билету
+                        </div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">
+                            Summary билета и алгоритмы на Java++
+                        </div>
+                    </div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">★ Summary билета (ключевые факты)</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Сводная таблица сложности:</strong>
+                                <div style="overflow-x: auto; margin-top: 6px;">
+                                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1.5px solid var(--border-color); color: var(--text-muted);">
+                                                <th style="padding: 6px 8px;">Задача</th>
+                                                <th style="padding: 6px 8px;">Метод</th>
+                                                <th style="padding: 6px 8px;">Сложность по времени</th>
+                                                <th style="padding: 6px 8px;">Память</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Факторизация числа $n$</td>
+                                                <td style="padding: 6px 8px;">Пробное деление до $\sqrt{n}$</td>
+                                                <td style="padding: 6px 8px;">$O(\sqrt{n})$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Функция Эйлера $\varphi(n)$</td>
+                                                <td style="padding: 6px 8px;">Формула произведения по $p \mid n$</td>
+                                                <td style="padding: 6px 8px;">$O(\sqrt{n})$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Обратный по простому $p$</td>
+                                                <td style="padding: 6px 8px;">МТФ $a^{p-2} \pmod p$</td>
+                                                <td style="padding: 6px 8px;">$O(\log p)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Обратный по любому $m$</td>
+                                                <td style="padding: 6px 8px;">Расширенный алгоритм Евклида</td>
+                                                <td style="padding: 6px 8px;">$O(\log m)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log m)$ стек</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Реализации на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Вычисление $\varphi(n)$, бинарное возведение в степень и ExtGCD на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-com">// 1. Функция Эйлера за O(sqrt(n))</span>
+<span class="tok-kw">long</span> <span class="tok-func">phi</span>(<span class="tok-kw">long</span> n) {
+    <span class="tok-kw">long</span> result = n;
+    <span class="tok-kw">for</span> (<span class="tok-kw">long</span> p = <span class="tok-num">2</span>; p * p &lt;= n; p++) {
+        <span class="tok-kw">if</span> (n % p == <span class="tok-num">0</span>) {
+            <span class="tok-kw">while</span> (n % p == <span class="tok-num">0</span>) n /= p;
+            result -= result / p; <span class="tok-com">// result * (1 - 1/p)</span>
+        }
+    }
+    <span class="tok-kw">if</span> (n &gt; <span class="tok-num">1</span>) {
+        result -= result / n;
+    }
+    <span class="tok-kw">return</span> result;
+}
+
+<span class="tok-com">// 2. Быстрое бинарное возведение в степень (a^b % mod) за O(log b)</span>
+<span class="tok-kw">long</span> <span class="tok-func">binPow</span>(<span class="tok-kw">long</span> a, <span class="tok-kw">long</span> b, <span class="tok-kw">long</span> mod) {
+    <span class="tok-kw">long</span> res = <span class="tok-num">1</span>;
+    a %= mod;
+    <span class="tok-kw">while</span> (b &gt; <span class="tok-num">0</span>) {
+        <span class="tok-kw">if</span> ((b &amp; <span class="tok-num">1</span>) != <span class="tok-num">0</span>) res = (res * a) % mod;
+        a = (a * a) % mod;
+        b &gt;&gt;= <span class="tok-num">1</span>;
+    }
+    <span class="tok-kw">return</span> res;
+}
+
+<span class="tok-com">// 3. Расширенный алгоритм Евклида: возвращает gcd(a, b) и заполняет x, y</span>
+<span class="tok-kw">long</span> <span class="tok-func">extGcd</span>(<span class="tok-kw">long</span> a, <span class="tok-kw">long</span> b, <span class="tok-kw">long</span>[] xy) {
+    <span class="tok-kw">if</span> (b == <span class="tok-num">0</span>) {
+        xy[<span class="tok-num">0</span>] = <span class="tok-num">1</span>; xy[<span class="tok-num">1</span>] = <span class="tok-num">0</span>;
+        <span class="tok-kw">return</span> a;
+    }
+    <span class="tok-kw">long</span>[] nextXy = <span class="tok-kw">new</span> <span class="tok-kw">long</span>[<span class="tok-num">2</span>];
+    <span class="tok-kw">long</span> g = <span class="tok-func">extGcd</span>(b, a % b, nextXy);
+    xy[<span class="tok-num">0</span>] = nextXy[<span class="tok-num">1</span>];
+    xy[<span class="tok-num">1</span>] = nextXy[<span class="tok-num">0</span>] - (a / b) * nextXy[<span class="tok-num">1</span>];
+    <span class="tok-kw">return</span> g;
+}
+
+<span class="tok-com">// Обратный по произвольному модулю m</span>
+<span class="tok-kw">long</span> <span class="tok-func">modInverse</span>(<span class="tok-kw">long</span> a, <span class="tok-kw">long</span> m) {
+    <span class="tok-kw">long</span>[] xy = <span class="tok-kw">new</span> <span class="tok-kw">long</span>[<span class="tok-num">2</span>];
+    <span class="tok-kw">long</span> g = <span class="tok-func">extGcd</span>(a, m, xy);
+    <span class="tok-kw">if</span> (g != <span class="tok-num">1</span>) <span class="tok-kw">return</span> -<span class="tok-num">1</span>; <span class="tok-com">// обратного не существует!</span>
+    <span class="tok-kw">return</span> (xy[<span class="tok-num">0</span>] % m + m) % m;
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-factor" class="nav-item nav-alg">1. Факторизация $O(\sqrt{n})$</a>
+                        <a href="#sec-euler" class="nav-item nav-def">2. Функция Эйлера $\varphi(n)$</a>
+                        <a href="#sec-zm" class="nav-item nav-def">3. Арифметика в $\mathbb{Z}_m$</a>
+                        <a href="#sec-theorems" class="nav-item nav-thm">4. МТФ и теорема Эйлера</a>
+                        <a href="#sec-inverse" class="nav-item nav-proof">5. Поиск обратного</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
