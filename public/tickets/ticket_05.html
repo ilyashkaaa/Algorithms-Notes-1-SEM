@@ -1,0 +1,257 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 05 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Классическое и линейное решето Эратосфена</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Классическое решето за $O(n \log \log n)$ (время б/д). Линейное решето за $O(n)$ через минимальный простой делитель.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">05</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-classic-sieve" class="nav-item nav-alg">1. Классическое решето</a>
+                        <a href="#sec-linear-sieve" class="nav-item nav-alg">2. Линейное решето $O(n)$</a>
+                        <a href="#sec-linear-proof" class="nav-item nav-proof">3. Доказательство $O(n)$</a>
+                        <a href="#sec-factor-bonus" class="nav-item nav-thm">4. Быстрая факторизация</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Классическое решето Эратосфена -->
+                    <section id="sec-classic-sieve" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Классическое решето Эратосфена за $O(n \log \log n)$</span>
+                        <p>
+                            <strong>Постановка задачи:</strong> Найти все простые числа в диапазоне от $2$ до $n$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Алгоритм:</strong>
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 4px;">
+                            <li>Инициализируем булев массив $\mathrm{isPrime}[0 \dots n]$ значениями $\mathrm{true}$, за исключением $0$ и $1$.</li>
+                            <li>Перебираем числа $p$ от $2$ до $\lfloor \sqrt{n} \rfloor$. Если $\mathrm{isPrime}[p] == \mathrm{true}$, вычеркиваем все составные числа, кратные $p$, начиная с $p^2$:
+                                $$i = p^2, \; p^2 + p, \; p^2 + 2p, \; \dots \le n$$
+                                <em>Оптимизация старта с $p^2$:</em> Любое составное кратное $k \cdot p$ при $k < p$ уже гарантированно было вычеркнуто минимальным простым делителем числа $k$.
+                            </li>
+                        </ol>
+                        <p style="margin-top: 8px;">
+                            <strong>Временная сложность (б/д):</strong> Общее число вычеркиваний оценивается суммой по простым числам (по теореме Мертенса $\sum_{p \le n} \frac{1}{p} = \ln \ln n + M + O(1/\ln n)$):
+                            $$T(n) = \sum_{p \le n, \; p \text{ prime}} \frac{n}{p} = n \sum_{p \le n} \frac{1}{p} = O(n \log \log n)$$
+                            Память: $O(n)$ бит.
+                        </p>
+                    </section>
+
+                    <!-- Проблема классического решета -->
+                    <div class="vcard vcard-alert">
+                        <span class="vcard-title-pill">♦ Причина сублинейности: повторные вычеркивания</span>
+                        <p style="font-size: 13.5px;">
+                            Классическое решето тратит лишнее время, потому что одно и то же составное число вычеркивается <strong>многократно</strong>: число $6$ вычеркивается двойкой и тройкой, число $30$ вычеркивается $2, 3$ и $5$, а число $2310$ — пятью различными простыми. Чтобы достичь строго линейного времени $O(n)$, нужно гарантировать, что каждое составное число вычеркивается <strong>ровно один раз</strong>.
+                        </p>
+                    </div>
+
+                    <!-- 2. Линейное решето Эратосфена -->
+                    <section id="sec-linear-sieve" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Линейное решето Эратосфена за $O(n)$</span>
+                        <p>
+                            <strong>Основная идея:</strong> Каждое составное число $x$ представляется в виде $x = p \cdot i$, где $p = lp[x]$ — <strong>наименьший простой делитель</strong> (<em>least prime</em>) числа $x$. Алгоритм вычеркивает число $x$ ровно в тот момент, когда внешний цикл доходит до сомножителя $i$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Структуры данных:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>Массив $lp[2 \dots n]$, где $lp[i]$ — минимальный простой делитель числа $i$ (инициализирован нулями).</li>
+                            <li>Список найденных простых чисел $\mathrm{primes}$.</li>
+                        </ul>
+                        <p style="margin-top: 8px;">
+                            <strong>Шаги алгоритма:</strong>
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 4px;">
+                            <li>Итерируемся $i$ от $2$ до $n$. Если $lp[i] == 0$, значит число $i$ простое: записываем $lp[i] = i$ и добавляем $i$ в $\mathrm{primes}$.</li>
+                            <li>Перебираем простые числа $p \in \mathrm{primes}$ такие, что $p \le lp[i]$ и $p \cdot i \le n$:
+                                <ul>
+                                    <li>Помечаем составное число: $lp[p \cdot i] = p$.</li>
+                                    <li><strong>Ключевая точка останова:</strong> Если $p == lp[i]$, немедленно прерываем внутренний цикл (`break`)!</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </section>
+
+                    <!-- 3. Доказательство линейности и корректности -->
+                    <section id="sec-linear-proof" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема и Доказательство] Линейность времени работы $O(n)$</span>
+                        <p>
+                            <strong>Теорема:</strong> Линейное решето Эратосфена находит все простые числа от $2$ до $n$ и корректно заполняет массив $lp$ ровно за $O(n)$ операций.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            <strong>Доказательство корректности и единственности вычеркивания:</strong>
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li style="margin-bottom: 6px;">
+                                Пусть $x$ — произвольное составное число $\le n$, и пусть $p = lp[x]$ — его наименьший простой делитель. Представим $x = p \cdot i$.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                Так как $p$ — наименьший простой делитель числа $x$, а $i = x / p$, то все простые делители числа $i$ не меньше $p$, то есть $p \le lp[i]$.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                Следовательно, на шаге внешнего цикла, равном $i$, число $p$ обязательно встретится во внутреннем цикле (так как $p \le lp[i]$), и число $x = p \cdot i$ будет помечено: $lp[x] = p$.
+                            </li>
+                            <li>
+                                <strong>Зачем нужен `break` при $p == lp[i]$?</strong>
+                                <br>Если бы мы продолжили цикл для следующего простого $p' > p = lp[i]$, то для составного числа $y = p' \cdot i$ наименьшим простым делителем уже <em>не являлось бы</em> $p'$, поскольку $y$ делится на $lp[i] = p < p'$. Число $y$ обязано быть вычеркнуто позже своим истинным минимальным делителем $p$.
+                            </li>
+                        </ol>
+                        <p style="margin-top: 8px;">
+                            <strong>Оценка времени:</strong> Каждое составное число $x \in [2, n]$ помечается <strong>ровно один раз</strong> через пару $(p, i) = (lp[x], x / lp[x])$. Таким образом, тело внутреннего цикла выполняется не более $n$ раз.
+                            $$\text{Время работы: } T(n) = \Theta(n), \quad \text{Память: } O(n)$$
+                        </p>
+                    </section>
+
+                    <!-- 4. Бонус: быстрая факторизация чисел -->
+                    <section id="sec-factor-bonus" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Применение] Факторизация за $O(\log x)$ с помощью массива $lp$</span>
+                        <p>
+                            Построенный массив минимальных простых делителей $lp$ позволяет факторизовать любое число $x \le n$ за время, пропорциональное количеству его простых делителей, то есть не более $O(\log x)$:
+                        </p>
+                        <pre class="vcard-code"><code><span class="tok-com">// Факторизация за O(log x)</span>
+<span class="tok-kw">while</span> (x &gt; <span class="tok-num">1</span>) {
+    <span class="tok-kw">int</span> p = lp[x];
+    factors.<span class="tok-func">add</span>(p);
+    x /= p;
+}</code></pre>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ К БИЛЕТУ
+                         ===================================================== -->
+
+                    <div id="sec-extra" class="extra-divider-banner">
+                        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Часть II: Дополнительные материалы к билету
+                        </div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">
+                            Summary билета и реализация на Java++
+                        </div>
+                    </div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">★ Summary билета (ключевые факты)</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Сравнение двух алгоритмов:</strong>
+                                <div style="overflow-x: auto; margin-top: 6px;">
+                                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1.5px solid var(--border-color); color: var(--text-muted);">
+                                                <th style="padding: 6px 8px;">Алгоритм</th>
+                                                <th style="padding: 6px 8px;">Время работы</th>
+                                                <th style="padding: 6px 8px;">Память</th>
+                                                <th style="padding: 6px 8px;">Число вычеркиваний числа $x$</th>
+                                                <th style="padding: 6px 8px;">Дополнительные возможности</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Классическое решето</td>
+                                                <td style="padding: 6px 8px;">$O(n \log \log n)$</td>
+                                                <td style="padding: 6px 8px;">$n$ бит (битовый массив)</td>
+                                                <td style="padding: 6px 8px;">Столько, сколько простых делителей</td>
+                                                <td style="padding: 6px 8px;">Минимальный расход памяти</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Линейное решето</td>
+                                                <td style="padding: 6px 8px;">$O(n)$ строго</td>
+                                                <td style="padding: 6px 8px;">$4n$ байт (массив `int lp[]`)</td>
+                                                <td style="padding: 6px 8px;"><strong>Ровно 1 раз</strong> (делителем $lp[x]$)</td>
+                                                <td style="padding: 6px 8px;">Факторизация за $O(\log x)$, вычисление $\varphi(x), \mu(x)$</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Реализация на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация линейного и классического решета на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-com">// 1. Линейное решето Эратосфена за O(n)</span>
+<span class="tok-kw">class</span> <span class="tok-type">LinearSieve</span> {
+    <span class="tok-kw">int</span>[] lp;           <span class="tok-com">// lp[i] - минимальный простой делитель</span>
+    <span class="tok-type">List</span>&lt;<span class="tok-type">Integer</span>&gt; primes; <span class="tok-com">// список простых чисел</span>
+
+    <span class="tok-type">LinearSieve</span>(<span class="tok-kw">int</span> n) {
+        lp = <span class="tok-kw">new</span> <span class="tok-kw">int</span>[n + <span class="tok-num">1</span>];
+        primes = <span class="tok-kw">new</span> <span class="tok-type">ArrayList</span>&lt;&gt;();
+
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">2</span>; i &lt;= n; i++) {
+            <span class="tok-kw">if</span> (lp[i] == <span class="tok-num">0</span>) {
+                lp[i] = i;
+                primes.<span class="tok-func">add</span>(i);
+            }
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> p : primes) {
+                <span class="tok-kw">if</span> (p &gt; lp[i] || (<span class="tok-kw">long</span>)p * i &gt; n) {
+                    <span class="tok-kw">break</span>;
+                }
+                lp[p * i] = p; <span class="tok-com">// p - гарантированно минимальный делитель (p*i)</span>
+            }
+        }
+    }
+}
+
+<span class="tok-com">// 2. Классическое решето Эратосфена за O(n log log n)</span>
+<span class="tok-kw">boolean</span>[] <span class="tok-func">classicSieve</span>(<span class="tok-kw">int</span> n) {
+    <span class="tok-kw">boolean</span>[] isPrime = <span class="tok-kw">new</span> <span class="tok-kw">boolean</span>[n + <span class="tok-num">1</span>];
+    <span class="tok-type">Arrays</span>.<span class="tok-func">fill</span>(isPrime, <span class="tok-kw">true</span>);
+    isPrime[<span class="tok-num">0</span>] = isPrime[<span class="tok-num">1</span>] = <span class="tok-kw">false</span>;
+
+    <span class="tok-kw">for</span> (<span class="tok-kw">int</span> p = <span class="tok-num">2</span>; p * p &lt;= n; p++) {
+        <span class="tok-kw">if</span> (isPrime[p]) {
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = p * p; i &lt;= n; i += p) {
+                isPrime[i] = <span class="tok-kw">false</span>;
+            }
+        }
+    }
+    <span class="tok-kw">return</span> isPrime;
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-classic-sieve" class="nav-item nav-alg">1. Классическое $O(n \log \log n)$</a>
+                        <a href="#sec-linear-sieve" class="nav-item nav-alg">2. Линейное $O(n)$</a>
+                        <a href="#sec-linear-proof" class="nav-item nav-proof">3. Доказательство $O(n)$</a>
+                        <a href="#sec-factor-bonus" class="nav-item nav-thm">4. Быстрая факторизация</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
