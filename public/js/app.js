@@ -43,16 +43,39 @@ document.addEventListener('DOMContentLoaded', () => {
     initSidebarResizer();
 });
 
-// 1. Sidebar Toggle Logic
+// 1. Sidebar Toggle Logic (Desktop collapse + Mobile off-canvas drawer)
 function initSidebarToggle() {
     const toggleBtn = document.getElementById('sidebarToggle');
     const sidebar = document.querySelector('.app-sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
     if (!toggleBtn || !sidebar) return;
 
     toggleBtn.addEventListener('click', () => {
-        const isCollapsed = sidebar.classList.toggle('collapsed');
-        document.body.classList.toggle('sidebar-collapsed', isCollapsed);
-        toggleBtn.innerHTML = isCollapsed ? '☰ Меню' : '✕ Меню';
+        if (window.innerWidth <= 860) {
+            const isOpen = document.body.classList.toggle('sidebar-open');
+            toggleBtn.innerHTML = isOpen ? '✕ Меню' : '☰ Меню';
+        } else {
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+            toggleBtn.innerHTML = isCollapsed ? '☰ Меню' : '✕ Меню';
+        }
+    });
+
+    if (backdrop) {
+        backdrop.addEventListener('click', () => {
+            document.body.classList.remove('sidebar-open');
+            toggleBtn.innerHTML = '☰ Меню';
+        });
+    }
+
+    // Auto-close drawer on mobile when clicking a ticket item
+    document.querySelectorAll('.ticket-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 860) {
+                document.body.classList.remove('sidebar-open');
+                toggleBtn.innerHTML = '☰ Меню';
+            }
+        });
     });
 }
 
@@ -266,6 +289,14 @@ async function loadTicket(ticketId) {
         } else {
             container.innerHTML = loadedTicketsCache[ticketId];
         }
+
+        // Close mobile accordion on link click
+        container.querySelectorAll('.mobile-toc-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                const acc = container.querySelector('.mobile-toc-accordion');
+                if (acc) acc.removeAttribute('open');
+            });
+        });
 
         // Re-render MathJax equations
         if (window.MathJax && window.MathJax.typesetPromise) {
