@@ -1,0 +1,258 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 02 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Бинарный поиск и вещественный бинпоиск</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Классический бинпоиск. Бинпоиск по ответу. Временная сложность. Вещественнозначный бинарный поиск и критерии останова.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">02</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-classic" class="nav-item nav-def">1. Классический бинпоиск</a>
+                        <a href="#sec-ans" class="nav-item nav-thm">2. Бинпоиск по ответу</a>
+                        <a href="#sec-real" class="nav-item nav-alg">3. Вещественный бинпоиск</a>
+                        <a href="#sec-complexity" class="nav-item nav-proof">4. Анализ сложности</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Классический бинарный поиск -->
+                    <section id="sec-classic" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Классический бинарный поиск</span>
+                        <p>
+                            <strong>Постановка задачи (из лекции):</strong> Дан отсортированный массив $A[1 \dots n]$. Требуется проверить, есть ли в нем элемент $X$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            Обозначим за $l = 1$ и $r = n$ левую и правую границы рассматриваемого подмассива.
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li style="margin-bottom: 6px;">
+                                Если диапазон валиден, то проверяем: $A\left[\left\lceil \frac{l + r}{2} \right\rceil\right] \stackrel{?}{\ge} X$. Иначе возвращаем границу.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                Если полученный результат истинен, то запускаем рекурсивно поиск в левой половине массива.
+                            </li>
+                            <li>
+                                Иначе — запускаем рекурсивно поиск в правой половине массива.
+                            </li>
+                        </ol>
+                        <p style="margin-top: 10px; font-size: 13.5px;">
+                            <strong>Что делает алгоритм на каждом шаге:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>Сравнивает средний элемент с $X$ за $O(1)$.</li>
+                            <li>Решает, продолжать в левой или правой половине за $O(1)$.</li>
+                            <li>Запускается рекурсивно, уменьшая область поиска в два раза.</li>
+                        </ul>
+                        <p style="margin-top: 6px; font-size: 13.5px;">
+                            Результат будет получен, когда длина диапазона станет равной $1$. Всего шагов: $\log_2 n$, а итоговое время: $\log_2 n \cdot O(1) = O(\log n)$.
+                        </p>
+                    </section>
+
+                    <!-- 2. Бинпоиск по ответу -->
+                    <section id="sec-ans" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Метод] Бинарный поиск по ответу</span>
+                        <p>
+                            <strong>Определение (из лекции):</strong> Пусть имеется монотонный предикат $P(n) \in \{0, 1\}$, то есть:
+                            $$\exists N_0 : \begin{cases} P(n) = 0, & n < N_0 \\ P(n) = 1, & n \ge N_0 \end{cases}$$
+                            И перед нами стоит задача отыскать это пороговое значение $N_0$.
+                        </p>
+                        <div class="vcard vcard-geo" style="margin: 10px 0;">
+                            <strong>Пример из лекции:</strong> Задача проверки наличия элемента $X$ в отсортированном массиве. В данном случае предикат имеет вид:
+                            $$P(i) = 1 \iff a[i] \ge X$$
+                        </div>
+                        <p style="margin-top: 8px;">
+                            <strong>Алгоритм:</strong> Пусть $N_0$ заведомо лежит в диапазоне $[l; r]$.
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li style="margin-bottom: 6px;">
+                                Если диапазон валиден, то вычисляем $P\left(\left\lceil \frac{l + r}{2} \right\rceil\right)$. Иначе возвращаем границу.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                Если результат истинен, то $N_0 \in \left[l; \left\lceil \frac{l + r}{2} \right\rceil\right]$. Запускаем рекурсивно поиск в левой половине.
+                            </li>
+                            <li>
+                                Иначе $N_0 \in \left[\left\lceil \frac{l + r}{2} \right\rceil; r\right]$. Запускаем рекурсивно поиск в правой половине.
+                            </li>
+                        </ol>
+                        <p style="margin-top: 8px; font-weight: 600;">
+                            Сложность алгоритма: $O(\log n)$.
+                        </p>
+                    </section>
+
+                    <!-- 3. Вещественный бинарный поиск -->
+                    <section id="sec-real" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Вещественный бинарный поиск</span>
+                        <p>
+                            <strong>Пример из лекции:</strong> Допустим, нужно решить уравнение:
+                            $$x + \tan x = 3, \quad x \in \left(0; \frac{\pi}{2}\right)$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            Рассмотрим монотонно возрастающую функцию $f(x) = x + \tan x - 3$ и предикат:
+                            $$P(x) = \mathbb{I}(f(x) \ge 0)$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            Применяем бинарный поиск с начальными границами $l = 0, r = \frac{\pi}{2}$.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            <strong>Условие выхода:</strong> $|r - l| < \varepsilon$.
+                        </p>
+                        <p style="margin-top: 8px; font-weight: 600;">
+                            Сложность алгоритма:
+                            $$O\left(\log \frac{r - l}{\varepsilon}\right)$$
+                        </p>
+                    </section>
+
+                    <!-- 4. Формальный анализ через рекуррентные соотношения -->
+                    <section id="sec-complexity" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема] Формальный анализ через рекуррентные соотношения</span>
+                        <p>
+                            Введем функцию $T(n)$ — время решения задачи для массива длины $n$. Так как за константное число операций задача сводится к вдвое меньшей, запишем рекуррентное соотношение:
+                            $$T(n) = T\left(\left\lfloor \frac{n}{2} \right\rfloor\right) + 1$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Метод развертывания рекурренты (из лекции):</strong>
+                            $$T(n) = T\left(\frac{n}{2}\right) + 1 = \left(T\left(\frac{n}{4}\right) + 1\right) + 1 = T\left(\frac{n}{4}\right) + 2 = \dots = T\left(\frac{n}{2^k}\right) + k$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            Остановка происходит тогда же, когда и в алгоритме: при $n / 2^k \le 1$, то есть при $k = \lceil \log_2 n \rceil$, где $T(1) = 1$:
+                            $$T(n) = T\left(\frac{n}{2^{\lceil \log_2 n \rceil}}\right) + \lceil \log_2 n \rceil = 1 + \lceil \log_2 n \rceil \le \log_2 n + 2 = O(\log n)$$
+                        </p>
+                        <div class="vcard vcard-geo" style="margin-top: 10px;">
+                            <strong>Мастер-теорема (б/д, формулировка из лекции):</strong><br>
+                            Пусть $T(n) = a T(n/b) + f(n)$ при $a \ge 1, b > 1$. Для бинпоиска $a = 1, b = 2, f(n) = 1 = \Theta(n^{\log_2 1})$. Это случай 2 ($f(n) = \Theta(n^{\log_b a})$), откуда $T(n) = \Theta(n^{\log_b a} \log n) = \Theta(\log n)$.
+                        </div>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ К БИЛЕТУ
+                         ===================================================== -->
+
+                    <div id="sec-extra" class="extra-divider-banner">
+                        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Часть II: Дополнительные материалы к билету
+                        </div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">
+                            Summary билета и реализации на Java++
+                        </div>
+                    </div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">★ Summary билета (ключевые факты)</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Защита от переполнения:</strong> Вычисление середины $M = (L + R) / 2$ при $L + R > 2^{31}-1$ переполняет стандартный знаковый 32-битный `int`. Всегда пишется:
+                                $$M = L + \frac{R - L}{2}$$
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                <strong>Сводная таблица сложности:</strong>
+                                <div style="overflow-x: auto; margin-top: 6px;">
+                                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1.5px solid var(--border-color); color: var(--text-muted);">
+                                                <th style="padding: 6px 8px;">Тип поиска</th>
+                                                <th style="padding: 6px 8px;">Число итераций</th>
+                                                <th style="padding: 6px 8px;">Временная сложность</th>
+                                                <th style="padding: 6px 8px;">Память</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Классический бинпоиск</td>
+                                                <td style="padding: 6px 8px;">$\lceil \log_2 n \rceil$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Бинпоиск по ответу</td>
+                                                <td style="padding: 6px 8px;">$\log_2(X_{\max} - X_{\min})$</td>
+                                                <td style="padding: 6px 8px;">$O(T_P \log(\text{Range}))$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Вещественный бинпоиск</td>
+                                                <td style="padding: 6px 8px;">$\log_2((R-L)/\varepsilon)$ либо $K$ итераций</td>
+                                                <td style="padding: 6px 8px;">$O(T_P \log((R-L)/\varepsilon))$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Реализация на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализации классического и вещественного бинпоиска на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-com">// 1. Классический LowerBound: первый индекс, где arr[i] &gt;= x</span>
+<span class="tok-kw">int</span> <span class="tok-func">lowerBound</span>(<span class="tok-kw">int</span>[] arr, <span class="tok-kw">int</span> n, <span class="tok-kw">int</span> x) {
+    <span class="tok-kw">int</span> l = <span class="tok-num">0</span>, r = n; <span class="tok-com">// полуинтервал [l, r)</span>
+    <span class="tok-kw">while</span> (l &lt; r) {
+        <span class="tok-kw">int</span> m = l + (r - l) / <span class="tok-num">2</span>; <span class="tok-com">// без переполнения int</span>
+        <span class="tok-kw">if</span> (arr[m] &lt; x) {
+            l = m + <span class="tok-num">1</span>;
+        } <span class="tok-kw">else</span> {
+            r = m;
+        }
+    }
+    <span class="tok-kw">return</span> l; <span class="tok-com">// индекс первого элемента &gt;= x (или n, если такого нет)</span>
+}
+
+<span class="tok-com">// 2. Вещественный бинарный поиск по числу итераций</span>
+<span class="tok-kw">double</span> <span class="tok-func">realBinarySearch</span>(<span class="tok-kw">double</span> l, <span class="tok-kw">double</span> r) {
+    <span class="tok-com">// 80 итераций сокращают отрезок в 2^80 раз (~ 10^24)</span>
+    <span class="tok-kw">for</span> (<span class="tok-kw">int</span> iter = <span class="tok-num">0</span>; iter &lt; <span class="tok-num">80</span>; iter++) {
+        <span class="tok-kw">double</span> m = l + (r - l) / <span class="tok-num">2.0</span>;
+        <span class="tok-kw">if</span> (<span class="tok-func">check</span>(m)) {
+            l = m; <span class="tok-com">// или r = m в зависимости от монотонности</span>
+        } <span class="tok-kw">else</span> {
+            r = m;
+        }
+    }
+    <span class="tok-kw">return</span> l;
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-classic" class="nav-item nav-def">1. Классический бинпоиск</a>
+                        <a href="#sec-ans" class="nav-item nav-thm">2. Бинпоиск по ответу</a>
+                        <a href="#sec-real" class="nav-item nav-alg">3. Вещественный бинпоиск</a>
+                        <a href="#sec-complexity" class="nav-item nav-proof">4. Анализ сложности</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
