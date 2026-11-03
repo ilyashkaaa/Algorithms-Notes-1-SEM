@@ -1,0 +1,282 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 28 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Дерево отрезков с групповым обновлением (Lazy)</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Техника отложенной модификации (Lazy Propagation). Свойства операций (ассоциативность, нейтральный элемент, дистрибутивность). Проталкивание push. Групповое обновление и диапазонный запрос за $O(\log n)$.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">28</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-lazy-idea" class="nav-item nav-def">1. Идея Lazy Propagation</a>
+                        <a href="#sec-algebraic-reqs" class="nav-item nav-geo">2. Свойства операций (дистрибутивность)</a>
+                        <a href="#sec-push-func" class="nav-item nav-alg">3. Функция проталкивания push</a>
+                        <a href="#sec-lazy-ops" class="nav-item nav-thm">4. Реализация updateRange и query</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Идея Lazy Propagation -->
+                    <section id="sec-lazy-idea" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Концепция] Запрос группового обновления и лень (Lazy Propagation)</span>
+                        <p>
+                            <strong>Групповое обновление (Range Update):</strong> Применить операцию изменения $ch(\cdot, val)$ ко всем элементам на отрезке $[l, r]$. Например:
+                        </p>
+                        $$A[i] = A[i] + val \quad \forall i \in [l, r]$$
+                        <p style="margin-top: 8px;">
+                            <strong>Проблема наивного обновления:</strong> Если обновлять каждый лист индивидуально, операция займет $O((r - l + 1) \log n) = O(n \log n)$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Идея отложенной модификации (Lazy Propagation):</strong>
+                            Если отрезок узла $[tl, tr]$ <em>целиком</em> содержится внутри отрезка обновления $[l, r]$, <strong>не нужно рекурсивно спускаться в его потомков</strong>!
+                            Мы запоминаем «обещание» обновить поддерево в виде отложенной пометки (несогласованности) $lazy[v]$, сразу пересчитываем агрегат текущего узла $tree[v]$ и завершаем вызов.
+                        </p>
+                    </section>
+
+                    <!-- 2. Свойства операций (дистрибутивность) -->
+                    <section id="sec-algebraic-reqs" class="vcard vcard-geo">
+                        <span class="vcard-title-pill">[Алгебра] Три условия совместности операций (Лекция 8, Кулапин)</span>
+                        <p>
+                            Пусть $op$ — операция запроса на отрезке (например, $\min$), а $ch$ — операция модификации (например, $+ val$).
+                            Для корректной работы Lazy Propagation операция $ch$ обязана удовлетворять трем аксиомам:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>Существование нейтрального элемента $e_{ch}$:</strong>
+                                $$ch(x, e_{ch}) = x \quad (\text{например, } +0 \text{ при прибавлении})$$
+                            </li>
+                            <li><strong>Ассоциативность модификаций:</strong>
+                                $$ch(a, ch(b, c)) = ch(ch(a, b), c)$$
+                                Позволяет накапливать последовательные обновления в узле: если к узлу последовательно применили $val_1$, затем $val_2$, новая отложенная пометка равна $ch(lazy[v], val_2)$.
+                            </li>
+                            <li><strong>Дистрибутивность модификации относительно операции запроса $op$:</strong>
+                                $$ch(op(a, b), c) = op(ch(a, c), ch(b, c))$$
+                                <em>Пример для RMQ и прибавления:</em> $\min(a + c, b + c) = \min(a, b) + c$. Благодаря этому значению узла $\min$ можно сразу прибавить $c$ без пересчета сыновей!
+                                <br><em>Пример для RSQ и прибавления:</em> $\sum_{i=1}^k (a_i + c) = \sum a_i + k \cdot c$.
+                            </li>
+                        </ol>
+                    </section>
+
+                    <!-- 3. Функция проталкивания push -->
+                    <section id="sec-push-func" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Проталкивание несогласованности (push)</span>
+                        <p>
+                            <strong>Несогласованность (Lazy Tag):</strong> Величина $lazy[v]$, хранящаяся в узле, которую необходимо передать детям, чтобы значения в их поддеревьях стали истинными.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Процедура $\mathrm{push}(v, tl, tr)$:</strong>
+                            Вызывается перед тем, как спуститься в детей узла $v$:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 4px;">
+                            <li>Если узел является листом ($tl == tr$) или пометка нейтральна ($lazy[v] == e_{ch}$) — делать ничего не нужно.</li>
+                            <li>Применяем пометку $lazy[v]$ к левому ребенку $2v+1$:
+                                <br>$\mathrm{apply}(2v+1, lazy[v])$;
+                            </li>
+                            <li>Применяем пометку $lazy[v]$ к правому ребенку $2v+2$:
+                                <br>$\mathrm{apply}(2v+2, lazy[v])$;
+                            </li>
+                            <li>Сбрасываем пометку в текущем узле: $lazy[v] = e_{ch}$.</li>
+                        </ol>
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            Функция $\mathrm{push}$ работает за строго $O(1)$ и восстанавливает согласованность перед любым разделением отрезка.
+                        </div>
+                    </section>
+
+                    <!-- 4. Реализация updateRange и query -->
+                    <section id="sec-lazy-ops" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Алгоритмы] Обновление отрезка и Запрос за $O(\log n)$</span>
+                        <div style="margin-top: 8px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Групповое обновление: $\mathrm{updateRange}(v, tl, tr, l, r, val)$</h4>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если отрезок узла не пересекается с $[l, r]$ ($l > tr$ или $r < tl$) — выход.</li>
+                                <li>Если отрезок узла целиком внутри запроса ($l \le tl \le tr \le r$):
+                                    <br>Применяем модификацию: $\mathrm{apply}(v, val)$, и немедленно выходим! ($O(1)$).
+                                </li>
+                                <li>Частичное пересечение:
+                                    <ul style="margin-left: 18px; margin-top: 2px;">
+                                        <li>Вызываем $\mathrm{push}(v, tl, tr)$.</li>
+                                        <li>Рекурсивно обновляем детей: левого и правого.</li>
+                                        <li>Пересчитываем значение текущего узла:
+                                            $$\mathrm{tree}[v] = \mathrm{tree}[2v+1] \circ \mathrm{tree}[2v+2]$$
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Запрос на отрезке: $\mathrm{query}(v, tl, tr, l, r)$</h4>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Не пересекается $\implies$ возвращаем $\mathrm{neutral}$.</li>
+                                <li>Целиком внутри $\implies$ возвращаем $\mathrm{tree}[v]$ за $O(1)$.</li>
+                                <li>Частичное пересечение:
+                                    <ul style="margin-left: 18px; margin-top: 2px;">
+                                        <li><strong>Обязательно вызываем $\mathrm{push}(v, tl, tr)$!</strong></li>
+                                        <li>Возвращаем объединение ответов от левого и правого сыновей:
+                                            $$\mathrm{ans} = \mathrm{query}(2v+1, \dots) \circ \mathrm{query}(2v+2, \dots)$$
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 13px;">
+                            <strong>Точечное обновление:</strong> Является тривиальным частным случаем $\mathrm{updateRange}(pos, pos, val)$ и выполняется за то же время $O(\log n)$.
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные параметры дерева отрезков с Lazy Propagation</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Операция</th>
+                                    <th style="padding: 6px 8px;">Сложность</th>
+                                    <th style="padding: 6px 8px;">Механика</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Build</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;">Инициализация tree и зануление lazy</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Range Update</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(\log n)$</strong></td>
+                                    <td style="padding: 6px 8px;">Покрытие отрезка не более чем $2 \log n$ узлами с пометками</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Range Query</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(\log n)$</strong></td>
+                                    <td style="padding: 6px 8px;">Спуск с проталкиванием push на каждом шаге</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Память</strong></td>
+                                    <td style="padding: 6px 8px;">$2 \times 4n = 8n$</td>
+                                    <td style="padding: 6px 8px;">Массивы tree[4n] и lazy[4n]</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Дерево отрезков на минимум с прибавлением на отрезке на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">LazySegmentTreeRMQ</span> {
+    <span class="tok-kw">private int</span>[] tree;
+    <span class="tok-kw">private int</span>[] lazy;
+    <span class="tok-kw">private int</span> n;
+    <span class="tok-kw">private static final int</span> INF = <span class="tok-type">Integer</span>.MAX_VALUE;
+
+    <span class="tok-func">LazySegmentTreeRMQ</span>(<span class="tok-kw">int</span>[] a) {
+        <span class="tok-kw">this</span>.n = a.length;
+        <span class="tok-kw">this</span>.tree = <span class="tok-kw">new int</span>[<span class="tok-num">4</span> * n];
+        <span class="tok-kw">this</span>.lazy = <span class="tok-kw">new int</span>[<span class="tok-num">4</span> * n];
+        <span class="tok-func">build</span>(a, <span class="tok-num">0</span>, <span class="tok-num">0</span>, n - <span class="tok-num">1</span>);
+    }
+
+    <span class="tok-kw">private void</span> <span class="tok-func">build</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> v, <span class="tok-kw">int</span> tl, <span class="tok-kw">int</span> tr) {
+        <span class="tok-kw">if</span> (tl == tr) { tree[v] = a[tl]; <span class="tok-kw">return</span>; }
+        <span class="tok-kw">int</span> tm = (tl + tr) / <span class="tok-num">2</span>;
+        <span class="tok-func">build</span>(a, <span class="tok-num">2</span> * v + <span class="tok-num">1</span>, tl, tm);
+        <span class="tok-func">build</span>(a, <span class="tok-num">2</span> * v + <span class="tok-num">2</span>, tm + <span class="tok-num">1</span>, tr);
+        tree[v] = <span class="tok-type">Math</span>.<span class="tok-func">min</span>(tree[<span class="tok-num">2</span> * v + <span class="tok-num">1</span>], tree[<span class="tok-num">2</span> * v + <span class="tok-num">2</span>]);
+    }
+
+    <span class="tok-com">// Применение модификации к узлу</span>
+    <span class="tok-kw">private void</span> <span class="tok-func">apply</span>(<span class="tok-kw">int</span> v, <span class="tok-kw">int</span> val) {
+        tree[v] += val;
+        lazy[v] += val;
+    }
+
+    <span class="tok-com">// Проталкивание пометки в детей за O(1)</span>
+    <span class="tok-kw">private void</span> <span class="tok-func">push</span>(<span class="tok-kw">int</span> v) {
+        <span class="tok-kw">if</span> (lazy[v] != <span class="tok-num">0</span>) {
+            <span class="tok-func">apply</span>(<span class="tok-num">2</span> * v + <span class="tok-num">1</span>, lazy[v]);
+            <span class="tok-func">apply</span>(<span class="tok-num">2</span> * v + <span class="tok-num">2</span>, lazy[v]);
+            lazy[v] = <span class="tok-num">0</span>;
+        }
+    }
+
+    <span class="tok-com">// Групповое прибавление val на [l, r] за O(log n)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">updateRange</span>(<span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r, <span class="tok-kw">int</span> val) {
+        <span class="tok-func">updateRec</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>, n - <span class="tok-num">1</span>, l, r, val);
+    }
+
+    <span class="tok-kw">private void</span> <span class="tok-func">updateRec</span>(<span class="tok-kw">int</span> v, <span class="tok-kw">int</span> tl, <span class="tok-kw">int</span> tr, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r, <span class="tok-kw">int</span> val) {
+        <span class="tok-kw">if</span> (l &gt; tr || r &lt; tl) <span class="tok-kw">return</span>;
+        <span class="tok-kw">if</span> (l &lt;= tl &amp;&amp; tr &lt;= r) {
+            <span class="tok-func">apply</span>(v, val);
+            <span class="tok-kw">return</span>;
+        }
+        <span class="tok-func">push</span>(v);
+        <span class="tok-kw">int</span> tm = (tl + tr) / <span class="tok-num">2</span>;
+        <span class="tok-func">updateRec</span>(<span class="tok-num">2</span> * v + <span class="tok-num">1</span>, tl, tm, l, r, val);
+        <span class="tok-func">updateRec</span>(<span class="tok-num">2</span> * v + <span class="tok-num">2</span>, tm + <span class="tok-num">1</span>, tr, l, r, val);
+        tree[v] = <span class="tok-type">Math</span>.<span class="tok-func">min</span>(tree[<span class="tok-num">2</span> * v + <span class="tok-num">1</span>], tree[<span class="tok-num">2</span> * v + <span class="tok-num">2</span>]);
+    }
+
+    <span class="tok-com">// Запрос минимума на [l, r] за O(log n)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">query</span>(<span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">return</span> <span class="tok-func">queryRec</span>(<span class="tok-num">0</span>, <span class="tok-num">0</span>, n - <span class="tok-num">1</span>, l, r);
+    }
+
+    <span class="tok-kw">private int</span> <span class="tok-func">queryRec</span>(<span class="tok-kw">int</span> v, <span class="tok-kw">int</span> tl, <span class="tok-kw">int</span> tr, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">if</span> (l &gt; tr || r &lt; tl) <span class="tok-kw">return</span> INF;
+        <span class="tok-kw">if</span> (l &lt;= tl &amp;&amp; tr &lt;= r) <span class="tok-kw">return</span> tree[v];
+        <span class="tok-func">push</span>(v);
+        <span class="tok-kw">int</span> tm = (tl + tr) / <span class="tok-num">2</span>;
+        <span class="tok-kw">return</span> <span class="tok-type">Math</span>.<span class="tok-func">min</span>(
+            <span class="tok-func">queryRec</span>(<span class="tok-num">2</span> * v + <span class="tok-num">1</span>, tl, tm, l, r),
+            <span class="tok-func">queryRec</span>(<span class="tok-num">2</span> * v + <span class="tok-num">2</span>, tm + <span class="tok-num">1</span>, tr, l, r)
+        );
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-lazy-idea" class="nav-item nav-def">1. Идея Lazy</a>
+                        <a href="#sec-algebraic-reqs" class="nav-item nav-geo">2. Свойства операций</a>
+                        <a href="#sec-push-func" class="nav-item nav-alg">3. Проталкивание push</a>
+                        <a href="#sec-lazy-ops" class="nav-item nav-thm">4. Реализация update/query</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
