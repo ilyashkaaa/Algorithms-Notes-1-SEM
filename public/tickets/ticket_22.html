@@ -1,0 +1,477 @@
+                
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 22 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Декартово дерево (Treap)</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Определение. Операции Split, Merge. Выразимость остальных операций. Теорема о высоте.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">22</div>
+                    </div>
+                </div>
+
+                <!-- Main Column: Blackboard Program & Extra Materials -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Определение -->
+                    <section id="sec-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Декартово дерево (Treap)</span>
+                        <p>
+                            <strong>Декартовым деревом</strong> (от англ. <em>tree</em> + <em>heap</em> = <em>treap</em>, в русскоязычной литературе также <em>дерамида</em> или <em>кучедерево</em>) над множеством пар $(x_i, y_i)$ называется бинарное дерево, удовлетворяющее двум условиям одновременно:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 8px;">
+                            <li style="margin-bottom: 6px;">
+                                <strong>Свойство дерева поиска (BST):</strong> По первой координате (ключу $x$) дерево является бинарным деревом поиска: для любого узла $(x, y)$ все ключи в левом поддереве строго меньше $x$, а в правом поддереве — строго больше $x$.
+                            </li>
+                            <li>
+                                <strong>Свойство кучи (Heap):</strong> По второй координате (приоритету $y$) дерево является кучей на максимум (Max-Heap): для любого узла $(x, y)$ приоритеты обоих его непосредственных сыновей не превосходят $y$:
+                                $$v.y \ge v.left.y \quad \text{и} \quad v.y \ge v.right.y$$
+                            </li>
+                        </ol>
+                    </section>
+
+                    <!-- Геометрический взгляд -->
+                    <div class="vcard vcard-geo">
+                        <span class="vcard-title-pill">♦ Геометрический взгляд</span>
+                        <p style="font-size: 13.5px;">
+                            Если представить пары $(x_i, y_i)$ как точки на декартовой плоскости $\mathbb{R}^2$, то декартово дерево однозначно соответствует рекурсивному разбиению плоскости: корень — точка с максимальной ординатой $y$, а её абсцисса $x$ делит плоскость вертикальной прямой на две полуплоскости, для которых левое и правое поддеревья строятся рекурсивно тем же правилом.
+                        </p>
+                    </div>
+
+                    <!-- 2. Теорема о существовании и единственности -->
+                    <section id="sec-unique" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теорема] Существование и единственность декартова дерева</span>
+                        <p>
+                            Пусть задано конечное множество пар $S = \{(x_1, y_1), (x_2, y_2), \dots, (x_n, y_n)\}$, в котором все ключи $x_i$ попарно различны и все приоритеты $y_i$ попарно различны. Тогда для множества $S$ существует декартово дерево, и оно определено единственным образом (с точностью до изоморфизма).
+                        </p>
+                    </section>
+
+                    <!-- Доказательство теоремы о единственности -->
+                    <div class="vcard vcard-proof">
+                        <div style="font-weight: 700; color: var(--card-proof); margin-bottom: 8px;">
+                            ▸ Доказательство (индукция по числу элементов $n = |S|$)
+                        </div>
+                        <p><strong>База индукции ($n = 0, n = 1$):</strong></p>
+                        <ul style="margin-left: 20px; margin-bottom: 10px;">
+                            <li>Для $S = \emptyset$ существует ровно одно пустое дерево.</li>
+                            <li>Для $n = 1$ дерево состоит из единственной вершины, что тривиально удовлетворяет обоим свойствам и определено однозначно.</li>
+                        </ul>
+
+                        <p><strong>Индукционный переход ($n > 1$):</strong></p>
+                        <ol style="margin-left: 20px;">
+                            <li style="margin-bottom: 6px;">
+                                <strong>Выбор корня:</strong> В силу свойства кучи приоритет корня обязан быть строго больше приоритетов всех остальных вершин дерева. Поскольку все $y_i$ попарно различны, точка с максимальной ординатой
+                                $$(x_0, y_0) = \arg\max_{(x, y) \in S} y$$
+                                определена <strong>единственным образом</strong>. Следовательно, корнем дерева обязана быть вершина $(x_0, y_0)$.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                <strong>Разбиение на поддеревья:</strong> В силу свойства дерева поиска все оставшиеся элементы множества $S \setminus \{(x_0, y_0)\}$ обязаны разделиться на две непересекающиеся группы:
+                                $$L = \{ (x, y) \in S \mid x < x_0 \}, \qquad R = \{ (x, y) \in S \mid x > x_0 \}.$$
+                                Так как все ключи $x$ попарно различны, каждый элемент множества однозначно попадает либо в $L$, либо в $R$.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                <strong>Применение индукционного предположения:</strong> Заметим, что $|L| < n$ и $|R| < n$. По индукционному предположению для множества $L$ существует единственное декартово дерево $T_L$, а для множества $R$ — единственное декартово дерево $T_R$.
+                            </li>
+                            <li>
+                                <strong>Корректность сборки:</strong> Подвешивая $T_L$ в качестве левого сына корня $(x_0, y_0)$, а $T_R$ — в качестве правого сына, получаем дерево $T$:
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li>Свойство BST выполнено: все ключи $T_L$ строго меньше $x_0$, а все ключи $T_R$ строго больше $x_0$.</li>
+                                    <li>Свойство кучи выполнено: $y_0$ строго больше всех приоритетов в $S$, следовательно, больше приоритетов корней $T_L$ и $T_R$.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <p style="margin-top: 8px;">
+                            Поскольку выбор корня и разбиение на $L$ и $R$ определены строго однозначно, полученное декартово дерево существует и единственно. $\blacksquare$
+                        </p>
+                    </div>
+
+                    <!-- 3. Базовые операции: Split и Merge -->
+                    <section id="sec-splitmerge">
+                        <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 14px; color: var(--text-primary);">
+                            Базовые операции: Split и Merge
+                        </h2>
+                        <p style="margin-bottom: 16px;">
+                            Декартово дерево относится к классу <em>сливаемых</em> (mergeable) деревьев поиска. Все модифицирующие операции выражаются через две базовые процедуры: $\mathrm{Split}$ и $\mathrm{Merge}$.
+                        </p>
+
+                        <!-- Merge -->
+                        <div class="vcard vcard-alg">
+                            <span class="vcard-title-pill">[Алгоритм] Операция Merge(T₁, T₂)</span>
+                            <p><strong>Предусловие:</strong> Все ключи в дереве $T_1$ строго меньше любого ключа в дереве $T_2$: $\max(T_1.x) < \min(T_2.x)$.</p>
+                            <p style="margin-top: 6px;"><strong>Алгоритм:</strong></p>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если $T_1 = \emptyset$, возвращаем $T_2$. Если $T_2 = \emptyset$, возвращаем $T_1$.</li>
+                                <li>Сравниваем приоритеты корней $T_1.y$ и $T_2.y$:
+                                    <ul style="margin-left: 18px; margin-top: 4px;">
+                                        <li>Если $T_1.y > T_2.y$, то $T_1$ становится корнем результирующего дерева. Его левое поддерево сохраняется, а правый сын пересчитывается рекурсивно: $T_1.right = \mathrm{Merge}(T_1.right, T_2)$.</li>
+                                        <li>Иначе корнем становится $T_2$, его правое поддерево сохраняется, а левый сын пересчитывается: $T_2.left = \mathrm{Merge}(T_1, T_2.left)$.</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                            <p style="margin-top: 8px; font-weight: 600;">
+                                <strong>Время работы:</strong> На каждом шаге рекурсии спускаемся либо по правому хребту $T_1$, либо по левому хребту $T_2$. Следовательно, время работы строго ограничено суммой высот:
+                                $$T = O(h(T_1) + h(T_2)) = O(h).$$
+                            </p>
+                        </div>
+
+                        <!-- Split -->
+                        <div class="vcard vcard-alg">
+                            <span class="vcard-title-pill">[Алгоритм] Операция Split(T, x₀)</span>
+                            <p><strong>Цель:</strong> Разбить дерево $T$ по ключу $x_0$ на два непересекающихся дерева $\langle T_1, T_2 \rangle$ таких, что все ключи в $T_1 \le x_0$, а все ключи в $T_2 > x_0$.</p>
+                            <p style="margin-top: 6px;"><strong>Алгоритм:</strong></p>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если $T = \emptyset$, возвращаем пару $\langle \emptyset, \emptyset \rangle$.</li>
+                                <li>Сравниваем ключ корня $T.x$ с порогом $x_0$:
+                                    <ul style="margin-left: 18px; margin-top: 4px;">
+                                        <li>Если $T.x \le x_0$, то корень и всё его левое поддерево гарантированно принадлежат $T_1$. Рекурсивно расщепляем правое поддерево: $\langle R_1, R_2 \rangle = \mathrm{Split}(T.right, x_0)$. Подвешиваем $R_1$ как правого сына $T$, обновляем размер и возвращаем $\langle T, R_2 \rangle$.</li>
+                                        <li>Если $T.x > x_0$, симметрично: корень и правое поддерево идут в $T_2$. Расщепляем левое поддерево: $\langle L_1, L_2 \rangle = \mathrm{Split}(T.left, x_0)$, подвешиваем $L_2$ как левого сына $T$, обновляем размер и возвращаем $\langle L_1, T \rangle$.</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                            <p style="margin-top: 8px; font-weight: 600;">
+                                <strong>Время работы:</strong> Рекурсивный путь в точности повторяет путь поиска ключа $x_0$ в дереве, поэтому время строго ограничено высотой: $O(h)$.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- 4. Выразимость остальных операций -->
+                    <section id="sec-express" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Операции] Выразимость через Split и Merge</span>
+                        
+                        <div style="margin-bottom: 12px;">
+                            <strong>1. Вставка $\mathrm{Insert}(x, y)$:</strong>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Расщепляем дерево по ключу: $\langle T_1, T_2 \rangle = \mathrm{Split}(T, x)$.</li>
+                                <li>Создаем новый узел $M = \mathrm{new\ Node}(x, y)$.</li>
+                                <li>Сливаем части обратно: $T = \mathrm{Merge}(\mathrm{Merge}(T_1, M), T_2)$. Время: $O(h)$.</li>
+                            </ol>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <strong>2. Удаление $\mathrm{Erase}(x)$ — Способ I (через два Split и один Merge):</strong>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Выделяем поддерево ключа $x$: $\langle T_{12}, T_3 \rangle = \mathrm{Split}(T, x)$, затем $\langle T_1, T_2 \rangle = \mathrm{Split}(T_{12}, x - 1)$.</li>
+                                <li>В $T_2$ остался ровно узел с ключом $x$ (если он присутствовал). Освобождаем память $T_2$.</li>
+                                <li>Сливаем оставшиеся части: $T = \mathrm{Merge}(T_1, T_3)$. Время: $O(h)$.</li>
+                            </ol>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <strong>3. Удаление $\mathrm{Erase}(x)$ — Способ II (быстрый лекторский, без Split):</strong>
+                            <p style="margin-top: 4px;">
+                                Находим узел $x$ обычным спуском по BST. Если у него не более одного ребенка — удаляем тривиально. Если два ребенка — заменяем узел $x$ на результат $\mathrm{Merge}(x.left, x.right)$ без лишних разрезов всего дерева. Время: $O(h)$.
+                            </p>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <strong>4. Поиск $\mathrm{Find}(x)$ и $\mathrm{LowerBound}(x)$:</strong>
+                            <p style="margin-top: 4px;">
+                                Выполняются стандартным спуском по BST за $O(h)$, приоритеты при чтении игнорируются.
+                            </p>
+                        </div>
+
+                        <div>
+                            <strong>5. $k$-я порядковая статистика и номер ключа:</strong>
+                            <p style="margin-top: 4px;">
+                                Поддерживая в каждом узле поле $size = 1 + size(left) + size(right)$, можно за $O(h)$ найти $k$-й по величине элемент:
+                            </p>
+                            <ul style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если $k \le size(left) \implies$ рекурсивно переходим в $left$.</li>
+                                <li>Если $k = size(left) + 1 \implies$ текущий корень и есть искомая $k$-я статистика.</li>
+                                <li>Если $k > size(left) + 1 \implies$ переходим в $right$ с поиском $(k - size(left) - 1)$-й статистики.</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- 5. Теорема о высоте со случайными приоритетами -->
+                    <section id="sec-height" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теорема] Высота декартова дерева со случайными приоритетами</span>
+                        <p>
+                            Пусть множество $S$ состоит из $n$ элементов, а приоритеты $y_i$ выбраны случайно, независимо и равномерно из непрерывного распределения (или являются случайной перестановкой чисел $\{1, \dots, n\}$). Тогда:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li>Математическое ожидание глубины любого узла составляет $\mathbb{E}[\mathrm{depth}(v)] \le 2 \ln n + O(1) = O(\log n)$.</li>
+                            <li>Математическое ожидание высоты дерева составляет $\mathbb{E}[h] = O(\log n)$.</li>
+                        </ol>
+                    </section>
+
+                    <!-- Доказательство теоремы о высоте -->
+                    <div class="vcard vcard-proof">
+                        <div style="font-weight: 700; color: var(--card-proof); margin-bottom: 8px;">
+                            ▸ Доказательство через индикаторные случайные величины
+                        </div>
+                        <p>
+                            Пусть ключи отсортированы в порядке возрастания: $x_1 < x_2 < \dots < x_n$.
+                            Глубина вершины $x_i$ равна числу её предков в дереве:
+                            $$\mathrm{depth}(x_i) = \sum_{j \neq i} I_{j \to i},$$
+                            где $I_{j \to i}$ — индикатор события «вершина $x_j$ является предком вершины $x_i$».
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Лемма об условии предка:</strong> Вершина $x_j$ является предком вершины $x_i$ тогда и только тогда, когда среди всех элементов на отрезке между ними в отсортированном массиве $\{ x_{\min(i, j)}, \dots, x_{\max(i, j)} \}$ именно элемент $x_j$ имеет <strong>максимальный приоритет</strong> $y$.
+                        </p>
+                        <p style="margin-top: 6px; font-style: italic; font-size: 13px;">
+                            Обоснование леммы: Если бы максимум на этом отрезке достигался в некотором третьем элементе $x_k$ между ними, то при рекурсивном построении дерева вершина $x_k$ встала бы в корень раньше и навсегда разделила бы $x_i$ и $x_j$ в разные поддеревья (одно налево от $x_k$, другое направо), исключая прямое предкование.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            Длина отрезка между $x_i$ и $x_j$ включительно равна $|i - j| + 1$. Так как все приоритеты независимы и равновероятны, вероятность того, что именно $x_j$ окажется максимальным из этих $|i - j| + 1$ элементов, строго равна:
+                            $$\mathbb{P}(I_{j \to i} = 1) = \frac{1}{|i - j| + 1}.$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            Используя линейность математического ожидания, получаем:
+                            $$\mathbb{E}[\mathrm{depth}(x_i)] = \sum_{j \neq i} \frac{1}{|i - j| + 1} = \sum_{j=1}^{i-1} \frac{1}{i - j + 1} + \sum_{j=i+1}^n \frac{1}{j - i + 1} \le 2 \sum_{k=2}^n \frac{1}{k} \le 2 \ln n = O(\log n).$$
+                        </p>
+                        <p style="margin-top: 6px;">
+                            Так как математическое ожидание глубины любой вершины логарифмично, среднее время работы всех операций декартова дерева составляет $O(\log n)$. $\blacksquare$
+                        </p>
+                    </div>
+
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ К БИЛЕТУ
+                         ===================================================== -->
+
+                    <div id="sec-extra" class="extra-divider-banner">
+                        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Часть II: Дополнительные материалы к билету
+                        </div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">
+                            Summary билета, реализация на Java++ и ловушки экзаменатора
+                        </div>
+                    </div>
+
+                    <!-- 6. Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">★ Summary билета (ключевые факты и инварианты)</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Суть структуры:</strong> Рандомизированное бинарное дерево поиска, узлы которого хранят пары $(x, y)$, где $x$ удовлетворяет свойству дерева поиска (BST), а $y$ — свойству кучи (Heap).
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                <strong>Сложность операций:</strong>
+                                <div style="overflow-x: auto; margin-top: 6px;">
+                                    <table style="width: 100%; font-size: 12.5px; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1.5px solid var(--border-color); color: var(--text-muted);">
+                                                <th style="padding: 6px 8px;">Операция</th>
+                                                <th style="padding: 6px 8px;">Среднее время</th>
+                                                <th style="padding: 6px 8px;">Худшее время</th>
+                                                <th style="padding: 6px 8px;">Доп. память</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 600;">$\mathrm{Find}(x)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 600;">$\mathrm{Insert}(x, y)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$ стек</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 600;">$\mathrm{Erase}(x)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$ стек</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 600;">$\mathrm{Split}(T, x) \ / \ \mathrm{Merge}(T_1, T_2)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$ стек</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 600;">$k$-я статистика</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 6px 8px; font-weight: 600;">Построение из сортированного массива</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$ стек</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                            <li>
+                                <strong>Ключевые инварианты:</strong>
+                                <ol style="margin-left: 20px; margin-top: 4px;">
+                                    <li><em>BST по ключам $x$:</em> Для каждого узла $v$: $\forall u \in v.left \implies u.x \le v.x$, $\forall w \in v.right \implies w.x > v.x$.</li>
+                                    <li><em>Max-Heap по приоритетам $y$:</em> Для каждого узла $v$: $v.y \ge v.left.y$ и $v.y \ge v.right.y$.</li>
+                                </ol>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- 7. Реализация на языке Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Справочная реализация на языке Java++ (для понимания)
+                            </span>
+                            <span style="font-size: 11px; color: var(--text-muted);">
+                                Кросс-платформенный синтаксис (Java / C++)
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-com">// ============================================================================</span>
+<span class="tok-com">// Псевдоязык Java++: понятен как Java, так и C++ разработчику</span>
+<span class="tok-com">// ============================================================================</span>
+<span class="tok-kw">class</span> <span class="tok-type">Node</span> {
+    <span class="tok-kw">int</span> <span class="tok-prop">key</span>;
+    <span class="tok-kw">int</span> <span class="tok-prop">priority</span>;
+    <span class="tok-kw">int</span> <span class="tok-prop">size</span> = <span class="tok-num">1</span>; <span class="tok-com">// размер поддерева для порядковых статистик</span>
+    <span class="tok-type">Node</span> <span class="tok-prop">left</span> = <span class="tok-kw">null</span>;
+    <span class="tok-type">Node</span> <span class="tok-prop">right</span> = <span class="tok-kw">null</span>;
+
+    <span class="tok-type">Node</span>(<span class="tok-kw">int</span> key, <span class="tok-kw">int</span> priority) {
+        <span class="tok-kw">this</span>.<span class="tok-prop">key</span> = key;
+        <span class="tok-kw">this</span>.<span class="tok-prop">priority</span> = priority;
+    }
+}
+
+<span class="tok-kw">int</span> <span class="tok-func">getSize</span>(<span class="tok-type">Node</span> t) {
+    <span class="tok-kw">return</span> (t != <span class="tok-kw">null</span>) ? t.<span class="tok-prop">size</span> : <span class="tok-num">0</span>;
+}
+
+<span class="tok-kw">void</span> <span class="tok-func">update</span>(<span class="tok-type">Node</span> t) {
+    <span class="tok-kw">if</span> (t != <span class="tok-kw">null</span>) {
+        t.<span class="tok-prop">size</span> = <span class="tok-num">1</span> + <span class="tok-func">getSize</span>(t.<span class="tok-prop">left</span>) + <span class="tok-func">getSize</span>(t.<span class="tok-prop">right</span>);
+    }
+}
+
+<span class="tok-type">Node</span> <span class="tok-func">merge</span>(<span class="tok-type">Node</span> t1, <span class="tok-type">Node</span> t2) {
+    <span class="tok-kw">if</span> (t1 == <span class="tok-kw">null</span> || t2 == <span class="tok-kw">null</span>) {
+        <span class="tok-kw">return</span> (t1 != <span class="tok-kw">null</span>) ? t1 : t2;
+    }
+    <span class="tok-kw">if</span> (t1.<span class="tok-prop">priority</span> &gt; t2.<span class="tok-prop">priority</span>) {
+        t1.<span class="tok-prop">right</span> = <span class="tok-func">merge</span>(t1.<span class="tok-prop">right</span>, t2);
+        <span class="tok-func">update</span>(t1);
+        <span class="tok-kw">return</span> t1;
+    } <span class="tok-kw">else</span> {
+        t2.<span class="tok-prop">left</span> = <span class="tok-func">merge</span>(t1, t2.<span class="tok-prop">left</span>);
+        <span class="tok-func">update</span>(t2);
+        <span class="tok-kw">return</span> t2;
+    }
+}
+
+<span class="tok-type">Pair</span>&lt;<span class="tok-type">Node</span>, <span class="tok-type">Node</span>&gt; <span class="tok-func">split</span>(<span class="tok-type">Node</span> t, <span class="tok-kw">int</span> k) {
+    <span class="tok-kw">if</span> (t == <span class="tok-kw">null</span>) {
+        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-type">Pair</span>(<span class="tok-kw">null</span>, <span class="tok-kw">null</span>);
+    }
+    <span class="tok-kw">if</span> (t.<span class="tok-prop">key</span> &lt;= k) {
+        <span class="tok-type">Pair</span>&lt;<span class="tok-type">Node</span>, <span class="tok-type">Node</span>&gt; res = <span class="tok-func">split</span>(t.<span class="tok-prop">right</span>, k);
+        t.<span class="tok-prop">right</span> = res.<span class="tok-prop">first</span>;
+        <span class="tok-func">update</span>(t);
+        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-type">Pair</span>(t, res.<span class="tok-prop">second</span>);
+    } <span class="tok-kw">else</span> {
+        <span class="tok-type">Pair</span>&lt;<span class="tok-type">Node</span>, <span class="tok-type">Node</span>&gt; res = <span class="tok-func">split</span>(t.<span class="tok-prop">left</span>, k);
+        t.<span class="tok-prop">left</span> = res.<span class="tok-prop">second</span>;
+        <span class="tok-func">update</span>(t);
+        <span class="tok-kw">return</span> <span class="tok-kw">new</span> <span class="tok-type">Pair</span>(res.<span class="tok-prop">first</span>, t);
+    }
+}
+
+<span class="tok-com">// Быстрое лекторское удаление без Split (merge детей узла)</span>
+<span class="tok-type">Node</span> <span class="tok-func">eraseFast</span>(<span class="tok-type">Node</span> t, <span class="tok-kw">int</span> key) {
+    <span class="tok-kw">if</span> (t == <span class="tok-kw">null</span>) <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
+    <span class="tok-kw">if</span> (t.<span class="tok-prop">key</span> == key) {
+        <span class="tok-kw">return</span> <span class="tok-func">merge</span>(t.<span class="tok-prop">left</span>, t.<span class="tok-prop">right</span>);
+    }
+    <span class="tok-kw">if</span> (key &lt; t.<span class="tok-prop">key</span>) {
+        t.<span class="tok-prop">left</span> = <span class="tok-func">eraseFast</span>(t.<span class="tok-prop">left</span>, key);
+    } <span class="tok-kw">else</span> {
+        t.<span class="tok-prop">right</span> = <span class="tok-func">eraseFast</span>(t.<span class="tok-prop">right</span>, key);
+    }
+    <span class="tok-func">update</span>(t);
+    <span class="tok-kw">return</span> t;
+}</code></pre>
+                    </section>
+
+                    <!-- 8. Каверзные вопросы экзаменатора -->
+                    <section id="sec-traps" class="vcard vcard-alert">
+                        <span class="vcard-title-pill">[Ловушки экзаменатора] Каверзные вопросы на коллоквиуме</span>
+                        
+                        <ol style="margin-left: 20px;">
+                            <li style="margin-bottom: 12px;">
+                                <strong>Вопрос: Что произойдет, если ключи $x_i$ могут совпадать (дубликаты)?</strong><br>
+                                <em>Ответ:</em> В стандартном коде условие $t.key \le k$ стабильно отправляет равные ключи в левую ветвь. При большом числе дубликатов дерево может вытянуться в несбалансированный «бамбук» глубины $O(n)$.<br>
+                                <strong>Решения:</strong> 1) Хранить в узле счетчик повторяемости <code>count</code>; 2) Использовать трехсторонний сплит ($\mathrm{Split3} \to <, =, >$); 3) Вводить составной ключ $(x_i, \mathrm{id}_i)$ со строгой уникальностью.
+                            </li>
+
+                            <li style="margin-bottom: 12px;">
+                                <strong>Вопрос: Что делать, если генератор псевдослучайных чисел выдаст два одинаковых приоритета $y$?</strong><br>
+                                <em>Ответ:</em> Коллизия приоритетов формально нарушает строгость теоремы о единственности. На практике используют 64-битный вихрь Мерсенна (<code>mt19937_64</code>) с диапазоном $[0, 2^{64}-1]$, где по парадоксу дней рождения вероятность коллизии для $n = 10^6$ ничтожно мала ($\approx 10^{-8}$). В качестве строгого тай-брейкера при равенстве $y$ можно сравнивать уникальные адреса объектов в памяти.
+                            </li>
+
+                            <li style="margin-bottom: 12px;">
+                                <strong>Вопрос: Всегда ли декартово дерево является рандомизированным? Можно ли построить его за $O(n)$?</strong><br>
+                                <em>Ответ:</em> <strong>Нет!</strong> Treap — это рандомизированное дерево, но само понятие <em>декартова дерева</em> абсолютно детерминировано для заданного набора пар $(x_i, y_i)$. Если точки уже отсортированы по ключу $x$, то декартово дерево строится за <strong>строго линейное время $O(n)$</strong> с помощью монотонного стека по правому хребту (алгоритм аналогичен построению Cartesian Tree для задачи Range Minimum Query).
+                            </li>
+
+                            <li style="margin-bottom: 12px;">
+                                <strong>Вопрос: Чем опасны рекурсивные $\mathrm{Split}$ и $\mathrm{Merge}$ на реальной машине?</strong><br>
+                                <em>Ответ:</em> Рекурсивные реализации расходуют $O(h)$ кадров стека вызовов. При неудачной последовательности приоритетов или при глубоком дереве ($n \ge 10^5$) возможен <strong>Stack Overflow</strong>.<br>
+                                <strong>Решение:</strong> Итеративный $\mathrm{Split}$ и $\mathrm{Merge}$ пишутся через поддержание указателей на адреса ссылок, которые необходимо перепривязать на очередном шаге спуска.
+                            </li>
+
+                            <li style="margin-bottom: 12px;">
+                                <strong>Вопрос: Зависит ли высота Treap от порядка добавления ключей $x$?</strong><br>
+                                <em>Ответ:</em> <strong>Категорически нет!</strong> Это ключевое преимущество декартова дерева: даже если ключи $x$ подаются строго по возрастанию или убыванию (что мгновенно превращает наивное BST в вырожденный список $O(n)$), форма Treap однозначно задается случайными приоритетами $y$. Математическое ожидание высоты гарантированно остается $O(\log n)$.
+                            </li>
+
+                            <li style="margin-bottom: 12px;">
+                                <strong>Вопрос: В чем Treap проигрывает AVL- и Красно-черным деревьям, а в чем превосходит их?</strong><br>
+                                <em>Ответ:</em><br>
+                                • <em>Минусы Treap:</em> Расходует лишние 4 байта на поле $y$; константа глубины у него больше ($\approx 2 \ln n \approx 1.386 \log_2 n$ против $1.01 \log_2 n$ у AVL); требует вызова генератора случайных чисел; хуже локализован в кэше процессора.<br>
+                                • <em>Плюсы Treap:</em> Код в 4 раза короче (нет 4 типов вращений AVL/RB); элементарно модифицируется в <strong>дерево по неявному ключу</strong> (Implicit Treap); тривиально поддерживает операции на подотрезках (Range Queries) и персистентность.
+                            </li>
+
+                            <li style="margin-bottom: 12px;">
+                                <strong>Вопрос: Насколько сложно сделать декартово дерево персистентным (Persistent Treap)?</strong><br>
+                                <em>Ответ:</em> Очень просто. В операциях <code>Split</code> и <code>Merge</code> модифицируется только путь спуска длины $O(\log n)$. Применив метод копирования пути (Path Copying), мы просто создаем копию текущей вершины перед спуском вглубь. Это дает полную персистентность с $O(\log n)$ дополнительной памяти и времени на модификацию.
+                            </li>
+
+                            <li>
+                                <strong>Вопрос: Что такое декартово дерево по неявному ключу (Implicit Treap)?</strong><br>
+                                <em>Ответ:</em> Ключ $x$ в узлах явно <strong>не хранится</strong>, а равен порядковому индексу элемента в массиве (вычисляется на лету как $size(left) + 1$). Это превращает Treap в супер-массив, поддерживающий вставку и удаление элементов по произвольному индексу, перемещение и переворот отрезков за $O(\log n)$.
+                            </li>
+                        </ol>
+                    </section>
+
+                </div>
+
+                <!-- Right Margin Column: Sticky Clickable Mini-TOC ONLY -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-def" class="nav-item nav-def">1. Определение</a>
+                        <a href="#sec-unique" class="nav-item nav-thm">2. Единственность</a>
+                        <a href="#sec-splitmerge" class="nav-item nav-alg">3. Split и Merge</a>
+                        <a href="#sec-express" class="nav-item nav-proof">4. Выразимость</a>
+                        <a href="#sec-height" class="nav-item nav-thm">5. Теорема о высоте</a>
+                        
+                        <div class="nav-divider"></div>
+                        
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                        <a href="#sec-traps" class="nav-subitem nav-alert">– Ловушки экзаменатора</a>
+                    </nav>
+                </aside>
+
