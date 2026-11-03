@@ -1,0 +1,270 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 19 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Бинарное дерево поиска (BST): Find, Insert, Erase</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Инвариант BST. Симметричный обход. Реализация операций Find, Insert, Erase (3 случая удаления узла: лист, 1 ребенок, 2 ребенка через in-order successor). Оценка времени $O(h)$ и проблема вырождения в бамбук.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">19</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-bst-def" class="nav-item nav-def">1. Инвариант BST</a>
+                        <a href="#sec-find-insert" class="nav-item nav-alg">2. Операции Find и Insert</a>
+                        <a href="#sec-erase" class="nav-item nav-proof">3. Удаление Erase (3 случая)</a>
+                        <a href="#sec-height-issue" class="nav-item nav-thm">4. Высота $h$ и вырождение</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Инвариант BST -->
+                    <section id="sec-bst-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Бинарное дерево поиска (Binary Search Tree)</span>
+                        <p>
+                            <strong>Бинарное дерево поиска (BST)</strong> — это двоичное дерево, в каждом узле $x$ которого хранится ключ $x.\mathrm{key}$, удовлетворяющее <strong>инварианту BST</strong>:
+                        </p>
+                        $$\forall u \in \mathrm{left}(x) \implies u.\mathrm{key} \le x.\mathrm{key}$$
+                        $$\forall v \in \mathrm{right}(x) \implies v.\mathrm{key} > x.\mathrm{key}$$
+                        <p style="margin-top: 8px;">
+                            (В модели с уникальными ключами в левом поддереве строго меньшие элементы, в правом — строго большие).
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Симметричный обход (In-order traversal):</strong>
+                            Рекурсивный обход поддеревьев в порядке $\mathrm{Left} \to \mathrm{Node} \to \mathrm{Right}$ посещает ключи дерева в строго неубывающем отсортированном порядке за линейное время $\Theta(n)$.
+                        </p>
+                    </section>
+
+                    <!-- 2. Операции Find и Insert -->
+                    <section id="sec-find-insert" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритмы] Базовые операции Find и Insert за $O(h)$</span>
+                        <div style="margin-top: 8px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Поиск: $\mathrm{Find}(x, \mathrm{key})$</h4>
+                            <p>
+                                Сравниваем искомый $\mathrm{key}$ с ключом текущего узла:
+                            </p>
+                            <ul style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если текущий узел $\mathrm{null}$ — ключ отсутствует в дереве ($\mathrm{false}$).</li>
+                                <li>Если $\mathrm{key} == x.\mathrm{key}$ — элемент найден ($\mathrm{true}$).</li>
+                                <li>Если $\mathrm{key} < x.\mathrm{key}$ — идем влево: $x = x.\mathrm{left}$.</li>
+                                <li>Если $\mathrm{key} > x.\mathrm{key}$ — идем вправо: $x = x.\mathrm{right}$.</li>
+                            </ul>
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Вставка: $\mathrm{Insert}(x, \mathrm{key})$</h4>
+                            <p>
+                                Идем вниз по дереву аналогично поиску $\mathrm{Find}$:
+                            </p>
+                            <ul style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если встречаем узел с совпадающим ключом — завершаем работу (ключ уже есть).</li>
+                                <li>Как только путь поиска пытается перейти в отсутствующий узел ($\mathrm{null}$), создаем новый узел с данным ключом и привязываем его к родителю.</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- 3. Удаление Erase -->
+                    <section id="sec-erase" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Алгоритм] Удаление узла Erase(key) (Лекционный разбор 3 случаев)</span>
+                        <p>
+                            Сначала находим узел $z$, содержащий удаляемый ключ. Если такой узел отсутствует — дерево не меняется. Если найден, возможны 3 случая в зависимости от числа сыновей узла $z$:
+                        </p>
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">Случай 1: Узел $z$ — лист (0 детей)</h4>
+                            <p>
+                                Узел просто удаляется из дерева, а соответствующий указатель у его родителя ($z.\mathrm{parent}$) зануляется.
+                            </p>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">Случай 2: Узел $z$ имеет ровно одного ребенка</h4>
+                            <p>
+                                Единственный сын узла $z$ (левый или правый) переподвешивается напрямую к родителю $z$, занимая место $z$. Сам узел $z$ освобождается.
+                            </p>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">Случай 3: Многодетный узел (2 ребенка)</h4>
+                            <p>
+                                Узел $z$ имеет обоих детей. Нельзя просто вырезать его без нарушения структуры:
+                            </p>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Найдем наименьший элемент, строго больший $z.\mathrm{key}$ — это <strong>следующий элемент в порядке симметричного обхода (in-order successor)</strong> $y$.</li>
+                                <li>Для поиска $y$ делаем один шаг вправо ($z.\mathrm{right}$), а затем спускаемся влево до упора ($y = \mathrm{findMin}(z.\mathrm{right})$).</li>
+                                <li><em>Ключевое свойство $y$:</em> Узел $y$ <strong>гарантированно не имеет левого ребенка</strong>! (иначе мы могли бы спуститься еще левее).</li>
+                                <li>Копируем значение $y.\mathrm{key}$ в узел $z$.</li>
+                                <li>Удаляем исходный узел $y$ из правого поддерева: так как у $y$ не более одного ребенка, это сводится к тривиальному Случаю 1 или Случаю 2!</li>
+                            </ol>
+                        </div>
+                    </section>
+
+                    <!-- 4. Высота h и вырождение -->
+                    <section id="sec-height-issue" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теорема] Временная сложность и проблема вырождения в бамбук</span>
+                        <p>
+                            Все три операции ($\mathrm{Find}$, $\mathrm{Insert}$, $\mathrm{Erase}$) на каждом шаге спускаются строго на один уровень вниз по дереву.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            Следовательно, время работы любой операции составляет:
+                        </p>
+                        $$T(n) = O(h)$$
+                        <p style="margin-top: 4px; font-size: 13px;">
+                            где $h$ — высота дерева (длина максимального пути от корня до листа).
+                        </p>
+                        <div style="background: rgba(248,113,113,0.06); border-left: 3px solid #f87171; padding: 8px 12px; margin-top: 10px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Проблема наивного BST:</strong>
+                            <ul style="margin-left: 18px; margin-top: 4px;">
+                                <li><em>Лучший случай:</em> Идеально сбалансированное дерево: $h = \lfloor \log_2 n \rfloor \implies O(\log n)$.</li>
+                                <li><em>Худший случай:</em> Если ключи поступают в отсортированном порядке ($1, 2, 3, \dots, n$), каждый следующий элемент подвешивается правым сыном предыдущего. Дерево вырождается в связный список (бамбук) глубины $h = n$, а операции деградируют до <strong>$O(n)$</strong>!</li>
+                            </ul>
+                            Для предотвращения вырождения используются самобалансирующиеся деревья поиска (AVL, Treap, Splay, RB-Tree).
+                        </div>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные свойства бинарного дерева поиска</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Операция</th>
+                                    <th style="padding: 6px 8px;">Средняя сложность</th>
+                                    <th style="padding: 6px 8px;">Худшая сложность (бамбук)</th>
+                                    <th style="padding: 6px 8px;">Суть действий</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Find(key)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;">Спуск влево или вправо по ключу</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Insert(key)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;">Поиск листа и прикрепление нового узла</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Erase(key)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;">3 случая (замена на in-order successor)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация BST (Find, Insert, Erase) на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">BinarySearchTree</span> {
+    <span class="tok-kw">static class</span> <span class="tok-type">Node</span> {
+        <span class="tok-kw">int</span> key;
+        <span class="tok-type">Node</span> left, right;
+        <span class="tok-func">Node</span>(<span class="tok-kw">int</span> key) { <span class="tok-kw">this</span>.key = key; }
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> root = <span class="tok-kw">null</span>;
+
+    <span class="tok-com">// Поиск ключа: O(h)</span>
+    <span class="tok-kw">boolean</span> <span class="tok-func">find</span>(<span class="tok-kw">int</span> key) {
+        <span class="tok-type">Node</span> cur = root;
+        <span class="tok-kw">while</span> (cur != <span class="tok-kw">null</span>) {
+            <span class="tok-kw">if</span> (key == cur.key) <span class="tok-kw">return true</span>;
+            cur = (key &lt; cur.key) ? cur.left : cur.right;
+        }
+        <span class="tok-kw">return false</span>;
+    }
+
+    <span class="tok-com">// Вставка ключа: O(h)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">insert</span>(<span class="tok-kw">int</span> key) {
+        root = <span class="tok-func">insertRec</span>(root, key);
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">insertRec</span>(<span class="tok-type">Node</span> node, <span class="tok-kw">int</span> key) {
+        <span class="tok-kw">if</span> (node == <span class="tok-kw">null</span>) <span class="tok-kw">return new</span> <span class="tok-type">Node</span>(key);
+        <span class="tok-kw">if</span> (key &lt; node.key) {
+            node.left = <span class="tok-func">insertRec</span>(node.left, key);
+        } <span class="tok-kw">else if</span> (key &gt; node.key) {
+            node.right = <span class="tok-func">insertRec</span>(node.right, key);
+        }
+        <span class="tok-kw">return</span> node;
+    }
+
+    <span class="tok-com">// Удаление ключа: O(h) с разбором 3 случаев</span>
+    <span class="tok-kw">void</span> <span class="tok-func">erase</span>(<span class="tok-kw">int</span> key) {
+        root = <span class="tok-func">eraseRec</span>(root, key);
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">eraseRec</span>(<span class="tok-type">Node</span> node, <span class="tok-kw">int</span> key) {
+        <span class="tok-kw">if</span> (node == <span class="tok-kw">null</span>) <span class="tok-kw">return null</span>;
+
+        <span class="tok-kw">if</span> (key &lt; node.key) {
+            node.left = <span class="tok-func">eraseRec</span>(node.left, key);
+        } <span class="tok-kw">else if</span> (key &gt; node.key) {
+            node.right = <span class="tok-func">eraseRec</span>(node.right, key);
+        } <span class="tok-kw">else</span> {
+            <span class="tok-com">// Найден удаляемый узел!</span>
+            <span class="tok-com">// Случай 1 и 2: 0 или 1 ребенок</span>
+            <span class="tok-kw">if</span> (node.left == <span class="tok-kw">null</span>) <span class="tok-kw">return</span> node.right;
+            <span class="tok-kw">if</span> (node.right == <span class="tok-kw">null</span>) <span class="tok-kw">return</span> node.left;
+
+            <span class="tok-com">// Случай 3: 2 ребенка. Ищем in-order successor (минимум в правом поддереве)</span>
+            <span class="tok-type">Node</span> succ = <span class="tok-func">findMin</span>(node.right);
+            node.key = succ.key; <span class="tok-com">// Заменяем ключ</span>
+            node.right = <span class="tok-func">eraseRec</span>(node.right, succ.key); <span class="tok-com">// Удаляем преемника</span>
+        }
+        <span class="tok-kw">return</span> node;
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">findMin</span>(<span class="tok-type">Node</span> node) {
+        <span class="tok-kw">while</span> (node.left != <span class="tok-kw">null</span>) node = node.left;
+        <span class="tok-kw">return</span> node;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-bst-def" class="nav-item nav-def">1. Инвариант BST</a>
+                        <a href="#sec-find-insert" class="nav-item nav-alg">2. Find и Insert</a>
+                        <a href="#sec-erase" class="nav-item nav-proof">3. Удаление Erase (3 случая)</a>
+                        <a href="#sec-height-issue" class="nav-item nav-thm">4. Высота $h$ и бамбук</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
