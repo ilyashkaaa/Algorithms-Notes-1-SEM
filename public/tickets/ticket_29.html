@@ -1,0 +1,320 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 29 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Декартово дерево по неявному ключу (Implicit Treap)</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Концепция неявного ключа как позиции элемента. Операции Split и Merge по индексу. Задача о развороте подотрезка (Reverse Range) за $O(\log n)$ через отложенный бит reversed и ленивое проталкивание.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">29</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-implicit-def" class="nav-item nav-def">1. Суть неявного ключа</a>
+                        <a href="#sec-implicit-ops" class="nav-item nav-alg">2. Split и Merge по размеру</a>
+                        <a href="#sec-reverse-problem" class="nav-item nav-thm">3. Задача о развороте подотрезка</a>
+                        <a href="#sec-lazy-reverse" class="nav-item nav-proof">4. Ленивое проталкивание push</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Суть неявного ключа -->
+                    <section id="sec-implicit-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Концепция] Что такое неявный ключ (Implicit Key)?</span>
+                        <p>
+                            В классическом декартовом дереве (Билет 22) каждый узел хранит явный ключ $x$ (BST) и приоритет $y$ (Heap).
+                            Однако если мы моделируем динамический массив, элементам соответствуют их <strong>порядковые позиции (индексы $0, 1, \dots, n-1$)</strong>.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Проблема явных индексов:</strong> Если хранить индекс как явный ключ $x$, то при вставке или вырезании элемента в позиции $i$ индексы всех последующих $n - i$ элементов увеличиваются или уменьшаются на 1, что требует $O(n)$ времени на обновление всего дерева.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Идея неявного ключа:</strong>
+                            Ключ $x$ <strong>вообще не хранится в узле</strong>! Ключом узла является его <em>порядковый номер в порядке симметричного обхода (in-order traversal)</em> всего дерева.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            Позиция узла $v$ внутри его собственного поддерева в 0-индексации строго равна числу узлов в его левом поддереве:
+                        </p>
+                        $$\mathrm{index\_in\_subtree}(v) = \mathrm{size}(v.\mathrm{left})$$
+                        <div style="background: rgba(56,189,248,0.06); border-left: 3px solid #38bdf8; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            Благодаря этому вставка или удаление узла меняет размеры поддеревьев только у его непосредственных предков ($O(\log n)$ узлов), автоматически сдвигая неявные индексы всех элементов правее без физической перезаписи!
+                        </div>
+                    </section>
+
+                    <!-- 2. Split и Merge по размеру -->
+                    <section id="sec-implicit-ops" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритмы] Операции Split и Merge по неявному ключу</span>
+                        <div style="margin-top: 8px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Разрезание: $\mathrm{Split}(T, k) \to (T_1, T_2)$</h4>
+                            <p>
+                                Разделяет дерево $T$ на $T_1$ (первые $k$ элементов массива) и $T_2$ (оставшиеся $n - k$ элементов):
+                            </p>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если $T == \mathrm{null}$, возвращаем $(\mathrm{null}, \mathrm{null})$.</li>
+                                <li><strong>Обязательно вызываем $\mathrm{push}(T)$</strong> перед спуском в детей.</li>
+                                <li>Считаем размер левого поддерева: $L = \mathrm{size}(T.\mathrm{left})$.</li>
+                                <li>Если $k \le L$: граница разреза находится в левом поддереве:
+                                    <br>Рекурсивно вызываем $(T_1, T_2') = \mathrm{Split}(T.\mathrm{left}, k)$.
+                                    <br>Привязываем: $T.\mathrm{left} = T_2'$, обновляем размер $\mathrm{update}(T)$, возвращаем $(T_1, T)$.
+                                </li>
+                                <li>Если $k > L$: граница разреза находится в правом поддереве:
+                                    <br>Рекурсивно вызываем $(T_1', T_2) = \mathrm{Split}(T.\mathrm{right}, k - L - 1)$ (относительный индекс!).
+                                    <br>Привязываем: $T.\mathrm{right} = T_1'$, обновляем размер $\mathrm{update}(T)$, возвращаем $(T, T_2)$.
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Слияние: $\mathrm{Merge}(T_1, T_2) \to T$</h4>
+                            <p>
+                                Склеивает массив $T_1$ и массив $T_2$ (все элементы $T_1$ chronologically предшествуют элементам $T_2$):
+                            </p>
+                            <ul style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если одно из деревьев пусто — возвращаем второе.</li>
+                                <li>Вызываем $\mathrm{push}(T_1)$ и $\mathrm{push}(T_2)$.</li>
+                                <li>Сравниваем приоритеты кучи:
+                                    <br>Если $T_1.y > T_2.y$, то $T_1$ становится корнем: $T_1.\mathrm{right} = \mathrm{Merge}(T_1.\mathrm{right}, T_2)$, $\mathrm{update}(T_1)$, return $T_1$.
+                                    <br>Иначе $T_2$ становится корнем: $T_2.\mathrm{left} = \mathrm{Merge}(T_1, T_2.\mathrm{left})$, $\mathrm{update}(T_2)$, return $T_2$.
+                                </li>
+                            </ul>
+                            <p style="margin-top: 6px; font-size: 12.5px;">
+                                Время работы $\mathrm{Split}$ и $\mathrm{Merge}$: строго <strong>$O(\log n)$</strong> в среднем благодаря свойствам декартова дерева.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- 3. Задача о развороте подотрезка -->
+                    <section id="sec-reverse-problem" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Задача] Разворот подотрезка массива за $O(\log n)$</span>
+                        <p>
+                            <strong>Постановка задачи:</strong> Дан массив $A[0 \dots n-1]$. Поступают запросы $\mathrm{reverse}(l, r)$, требующие перевернуть порядок следования элементов на отрезке $[l, r]$:
+                        </p>
+                        $$A[l] \leftrightarrow A[r], \quad A[l+1] \leftrightarrow A[r-1], \quad \dots$$
+                        <div style="margin-top: 8px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">Алгоритм решения через Treap по неявному ключу:</h4>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Вырезаем подотрезок $[l, r]$ из общего дерева $T$ с помощью двух операций $\mathrm{Split}$:
+                                    <ul style="margin-left: 18px; margin-top: 2px;">
+                                        <li>$\mathrm{Split}(T, r + 1) \implies (T_{12}, T_3)$, где $T_3$ — суффикс с индексами $> r$.</li>
+                                        <li>$\mathrm{Split}(T_{12}, l) \implies (T_1, T_2)$, где $T_1$ — префикс с индексами $< l$.</li>
+                                    </ul>
+                                    В результате дерево $T_2$ содержит <strong>в точности элементы отрезка $[l, r]$</strong>!
+                                </li>
+                                <li>Разворот поддерева $T_2$: вместо физической перестановки всех узлов мы просто инвертируем отложенный флаг в корне:
+                                    $$T_2.\mathrm{reversed} = T_2.\mathrm{reversed} \oplus \mathrm{true}$$
+                                </li>
+                                <li>Склеиваем деревья обратно в исходном порядке:
+                                    $$T = \mathrm{Merge}(\mathrm{Merge}(T_1, T_2), T_3)$$
+                                </li>
+                            </ol>
+                        </div>
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            Вся операция разворота состоит из 2 вызовов $\mathrm{Split}$, одной битовой операции в корне и 2 вызовов $\mathrm{Merge}$. Сложность: строго <strong>$O(\log n)$</strong>!
+                        </div>
+                    </section>
+
+                    <!-- 4. Ленивое проталкивание push -->
+                    <section id="sec-lazy-reverse" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Алгоритм] Ленивое проталкивание разворота: push(node)</span>
+                        <p>
+                            Что означает разворот массива на языке дерева?
+                        </p>
+                        <p style="margin-top: 6px;">
+                            При симметричном обходе $\mathrm{in-order}$ посещаются сначала левое поддерево, потом корень, потом правое поддерево: $\mathrm{Left} \to \mathrm{Root} \to \mathrm{Right}$.
+                            Чтобы элементы шли в обратном порядке, необходимо, чтобы обход происходил в порядке $\mathrm{Right} \to \mathrm{Root} \to \mathrm{Left}$.
+                            Для этого достаточно для каждого узла поддерева <strong>поменять местами его левого и правого сыновей</strong>:
+                        </p>
+                        $$\mathrm{swap}(v.\mathrm{left}, v.\mathrm{right})$$
+                        <div style="background: rgba(255,255,255,0.03); border-left: 3px solid var(--accent-color); padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 13px;">
+                            <strong>Функция $\mathrm{push}(v)$:</strong>
+                            <ol style="margin-left: 18px; margin-top: 4px;">
+                                <li>Если $v == \mathrm{null}$ или $v.\mathrm{reversed} == \mathrm{false}$ — выход.</li>
+                                <li>Флаг поднят: меняем местами ссылки на детей:
+                                    $$\mathrm{swap}(v.\mathrm{left}, v.\mathrm{right})$$
+                                </li>
+                                <li>Передаем флаг детям (инвертируем их флаги):
+                                    <br><code>if (v.left != null) v.left.reversed ^= true;</code>
+                                    <br><code>if (v.right != null) v.right.reversed ^= true;</code>
+                                </li>
+                                <li>Сбрасываем флаг в текущем узле: $v.\mathrm{reversed} = \mathrm{false}$.</li>
+                            </ol>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 12.5px; opacity: 0.9;">
+                            Инвариант: $\mathrm{push}(v)$ вызывается перед любым обращением к детям узла (в начале $\mathrm{Split}$, $\mathrm{Merge}$, $\mathrm{print}$ и т.д.), гарантируя актуальность связей.
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Возможности неявного декартова дерева</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Операция с массивом</th>
+                                    <th style="padding: 6px 8px;">Обычный массив</th>
+                                    <th style="padding: 6px 8px;">Implicit Treap</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Доступ по индексу $A[i]$</strong></td>
+                                    <td style="padding: 6px 8px;">$O(1)$</td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Вставка элемента в середину</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(\log n)$</strong></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Удаление элемента из середины</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(\log n)$</strong></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Разворот подотрезка reverse(l, r)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(\log n)$</strong></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Перемещение блока в начало/конец</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(\log n)$</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация Implicit Treap с операцией Reverse подотрезка на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">ImplicitTreap</span> {
+    <span class="tok-kw">static class</span> <span class="tok-type">Node</span> {
+        <span class="tok-kw">int</span> val;
+        <span class="tok-kw">int</span> y; <span class="tok-com">// Случайный приоритет кучи</span>
+        <span class="tok-kw">int</span> size = <span class="tok-num">1</span>;
+        <span class="tok-kw">boolean</span> reversed = <span class="tok-kw">false</span>; <span class="tok-com">// Отложенный флаг разворота</span>
+        <span class="tok-type">Node</span> left, right;
+
+        <span class="tok-func">Node</span>(<span class="tok-kw">int</span> val) {
+            <span class="tok-kw">this</span>.val = val;
+            <span class="tok-kw">this</span>.y = rnd.<span class="tok-func">nextInt</span>();
+        }
+    }
+
+    <span class="tok-kw">private static final</span> <span class="tok-type">Random</span> rnd = <span class="tok-kw">new</span> <span class="tok-type">Random</span>();
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> root = <span class="tok-kw">null</span>;
+
+    <span class="tok-kw">private int</span> <span class="tok-func">sz</span>(<span class="tok-type">Node</span> t) { <span class="tok-kw">return</span> t == <span class="tok-kw">null</span> ? <span class="tok-num">0</span> : t.size; }
+
+    <span class="tok-kw">private void</span> <span class="tok-func">update</span>(<span class="tok-type">Node</span> t) {
+        <span class="tok-kw">if</span> (t != <span class="tok-kw">null</span>) {
+            t.size = <span class="tok-num">1</span> + <span class="tok-func">sz</span>(t.left) + <span class="tok-func">sz</span>(t.right);
+        }
+    }
+
+    <span class="tok-com">// Проталкивание отложенного бита разворота за O(1)</span>
+    <span class="tok-kw">private void</span> <span class="tok-func">push</span>(<span class="tok-type">Node</span> t) {
+        <span class="tok-kw">if</span> (t != <span class="tok-kw">null</span> &amp;&amp; t.reversed) {
+            <span class="tok-type">Node</span> tmp = t.left; t.left = t.right; t.right = tmp; <span class="tok-com">// swap(left, right)</span>
+            <span class="tok-kw">if</span> (t.left != <span class="tok-kw">null</span>) t.left.reversed ^= <span class="tok-kw">true</span>;
+            <span class="tok-kw">if</span> (t.right != <span class="tok-kw">null</span>) t.right.reversed ^= <span class="tok-kw">true</span>;
+            t.reversed = <span class="tok-kw">false</span>;
+        }
+    }
+
+    <span class="tok-com">// Слияние двух подмассивов за O(log n)</span>
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">merge</span>(<span class="tok-type">Node</span> t1, <span class="tok-type">Node</span> t2) {
+        <span class="tok-func">push</span>(t1);
+        <span class="tok-func">push</span>(t2);
+        <span class="tok-kw">if</span> (t1 == <span class="tok-kw">null</span>) <span class="tok-kw">return</span> t2;
+        <span class="tok-kw">if</span> (t2 == <span class="tok-kw">null</span>) <span class="tok-kw">return</span> t1;
+
+        <span class="tok-kw">if</span> (t1.y &gt; t2.y) {
+            t1.right = <span class="tok-func">merge</span>(t1.right, t2);
+            <span class="tok-func">update</span>(t1);
+            <span class="tok-kw">return</span> t1;
+        } <span class="tok-kw">else</span> {
+            t2.left = <span class="tok-func">merge</span>(t1, t2.left);
+            <span class="tok-func">update</span>(t2);
+            <span class="tok-kw">return</span> t2;
+        }
+    }
+
+    <span class="tok-com">// Разрезание на первые k элементов и остальные за O(log n)</span>
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span>[] <span class="tok-func">split</span>(<span class="tok-type">Node</span> t, <span class="tok-kw">int</span> k) {
+        <span class="tok-kw">if</span> (t == <span class="tok-kw">null</span>) <span class="tok-kw">return new</span> <span class="tok-type">Node</span>[] { <span class="tok-kw">null</span>, <span class="tok-kw">null</span> };
+        <span class="tok-func">push</span>(t);
+        <span class="tok-kw">int</span> leftSize = <span class="tok-func">sz</span>(t.left);
+
+        <span class="tok-kw">if</span> (k &lt;= leftSize) {
+            <span class="tok-type">Node</span>[] res = <span class="tok-func">split</span>(t.left, k);
+            t.left = res[<span class="tok-num">1</span>];
+            <span class="tok-func">update</span>(t);
+            <span class="tok-kw">return new</span> <span class="tok-type">Node</span>[] { res[<span class="tok-num">0</span>], t };
+        } <span class="tok-kw">else</span> {
+            <span class="tok-type">Node</span>[] res = <span class="tok-func">split</span>(t.right, k - leftSize - <span class="tok-num">1</span>);
+            t.right = res[<span class="tok-num">0</span>];
+            <span class="tok-func">update</span>(t);
+            <span class="tok-kw">return new</span> <span class="tok-type">Node</span>[] { t, res[<span class="tok-num">1</span>] };
+        }
+    }
+
+    <span class="tok-com">// Разворот подотрезка [l, r] за O(log n)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">reverse</span>(<span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-type">Node</span>[] p1 = <span class="tok-func">split</span>(root, r + <span class="tok-num">1</span>);   <span class="tok-com">// p1[0] = [0..r], p1[1] = [r+1..n-1]</span>
+        <span class="tok-type">Node</span>[] p2 = <span class="tok-func">split</span>(p1[<span class="tok-num">0</span>], l);       <span class="tok-com">// p2[0] = [0..l-1], p2[1] = [l..r]</span>
+
+        <span class="tok-kw">if</span> (p2[<span class="tok-num">1</span>] != <span class="tok-kw">null</span>) {
+            p2[<span class="tok-num">1</span>].reversed ^= <span class="tok-kw">true</span>;         <span class="tok-com">// Отложенный разворот целевого подотрезка!</span>
+        }
+
+        root = <span class="tok-func">merge</span>(<span class="tok-func">merge</span>(p2[<span class="tok-num">0</span>], p2[<span class="tok-num">1</span>]), p1[<span class="tok-num">1</span>]);
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-implicit-def" class="nav-item nav-def">1. Неявный ключ</a>
+                        <a href="#sec-implicit-ops" class="nav-item nav-alg">2. Split и Merge</a>
+                        <a href="#sec-reverse-problem" class="nav-item nav-thm">3. Разворот подотрезка</a>
+                        <a href="#sec-lazy-reverse" class="nav-item nav-proof">4. Ленивый push</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
