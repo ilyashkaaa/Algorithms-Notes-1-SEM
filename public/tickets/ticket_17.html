@@ -1,0 +1,239 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 17 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Амортизационный анализ: Метод потенциалов</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Функция потенциала $\Phi(S)$. Телескопическое свойство сумм. Строгое доказательство амортизированной оценки $O(1)$ для push_back в динамическом массиве через потенциал $\Phi = 2s - c$.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">17</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-pot-def" class="nav-item nav-def">1. Функция потенциала</a>
+                        <a href="#sec-telescope" class="nav-item nav-proof">2. Телескопическая сумма</a>
+                        <a href="#sec-vector-pot" class="nav-item nav-alg">3. Анализ push_back ($\Phi = 2s - c$)</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Функция потенциала -->
+                    <section id="sec-pot-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Метод потенциалов (The Potential Method)</span>
+                        <p>
+                            В отличие от подсчета локальных виртуальных монет, метод потенциалов приписывает всей структуре данных $S$ скалярную величину — <strong>потенциал $\Phi(S)$</strong> (меру «напряжения» или накопленной энергии).
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Требования к функции потенциала $\Phi(S)$:</strong>
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 4px;">
+                            <li>$\Phi(S_0) = 0$, где $S_0$ — начальное состояние структуры данных до выполнения операций.</li>
+                            <li>$\Phi(S_i) \ge 0$ в любой момент времени $i \ge 0$. Потенциал никогда не может стать отрицательным.</li>
+                        </ol>
+                        <p style="margin-top: 8px;">
+                            <strong>Учетное (амортизированное) время $i$-й операции:</strong>
+                        </p>
+                        $$t'_i = t_i + \Delta \Phi_i = t_i + \Phi(S_i) - \Phi(S_{i-1})$$
+                        <p style="margin-top: 4px; font-size: 12.5px; opacity: 0.9;">
+                            где $t_i$ — истинное физическое время (число элементарных операций) $i$-го шага, а $\Delta\Phi_i = \Phi(S_i) - \Phi(S_{i-1})$ — изменение потенциала структуры в результате этой операции.
+                        </p>
+                    </section>
+
+                    <!-- 2. Телескопическая сумма -->
+                    <section id="sec-telescope" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема] Мажорирование реального времени телескопической суммой</span>
+                        <p>
+                            <strong>Теорема:</strong> Сумма учетных времен мажорирует сумму реальных времен работы для любой последовательности из $n$ операций:
+                        </p>
+                        $$\sum_{i=1}^n t_i \le \sum_{i=1}^n t'_i$$
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство:</strong>
+                            Распишем сумму учетных стоимостей:
+                        </p>
+                        $$\sum_{i=1}^n t'_i = \sum_{i=1}^n \left( t_i + \Phi(S_i) - \Phi(S_{i-1}) \right) = \sum_{i=1}^n t_i + \sum_{i=1}^n \left( \Phi(S_i) - \Phi(S_{i-1}) \right)$$
+                        <p style="margin-top: 6px;">
+                            Вторая сумма является <strong>телескопической</strong>: все промежуточные слагаемые взаимно уничтожаются:
+                        </p>
+                        $$\sum_{i=1}^n \left( \Phi(S_i) - \Phi(S_{i-1}) \right) = (\Phi(S_1) - \Phi(S_0)) + (\Phi(S_2) - \Phi(S_1)) + \dots + (\Phi(S_n) - \Phi(S_{n-1})) = \Phi(S_n) - \Phi(S_0)$$
+                        <p style="margin-top: 6px;">
+                            Подставляя граничные условия $\Phi(S_0) = 0$ и $\Phi(S_n) \ge 0$:
+                        </p>
+                        $$\sum_{i=1}^n t'_i = \sum_{i=1}^n t_i + \Phi(S_n) - \Phi(S_0) = \sum_{i=1}^n t_i + \Phi(S_n) \ge \sum_{i=1}^n t_i$$
+                        <p style="margin-top: 6px;">
+                            Разделив на число операций $n$, получаем:
+                        </p>
+                        $$\frac{1}{n} \sum_{i=1}^n t_i \le \frac{1}{n} \sum_{i=1}^n t'_i$$
+                        <p style="margin-top: 4px; font-size: 12.5px; opacity: 0.9;">
+                            Следовательно, среднее учетное время $t'$ сверху ограничивает среднее реальное время выполнения операций.
+                        </p>
+                    </section>
+
+                    <!-- 3. Анализ push_back -->
+                    <section id="sec-vector-pot" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Анализ] Применение метода потенциалов к push_back в векторе</span>
+                        <p>
+                            Пусть $s$ — текущее число элементов в массиве ($\mathrm{size}$), а $c$ — выделенная вместимость массива ($\mathrm{capacity}$).
+                            При заполнении ($s = c$) вместимость удваивается: $c_{\mathrm{new}} = 2c$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Выбор функции потенциала (Лекция 5, Кулапин):</strong>
+                        </p>
+                        $$\Phi(S) = 2s - c$$
+                        <p style="margin-top: 6px;">
+                            <strong>Проверка условий:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>Начальное состояние: при пустом массиве $\Phi(S_0) = 0$.</li>
+                            <li>Неотрицательность: массив всегда заполнен не менее чем наполовину своей вместимости ($s \ge c/2$). Поэтому $2s \ge c \implies \Phi(S) = 2s - c \ge 0$.
+                                Сразу после удвоения $s = c/2 \implies \Phi = 0$ (система разряжена).
+                                Непосредственно перед удвоением $s = c \implies \Phi = c > 0$ (система накопила максимальную энергию).
+                            </li>
+                        </ul>
+
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 6px; font-size: 14px; color: var(--accent-color);">Случай 1: Реаллокация не требуется ($s < c$)</h4>
+                            <p>
+                                Физическое время: $t_i = 1$ (запись нового элемента). Размер увеличился на 1: $s \to s + 1$, вместимость не изменилась: $c \to c$.
+                            </p>
+                            $$\Delta \Phi = (2(s + 1) - c) - (2s - c) = 2$$
+                            $$t'_i = t_i + \Delta \Phi = 1 + 2 = 3$$
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 6px; font-size: 14px; color: var(--accent-color);">Случай 2: Реаллокация требуется ($s = c$)</h4>
+                            <p>
+                                Физическое время: перекопирование $s$ старых элементов и запись 1 нового элемента: $t_i = s + 1$.
+                                Новое состояние: $s' = s + 1$, $c' = 2c = 2s$.
+                            </p>
+                            $$\Phi(S_{i-1}) = 2s - s = s$$
+                            $$\Phi(S_i) = 2(s + 1) - 2s = 2$$
+                            $$\Delta \Phi = \Phi(S_i) - \Phi(S_{i-1}) = 2 - s$$
+                            <p style="margin-top: 6px;">
+                                Вычисляем учетное время дорогой операции:
+                            </p>
+                            $$t'_i = t_i + \Delta \Phi = (s + 1) + (2 - s) = 3$$
+                        </div>
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 10px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Итог:</strong> И при обычной вставке, и при реаллокации учетное время $t'_i \equiv 3 = O(1)$ константно! Накопленный потенциал $\Phi = s$ в точности компенсировал дорогие затраты на копирование.
+                        </div>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные свойства метода потенциалов</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Параметр</th>
+                                    <th style="padding: 6px 8px;">Обычная вставка ($s < c$)</th>
+                                    <th style="padding: 6px 8px;">Вставка с удвоением ($s = c$)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Реальное время $t_i$</strong></td>
+                                    <td style="padding: 6px 8px;">$1$</td>
+                                    <td style="padding: 6px 8px;">$s + 1$</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Изменение потенциала $\Delta\Phi$</strong></td>
+                                    <td style="padding: 6px 8px;">$+2$</td>
+                                    <td style="padding: 6px 8px;">$2 - s$</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Учетное время $t'_i = t_i + \Delta\Phi$</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$3$</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$3$</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация DynamicVector с расчетом потенциала $\Phi$ на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">PotentialVector</span> {
+    <span class="tok-kw">private int</span>[] data = <span class="tok-kw">new int</span>[<span class="tok-num">1</span>];
+    <span class="tok-kw">private int</span> size = <span class="tok-num">0</span>;
+    <span class="tok-kw">private int</span> capacity = <span class="tok-num">1</span>;
+
+    <span class="tok-com">// Функция потенциала: Phi = 2 * size - capacity</span>
+    <span class="tok-kw">int</span> <span class="tok-func">getPotential</span>() {
+        <span class="tok-kw">return</span> <span class="tok-num">2</span> * size - capacity;
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">push_back</span>(<span class="tok-kw">int</span> x) {
+        <span class="tok-kw">if</span> (size == capacity) {
+            <span class="tok-kw">int</span> newCapacity = capacity * <span class="tok-num">2</span>;
+            <span class="tok-kw">int</span>[] newData = <span class="tok-kw">new int</span>[newCapacity];
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; size; i++) {
+                newData[i] = data[i];
+            }
+            data = newData;
+            capacity = newCapacity;
+        }
+        data[size] = x;
+        size++;
+    }
+
+    <span class="tok-com">// Удаление с гистерезисом (сжатие только при size <= capacity / 4)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">pop_back</span>() {
+        <span class="tok-kw">int</span> val = data[size - <span class="tok-num">1</span>];
+        size--;
+        <span class="tok-kw">if</span> (size &gt; <span class="tok-num">0</span> &amp;&amp; size &lt;= capacity / <span class="tok-num">4</span>) {
+            <span class="tok-kw">int</span> newCapacity = capacity / <span class="tok-num">2</span>;
+            <span class="tok-kw">int</span>[] newData = <span class="tok-kw">new int</span>[newCapacity];
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; size; i++) {
+                newData[i] = data[i];
+            }
+            data = newData;
+            capacity = newCapacity;
+        }
+        <span class="tok-kw">return</span> val;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-pot-def" class="nav-item nav-def">1. Функция потенциала</a>
+                        <a href="#sec-telescope" class="nav-item nav-proof">2. Телескопическая сумма</a>
+                        <a href="#sec-vector-pot" class="nav-item nav-alg">3. Анализ push_back</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
