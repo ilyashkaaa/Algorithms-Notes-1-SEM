@@ -23,6 +23,7 @@
 .vscode/
 .idea/
 scratch/
+scripts/
 *.swp
 
 # Raw lecture PDFs and TeX source in root (already on Google Drive)
