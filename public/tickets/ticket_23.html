@@ -1,0 +1,247 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 23 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Splay-дерево: Повороты и Теорема о Splay</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Определение Splay-дерева. Шаги подъема zig, zig-zig, zig-zag. Функция потенциала $\Phi = \sum \log_2 s(v)$. Теорема о времени работы операции Splay и доказательство амортизированной оценки $O(\log n)$.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">23</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-splay-def" class="nav-item nav-def">1. Определение Splay-дерева</a>
+                        <a href="#sec-splay-steps" class="nav-item nav-alg">2. Шаги zig, zig-zig, zig-zag</a>
+                        <a href="#sec-potential-tarjan" class="nav-item nav-geo">3. Функция потенциала и ранги</a>
+                        <a href="#sec-access-lemma" class="nav-item nav-proof">4. Теорема о времени работы Splay</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Определение Splay-дерева -->
+                    <section id="sec-splay-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Splay-дерево</span>
+                        <p>
+                            <strong>Splay-дерево</strong> — самобалансирующееся двоичное дерево поиска, которое <strong>не хранит никаких дополнительных метаданных</strong> в узлах (ни высот, как в AVL, ни приоритетов, как в Treap, ни цветов, как в RB-Tree).
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Фундаментальный принцип:</strong>
+                            После каждого обращения к вершине $x$ (поиск, вставка, удаление) вызывается операция $\mathrm{Splay}(x)$, которая поднимает вершину $x$ в корень дерева с помощью цепочки специальных поворотов.
+                        </p>
+                        <div style="background: rgba(248,113,113,0.06); border-left: 3px solid #f87171; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            В худшем случае дерево может временно вырождаться в бамбук высоты $\Theta(n)$, а одиночная операция может стоить $\Theta(n)$. Однако операция $\mathrm{Splay}$ при подъеме «складывает» и укорачивает длинные ветви дерева вдвое, гарантируя <strong>амортизированную сложность $O(\log n)$</strong> для любой последовательности операций!
+                        </div>
+                    </section>
+
+                    <!-- 2. Шаги zig, zig-zig, zig-zag -->
+                    <section id="sec-splay-steps" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] 3 типа шагов операции Splay(x)</span>
+                        <p>
+                            Пусть $p$ — родитель узла $x$, а $g$ — родитель $p$ (дедушка $x$). Подъем $x$ в корень состоит из последовательности шагов трех типов:
+                        </p>
+
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Шаг zig (одиночный поворот)</h4>
+                            <p>
+                                Применяется, когда родитель $p$ уже является корнем дерева ($g = \mathrm{null}$).
+                                Выполняется ровно один поворот ребра $(x, p)$ (правый или левый). Применяется не более одного раза в самом конце процедуры $\mathrm{Splay}$, если исходная глубина $x$ была нечетной.
+                            </p>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Шаг zig-zig (однонаправленный двойной поворот)</h4>
+                            <p>
+                                Применяется, когда $x$ и $p$ лежат по одну сторону: либо оба левые дети ($x = p.\mathrm{left}$ и $p = g.\mathrm{left}$), либо оба правые.
+                            </p>
+                            <div style="background: rgba(255,255,255,0.03); border-left: 3px solid var(--accent-color); padding: 6px 12px; margin-top: 4px; border-radius: 4px; font-size: 12.5px;">
+                                <strong>Критический порядок поворотов:</strong>
+                                Сначала поворачиваем $p$ вокруг дедушки $g$, и только затем $x$ вокруг $p$!
+                                <br><em>Почему это критично:</em> Именно такой порядок располовинивает длину пути от $g$ до корня, превращая вырожденный бамбук в сбалансированное дерево. Если наивно повернуть сначала $x$, а потом $p$, длина ветви не уменьшится.
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">3. Шаг zig-zag (разнонаправленный двойной поворот)</h4>
+                            <p>
+                                Применяется, когда $x$ и $p$ лежат по разные стороны: например, $x$ — правый сын $p$, а $p$ — левый сын $g$ (зигзаг).
+                                Сначала поворачиваем $x$ вокруг $p$, а затем $x$ вокруг $g$ (аналог большого поворота в AVL).
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- 3. Потенциал и ранги -->
+                    <section id="sec-potential-tarjan" class="vcard vcard-geo">
+                        <span class="vcard-title-pill">[Анализ] Функция потенциала и понятие ранга</span>
+                        <p>
+                            Для амортизированного анализа вводится:
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li>$s(v)$ — размер поддерева с корнем в вершине $v$ (число узлов в нем).</li>
+                            <li><strong>Ранг вершины $r(v)$:</strong> логарифм размера ее поддерева:
+                                $$r(v) = \log_2 s(v)$$
+                            </li>
+                            <li><strong>Функция потенциала всего дерева $\Phi(T)$:</strong> сумма рангов всех его вершин:
+                                $$\Phi(T) = \sum_{v \in T} r(v) = \sum_{v \in T} \log_2 s(v)$$
+                            </li>
+                        </ul>
+                        <p style="margin-top: 6px; font-size: 12.5px;">
+                            При поворотах узлов размеры и ранги меняются <em>только</em> у вершин $x, p, g$, участвующих в повороте. Ранги всех остальных узлов дерева остаются неизменными.
+                        </p>
+                    </section>
+
+                    <!-- 4. Теорема о времени Splay -->
+                    <section id="sec-access-lemma" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема и Доказательство] Теорема о времени работы операции Splay</span>
+                        <p>
+                            <strong>Теорема о времени работы Splay:</strong> Учетная стоимость операции $\mathrm{Splay}(x)$ в дереве с корнем $t$ ограничена величиной:
+                        </p>
+                        $$\hat{C}_{\mathrm{Splay}} \le 3(r(t) - r(x)) + 1 \le 3 \log_2 n + 1 = O(\log n)$$
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство леммы по шагам (Лекция 7, Кулапин):</strong>
+                            Пусть $r(u)$ и $r'(u)$ — ранги вершины $u$ до и после шага соответственно.
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>Оценка шага zig (1 поворот):</strong>
+                                Реальное время $= 1$. Меняются ранги только $x$ и $p$, причем $r'(x) = r(p)$ и $r'(p) < r'(x)$:
+                                $$\hat{c} = 1 + (r'(x) + r'(p) - r(x) - r(p)) \le 1 + r'(x) - r(x) \le 1 + 3(r'(x) - r(x))$$
+                            </li>
+                            <li><strong>Оценка шага zig-zig (2 поворота):</strong>
+                                Реальное время $= 2$. Заметим, что $r'(x) = r(g)$.
+                                Используя вогнутость логарифма ($\log a + \log b \le 2 \log \frac{a+b}{2}$), для непересекающихся поддеревьев $r(x) + r'(g) \le 2r'(x) - 2$.
+                                Отсюда учетная стоимость:
+                                $$\hat{c} = 2 + r'(x) + r'(p) + r'(g) - r(x) - r(p) - r(g) \le 3(r'(x) - r(x))$$
+                            </li>
+                            <li><strong>Оценка шага zig-zag (2 поворота):</strong>
+                                Аналогично через вогнутость логарифма:
+                                $$\hat{c} \le 2(r'(x) - r(x)) \le 3(r'(x) - r(x))$$
+                            </li>
+                        </ul>
+                        <p style="margin-top: 8px;">
+                            <strong>Телескопическое суммирование:</strong>
+                            Просуммируем учетные стоимости всех шагов от листа $x$ до корня $t$:
+                        </p>
+                        $$\hat{C}_{\mathrm{total}} = \sum \hat{c}_i \le 1 + \sum 3(r_{i}(x) - r_{i-1}(x)) = 1 + 3(r_{\mathrm{root}}(x) - r_{\mathrm{start}}(x))$$
+                        <p style="margin-top: 4px;">
+                            Так как $r_{\mathrm{root}}(x) = \log_2 n$, а $r_{\mathrm{start}}(x) \ge 0$:
+                        </p>
+                        $$\hat{C}_{\mathrm{total}} \le 3 \log_2 n + 1 = O(\log n)$$
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Вывод:</strong> Амортизированное время работы операции $\mathrm{Splay}(x)$ строго составляет <strong>$O(\log n)$</strong>.
+                        </div>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные тезисы Splay</span>
+                        <ul style="margin-left: 20px; margin-top: 6px; font-size: 13px;">
+                            <li><strong>Память на узел:</strong> 0 байт метаданных (только `left`, `right`, `parent`).</li>
+                            <li><strong>Худшее время одной операции:</strong> $O(n)$, но <strong>амортизированное</strong> — $O(\log n)$.</li>
+                            <li><strong>Порядок zig-zig:</strong> Сначала родитель $p$ вокруг дедушки $g$, потом $x$ вокруг $p$.</li>
+                            <li><strong>Потенциал:</strong> $\Phi = \sum_{v} \log_2 s(v)$.</li>
+                            <li><strong>Свойство самоадаптации:</strong> Часто запрашиваемые элементы находятся около корня, обеспечивая доступ за $O(1)$ (статическая и динамическая оптимальность).</li>
+                        </ul>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация процедуры Splay (zig, zig-zig, zig-zag) на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">SplayTreeBase</span> {
+    <span class="tok-kw">static class</span> <span class="tok-type">Node</span> {
+        <span class="tok-kw">int</span> key;
+        <span class="tok-type">Node</span> left, right, parent;
+        <span class="tok-func">Node</span>(<span class="tok-kw">int</span> key) { <span class="tok-kw">this</span>.key = key; }
+    }
+
+    <span class="tok-type">Node</span> root = <span class="tok-kw">null</span>;
+
+    <span class="tok-kw">private void</span> <span class="tok-func">rotate</span>(<span class="tok-type">Node</span> x) {
+        <span class="tok-type">Node</span> p = x.parent;
+        <span class="tok-type">Node</span> g = p.parent;
+        <span class="tok-kw">boolean</span> isLeft = (x == p.left);
+
+        <span class="tok-kw">if</span> (isLeft) {
+            p.left = x.right;
+            <span class="tok-kw">if</span> (x.right != <span class="tok-kw">null</span>) x.right.parent = p;
+            x.right = p;
+        } <span class="tok-kw">else</span> {
+            p.right = x.left;
+            <span class="tok-kw">if</span> (x.left != <span class="tok-kw">null</span>) x.left.parent = p;
+            x.left = p;
+        }
+        p.parent = x;
+        x.parent = g;
+        <span class="tok-kw">if</span> (g != <span class="tok-kw">null</span>) {
+            <span class="tok-kw">if</span> (p == g.left) g.left = x;
+            <span class="tok-kw">else</span> g.right = x;
+        } <span class="tok-kw">else</span> {
+            root = x;
+        }
+    }
+
+    <span class="tok-com">// Подъем вершины x в корень: амортизированно O(log n)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">splay</span>(<span class="tok-type">Node</span> x) {
+        <span class="tok-kw">if</span> (x == <span class="tok-kw">null</span>) <span class="tok-kw">return</span>;
+        <span class="tok-kw">while</span> (x.parent != <span class="tok-kw">null</span>) {
+            <span class="tok-type">Node</span> p = x.parent;
+            <span class="tok-type">Node</span> g = p.parent;
+            <span class="tok-kw">if</span> (g == <span class="tok-kw">null</span>) {
+                <span class="tok-com">// Шаг zig</span>
+                <span class="tok-func">rotate</span>(x);
+            } <span class="tok-kw">else if</span> ((x == p.left) == (p == g.left)) {
+                <span class="tok-com">// Шаг zig-zig: сначала родитель p, затем x!</span>
+                <span class="tok-func">rotate</span>(p);
+                <span class="tok-func">rotate</span>(x);
+            } <span class="tok-kw">else</span> {
+                <span class="tok-com">// Шаг zig-zag: дважды поворачиваем x</span>
+                <span class="tok-func">rotate</span>(x);
+                <span class="tok-func">rotate</span>(x);
+            }
+        }
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-splay-def" class="nav-item nav-def">1. Определение Splay</a>
+                        <a href="#sec-splay-steps" class="nav-item nav-alg">2. Шаги подъема</a>
+                        <a href="#sec-potential-tarjan" class="nav-item nav-geo">3. Функция потенциала</a>
+                        <a href="#sec-access-lemma" class="nav-item nav-proof">4. Теорема о Splay</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
