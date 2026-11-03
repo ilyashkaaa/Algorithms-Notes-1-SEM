@@ -1,0 +1,222 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 16 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Амортизационный анализ: Метод монеток</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Понятие амортизированной сложности. Метод бухгалтерского учета (метод монеток). Доказательство амортизированного $O(1)$ для push_back в динамическом массиве с удвоением емкости (3 монетки).
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">16</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-amort-intro" class="nav-item nav-def">1. Понятие амортизации</a>
+                        <a href="#sec-coins-method" class="nav-item nav-alg">2. Метод монеток (банк)</a>
+                        <a href="#sec-coins-pushback" class="nav-item nav-proof">3. push_back: правило 3 монеток</a>
+                        <a href="#sec-growth-strategy" class="nav-item nav-thm">4. Стратегии: $+C$ vs $\times 2$</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Понятие амортизации -->
+                    <section id="sec-amort-intro" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Амортизационный анализ (Amortized Analysis)</span>
+                        <p>
+                            В традиционном анализе оценивается худшее время выполнения <em>одиночной</em> операции. Однако в структурах данных единичная «тяжелая» операция (например, копирование всего массива) может происходить крайне редко и быть следствием накопления множества дешевых операций.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Амортизированная стоимость (Amortized Cost):</strong>
+                            Если последовательность из $m$ операций над структурой данных в худшем случае суммарно выполняется за время $T(m)$, то амортизированным временем одной операции называется величина:
+                        </p>
+                        $$T_{\mathrm{amort}} = \frac{T(m)}{m}$$
+                        <div style="background: rgba(56,189,248,0.06); border-left: 3px solid #38bdf8; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Важное отличие от среднего времени:</strong> Амортизированная оценка <em>не является вероятностной</em>. Она гарантирует, что любая конкретная серия из $m$ операций в самом наихудшем сценарии займет суммарно не более $m \cdot T_{\mathrm{amort}}$ времени.
+                        </div>
+                    </section>
+
+                    <!-- 2. Метод монеток -->
+                    <section id="sec-coins-method" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Метод] Бухгалтерский учет (Метод монеток / Banker's Method)</span>
+                        <p>
+                            Каждой элементарной операции присваивается фиктивная учетная стоимость в виртуальных «монетках» (credits):
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li>Пусть $c_i$ — реальная стоимость $i$-й операции (1 монета = $O(1)$ элементарных действий).</li>
+                            <li>Пусть $\hat{c}_i$ — назначенная нами учетная (амортизированная) стоимость.</li>
+                            <li>Если $\hat{c}_i > c_i$, избыток $\hat{c}_i - c_i$ помещается на банковский счет (или привязывается к конкретным элементам структуры как предоплаченный резерв).</li>
+                            <li>Если дорогая операция имеет $c_i > \hat{c}_i$, недостающая часть оплачивается накопленными монетами со счета.</li>
+                        </ul>
+                        <p style="margin-top: 8px;">
+                            <strong>Фундаментальный инвариант банка:</strong> Баланс счета никогда не должен уходить в минус:
+                        </p>
+                        $$\sum_{i=1}^m \hat{c}_i - \sum_{i=1}^m c_i \ge 0 \quad \implies \quad \sum_{i=1}^m c_i \le \sum_{i=1}^m \hat{c}_i$$
+                        <p style="margin-top: 6px; font-size: 12.5px; opacity: 0.9;">
+                            Если баланс всегда $\ge 0$, то сумма назначенных учетных стоимостей служит строгой верхней гранью для суммарного реального времени!
+                        </p>
+                    </section>
+
+                    <!-- 3. push_back: правило 3 монеток -->
+                    <section id="sec-coins-pushback" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема и Доказательство] Амортизация push_back с удвоением (3 монетки)</span>
+                        <p>
+                            Рассмотрим динамический массив (вектор), удваивающий свою вместимость при заполнении: $N \to 2N$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Теорема (Лекция 5, Кулапин):</strong> Амортизированная стоимость операции $\mathrm{push\_back}$ при геометрическом расширении с коэффициентом 2 равна $O(1)$ (ровно <strong>3 монетки</strong>).
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство методом монеток:</strong>
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 4px;">
+                            <li>Пусть запись одного элемента в массив стоит 1 монету, и копирование одного элемента на новое место при реаллокации тоже стоит 1 монету.</li>
+                            <li>За каждую операцию $\mathrm{push\_back}$ будем взимать <strong>3 монетки</strong> ($\hat{c} = 3$):
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li><strong>1-я монетка:</strong> Непосредственно оплачивает физическую запись нового элемента в ячейку массива.</li>
+                                    <li><strong>2-я монетка (депозит):</strong> Кладется на сам этот только что вставленный элемент (индекс $i$). Она будет использована в будущем для оплаты его переноса при следующем расширении.</li>
+                                    <li><strong>3-я монетка (депозит):</strong> Кладется на парный элемент из первой половины массива (индекс $i - N/2$), который уже был скопирован в прошлый раз и остался «без монет».</li>
+                                </ul>
+                            </li>
+                            <li><strong>Инвариант перед реаллокацией:</strong>
+                                Перед расширением массив был заполнен на $N/2$ элементов. За время добавления второй половины из $N/2$ элементов в массив пришло:
+                                $$\frac{N}{2} \times 2 \text{ депозитные монетки} = N \text{ монет}$$
+                                Таким образом, на каждом из $N$ элементов массива лежит ровно по одной монете!
+                            </li>
+                            <li><strong>Реаллокация:</strong>
+                                При заполнении выделяется массив размера $2N$. Чтобы скопировать все $N$ старых элементов на новое место, требуется ровно $N$ операций копирования.
+                                Эти операции полностью оплачиваются заготовленными $N$ монетами! Баланс в момент перекопирования становится равным 0, не уходя в минус.
+                            </li>
+                        </ol>
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            Инвариант сохраняется на каждом цикле удвоения. Следовательно, учетная стоимость $\hat{c} = 3$ покрывает любые затраты, а амортизированное время $\mathrm{push\_back}$ строго равно $O(1)$.
+                        </div>
+                    </section>
+
+                    <!-- 4. Сравнение стратегий: +C vs *2 -->
+                    <section id="sec-growth-strategy" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Анализ] Стратегии изменения емкости: $+C$ против $\times 2$</span>
+                        <p>
+                            Почему важно именно геометрическое, а не арифметическое расширение памяти?
+                        </p>
+                        <div style="margin-top: 8px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: #f87171;">1. Арифметическое расширение (capacity += C)</h4>
+                            <p>
+                                При заполнении выделяется память на константу $C$ больше (например, $+1$ или $+100$). Для вставки $n$ элементов произойдет $n/C$ реаллокаций.
+                                Суммарное время копирования:
+                            </p>
+                            $$\sum_{k=1}^{n/C} (k \cdot C) = C \cdot \frac{\frac{n}{C} \cdot \left(\frac{n}{C} + 1\right)}{2} = \Theta\left(\frac{n^2}{C}\right) = \Theta(n^2)$$
+                            <p style="margin-top: 4px; font-size: 12.5px; color: #f87171;">
+                                Амортизированное время одного добавления: $\Theta(n^2) / n = \Theta(n)$ — <strong>катастрофически неэффективно!</strong>
+                            </p>
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: #4ade80;">2. Геометрическое расширение (capacity *= k, k > 1)</h4>
+                            <p>
+                                Емкость умножается на константу $k > 1$ (обычно $k = 2$, в MSVC $k = 1.5$). Число реаллокаций: $\log_k n$.
+                                Суммарное время копирования элементов:
+                            </p>
+                            $$\sum_{j=0}^{\log_2 n} 2^j = 2^{\log_2 n + 1} - 1 = 2n - 1 = \Theta(n)$$
+                            <p style="margin-top: 4px; font-size: 12.5px; color: #4ade80;">
+                                Амортизированное время: $\Theta(n) / n = O(1)$.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Ключевые тезисы метода монеток</span>
+                        <ul style="margin-left: 20px; margin-top: 6px; font-size: 13px;">
+                            <li><strong>Амортизированная стоимость:</strong> Гарантированная средняя стоимость операции в худшей серии длины $m$.</li>
+                            <li><strong>Баланс монет:</strong> Сумма учетных стоимостей обязана мажорировать сумму реальных стоимостей: $\sum \hat{c}_i \ge \sum c_i$.</li>
+                            <li><strong>Правило 3 монет для push_back:</strong> 1 монета на запись, 1 монета на перенос себя в будущем, 1 монета на перенос элемента из первой половины.</li>
+                            <li><strong>Результат:</strong> За $N/2$ простых добавлений накапливается ровно $N$ монет, покрывающих перекопирование всего массива размера $N$.</li>
+                        </ul>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация динамического вектора с амортизированным push_back на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">DynamicArray</span> {
+    <span class="tok-kw">private int</span>[] data;
+    <span class="tok-kw">private int</span> size;
+    <span class="tok-kw">private int</span> capacity;
+
+    <span class="tok-func">DynamicArray</span>() {
+        <span class="tok-kw">this</span>.capacity = <span class="tok-num">1</span>;
+        <span class="tok-kw">this</span>.size = <span class="tok-num">0</span>;
+        <span class="tok-kw">this</span>.data = <span class="tok-kw">new int</span>[capacity];
+    }
+
+    <span class="tok-com">// Амортизированная сложность: O(1)</span>
+    <span class="tok-com">// Худшая единичная операция: O(n)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">push_back</span>(<span class="tok-kw">int</span> value) {
+        <span class="tok-kw">if</span> (size == capacity) {
+            <span class="tok-func">reallocate</span>(capacity * <span class="tok-num">2</span>);
+        }
+        data[size] = value;
+        size++;
+    }
+
+    <span class="tok-kw">private void</span> <span class="tok-func">reallocate</span>(<span class="tok-kw">int</span> newCapacity) {
+        <span class="tok-kw">int</span>[] newData = <span class="tok-kw">new int</span>[newCapacity];
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = <span class="tok-num">0</span>; i &lt; size; i++) {
+            newData[i] = data[i]; <span class="tok-com">// Оплачено заготовленными монетами!</span>
+        }
+        <span class="tok-kw">this</span>.data = newData;
+        <span class="tok-kw">this</span>.capacity = newCapacity;
+    }
+
+    <span class="tok-kw">int</span> <span class="tok-func">get</span>(<span class="tok-kw">int</span> index) {
+        <span class="tok-kw">return</span> data[index];
+    }
+
+    <span class="tok-kw">int</span> <span class="tok-func">getSize</span>() {
+        <span class="tok-kw">return</span> size;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-amort-intro" class="nav-item nav-def">1. Понятие амортизации</a>
+                        <a href="#sec-coins-method" class="nav-item nav-alg">2. Метод монеток</a>
+                        <a href="#sec-coins-pushback" class="nav-item nav-proof">3. Правило 3 монеток</a>
+                        <a href="#sec-growth-strategy" class="nav-item nav-thm">4. Стратегии $+C$ vs $\times 2$</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
