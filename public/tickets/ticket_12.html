@@ -1,0 +1,254 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 12 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Алгоритм медианы медиан</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Разбиение на пятерки. Геометрическое доказательство оценки $7n/10$. Рекуррентное соотношение $T(n) \le T(n/5) + T(7n/10) + O(n) = O(n)$ методом математической индукции.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">12</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-bfprt-idea" class="nav-item nav-def">1. Идея медианы медиан</a>
+                        <a href="#sec-bfprt-alg" class="nav-item nav-alg">2. Алгоритм выбора пивота</a>
+                        <a href="#sec-ratio-proof" class="nav-item nav-proof">3. Доказательство оценки $7n/10$</a>
+                        <a href="#sec-recurrence-proof" class="nav-item nav-thm">4. Решение рекуррентности $O(n)$</a>
+                        <a href="#sec-why-five" class="nav-item nav-geo">5. Почему именно пятерки?</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Идея алгоритма BFPRT -->
+                    <section id="sec-bfprt-idea" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Задача поиска детерминированного пивота</span>
+                        <p>
+                            В алгоритме Quick Select случайный выбор опорного элемента дает среднее время $O(n)$, но оставляет риск худшего случая $O(n^2)$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Алгоритм медианы медиан:</strong> Находит такой опорный элемент, который гарантированно делит массив в фиксированной пропорции, устраняя худший случай $O(n^2)$ и обеспечивая <strong>детерминированное линейное время $O(n)$</strong> в наихудшем случае.
+                        </p>
+                    </section>
+
+                    <!-- 2. Алгоритм выбора пивота -->
+                    <section id="sec-bfprt-alg" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Поиск медианы медиан</span>
+                        <p>
+                            Алгоритм поиска опорного элемента $M$ для массива $A$ размера $n$:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>Разбиение на группы:</strong> Массив разбивается на $\lceil n/5 \rceil$ групп по 5 элементов (последняя группа может содержать от 1 до 5 элементов).</li>
+                            <li><strong>Поиск локальных медиан:</strong> В каждой пятерке за константное число сравнений $O(1)$ находится медиана (3-й по величине элемент).</li>
+                            <li><strong>Сбор медиан:</strong> Найденные $\lceil n/5 \rceil$ медиан собираются в отдельный массив $B$.</li>
+                            <li><strong>Рекурсивный вызов:</strong> Рекурсивно вызывается алгоритм поиска порядковой статистики для нахождения медианы массива $B$ — элемента $M = \mathrm{Select}\left(B, \lfloor |B|/2 \rfloor\right)$. Элемент $M$ называется <strong>медианой медиан</strong>.</li>
+                        </ol>
+                    </section>
+
+                    <!-- 3. Доказательство оценки 7n/10 -->
+                    <section id="sec-ratio-proof" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема и Доказательство] Гарантия сбалансированности $7n/10$</span>
+                        <p>
+                            <strong>Теорема:</strong> Опорный элемент $M$ (медиана медиан) отсекает как минимум $3n/10$ элементов с каждого конца массива. Следовательно, после $\mathrm{Partition}(M)$ ни одна из двух частей не может содержать более $7n/10$ элементов.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li>Всего имеется $m = \lceil n/5 \rceil$ пятерок.</li>
+                            <li>Элемент $M$ является медианой массива медиан, следовательно, как минимум половина медиан пятерок не меньше $M$:
+                                $$\text{Число пятерок с медианой } \ge M \quad \ge \quad \frac{1}{2} \left\lceil \frac{n}{5} \right\rceil \ge \frac{n}{10}$$
+                            </li>
+                            <li>В каждой такой пятерке сама медиана и два элемента, которые не меньше нее, гарантированно $\ge M$ (всего $3$ элемента на группу).</li>
+                            <li>Исключая неполную группу и группу самого $M$, получаем число элементов, гарантированно больших либо равных $M$:
+                                $$\text{Количество элементов } \ge M \quad \ge \quad 3 \cdot \left( \frac{1}{2} \cdot \frac{n}{5} - 2 \right) \ge \frac{3n}{10} - 6$$
+                            </li>
+                            <li>Симметрично, как минимум половина медиан пятерок $\le M$, и в каждой такой пятерке не менее 3 элементов $\le M$. Следовательно:
+                                $$\text{Количество элементов } \le M \quad \ge \quad \frac{3n}{10} - 6$$
+                            </li>
+                        </ul>
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Вывод:</strong> При разбиении массива элементом $M$ размер большей подзадачи для следующего шага не превосходит:
+                            $$n - \frac{3n}{10} = \frac{7n}{10} \quad (\text{для достаточно больших } n)$$
+                        </div>
+                    </section>
+
+                    <!-- 4. Решение рекуррентности -->
+                    <section id="sec-recurrence-proof" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теорема] Линейная сложность медианы медиан в худшем случае</span>
+                        <p>
+                            <strong>Рекуррентное соотношение для времени работы $T(n)$:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li>Разбиение на пятерки и поиск медиан в них: $O(n) \le c_1 n$.</li>
+                            <li>Поиск медианы медиан в массиве размера $n/5$: $T(n/5)$.</li>
+                            <li>Разбиение $\mathrm{Partition}$ массива размера $n$ по элементу $M$: $c_2 n$.</li>
+                            <li>Рекурсивный спуск в одну из половин размером не более $7n/10$: $T(7n/10)$.</li>
+                        </ul>
+                        $$T(n) \le T\left(\frac{n}{5}\right) + T\left(\frac{7n}{10}\right) + cn$$
+                        <p style="margin-top: 10px;">
+                            <strong>Доказательство по индукции (Лекционный метод Кулапина):</strong>
+                            Докажем, что $T(n) \le 10 c n$.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            <em>База индукции:</em> Для малых $n < n_0$ алгоритм сортирует массив тривиально за $O(1)$, подбором константы неравенство $T(n) \le 10 c n$ выполняется.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            <em>Индукционный переход:</em> Предположим, что для всех $k < n$ утверждение верно: $T(k) \le 10 c k$. Тогда:
+                        </p>
+                        $$\begin{aligned}
+                        T(n) &\le T\left(\frac{n}{5}\right) + T\left(\frac{7n}{10}\right) + cn \\
+                        &\le 10 c \left(\frac{n}{5}\right) + 10 c \left(\frac{7n}{10}\right) + cn \\
+                        &= 2 c n + 7 c n + cn \\
+                        &= 10 c n
+                        \end{aligned}$$
+                        <p style="margin-top: 8px;">
+                            Индукционный переход полностью доказан! Следовательно, $T(n) = O(n)$ в худшем случае.
+                        </p>
+                    </section>
+
+                    <!-- 5. Почему именно пятерки? -->
+                    <section id="sec-why-five" class="vcard vcard-geo">
+                        <span class="vcard-title-pill">[Анализ] Почему именно 5 элементов в группе?</span>
+                        <p>
+                            Ключевое условие сходимости к $O(n)$ — сумма коэффициентов аргументов рекурсии должна быть <strong>строго меньше 1</strong>:
+                        </p>
+                        $$\alpha = \frac{1}{k} + \left(1 - \frac{\lceil k/2 \rceil}{2k}\right) < 1$$
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>Если группы по 3:</strong> медиана медиан гарантирует $2 \cdot \frac{n}{6} = \frac{n}{3}$ элементов. Рекуррентность:
+                                $$T(n) \le T\left(\frac{n}{3}\right) + T\left(\frac{2n}{3}\right) + cn$$
+                                Сумма долей: $\frac{1}{3} + \frac{2}{3} = 1$. Дерево рекурсии имеет глубину $\Theta(\log n)$ с работой $cn$ на каждом уровне, что дает $T(n) = \Theta(n \log n)$ — <em>линейность исчезает!</em>
+                            </li>
+                            <li><strong>Если группы по 5:</strong> сумма долей:
+                                $$\frac{1}{5} + \frac{7}{10} = \frac{2}{10} + \frac{7}{10} = \frac{9}{10} < 1$$
+                                Строго меньше 1 — ряд сходится, давая <strong>$O(n)$</strong>. 5 — наименьшее нечетное число, дающее сумму $< 1$.
+                            </li>
+                            <li><strong>Если группы по 7:</strong> сумма долей $\frac{1}{7} + \frac{5}{14} = \frac{1}{2} < 1$, но константа на сортировку 7 элементов заметно выше.</li>
+                        </ul>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные тезисы билета</span>
+                        <ul style="margin-left: 20px; margin-top: 6px; font-size: 13px;">
+                            <li><strong>Цель алгоритма:</strong> Детерминированный поиск опорного элемента, отсекающего не менее $30\%$ элементов с каждого конца.</li>
+                            <li><strong>Размер группы:</strong> Ровно 5 элементов. При 3 элементах сумма долей равна 1 и алгоритм деградирует в $O(n \log n)$.</li>
+                            <li><strong>Рекуррентность:</strong> $T(n) \le T(n/5) + T(7n/10) + cn$.</li>
+                            <li><strong>Оценка времени:</strong> Худший случай $O(n)$ с индуктивной константой $10c$.</li>
+                        </ul>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация алгоритма медианы медиан на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">MedianOfMedians</span> {
+    <span class="tok-com">// Сортировка малых отрезков вставками (до 5 элементов)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">insertionSort</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l + <span class="tok-num">1</span>; i &lt;= r; i++) {
+            <span class="tok-kw">int</span> cur = a[i], j = i - <span class="tok-num">1</span>;
+            <span class="tok-kw">while</span> (j &gt;= l &amp;&amp; a[j] &gt; cur) {
+                a[j + <span class="tok-num">1</span>] = a[j];
+                j--;
+            }
+            a[j + <span class="tok-num">1</span>] = cur;
+        }
+    }
+
+    <span class="tok-com">// Поиск медианы медиан (пивота) на отрезке [l, r]</span>
+    <span class="tok-kw">int</span> <span class="tok-func">getPivot</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">int</span> n = r - l + <span class="tok-num">1</span>;
+        <span class="tok-kw">if</span> (n &lt;= <span class="tok-num">5</span>) {
+            <span class="tok-func">insertionSort</span>(a, l, r);
+            <span class="tok-kw">return</span> a[l + n / <span class="tok-num">2</span>];
+        }
+
+        <span class="tok-com">// 1. Делим на пятерки и собираем медианы в префикс массива</span>
+        <span class="tok-kw">int</span> numMedians = <span class="tok-num">0</span>;
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l; i &lt;= r; i += <span class="tok-num">5</span>) {
+            <span class="tok-kw">int</span> subR = <span class="tok-type">Math</span>.<span class="tok-func">min</span>(i + <span class="tok-num">4</span>, r);
+            <span class="tok-func">insertionSort</span>(a, i, subR);
+            <span class="tok-kw">int</span> medianIdx = i + (subR - i) / <span class="tok-num">2</span>;
+            <span class="tok-func">swap</span>(a, l + numMedians, medianIdx);
+            numMedians++;
+        }
+
+        <span class="tok-com">// 2. Рекурсивно находим медиану собранных медиан (T(n/5))</span>
+        <span class="tok-kw">return</span> <span class="tok-func">select</span>(a, l, l + numMedians - <span class="tok-num">1</span>, l + numMedians / <span class="tok-num">2</span>);
+    }
+
+    <span class="tok-com">// Детерминированный Select за O(n) худшего времени</span>
+    <span class="tok-kw">int</span> <span class="tok-func">select</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r, <span class="tok-kw">int</span> k) {
+        <span class="tok-kw">if</span> (l == r) <span class="tok-kw">return</span> a[l];
+
+        <span class="tok-kw">int</span> pivot = <span class="tok-func">getPivot</span>(a, l, r);
+
+        <span class="tok-com">// Partition вокруг найденного pivot</span>
+        <span class="tok-kw">int</span> m = <span class="tok-func">partitionValue</span>(a, l, r, pivot);
+
+        <span class="tok-kw">if</span> (m == k) <span class="tok-kw">return</span> a[m];
+        <span class="tok-kw">if</span> (k &lt; m)  <span class="tok-kw">return</span> <span class="tok-func">select</span>(a, l, m - <span class="tok-num">1</span>, k);
+        <span class="tok-kw">return</span> <span class="tok-func">select</span>(a, m + <span class="tok-num">1</span>, r, k);
+    }
+
+    <span class="tok-kw">int</span> <span class="tok-func">partitionValue</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r, <span class="tok-kw">int</span> pivot) {
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l; i &lt;= r; i++) {
+            <span class="tok-kw">if</span> (a[i] == pivot) { <span class="tok-func">swap</span>(a, i, r); <span class="tok-kw">break</span>; }
+        }
+        <span class="tok-kw">int</span> m = l;
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l; i &lt; r; i++) {
+            <span class="tok-kw">if</span> (a[i] &lt; pivot) { <span class="tok-func">swap</span>(a, m, i); m++; }
+        }
+        <span class="tok-func">swap</span>(a, m, r);
+        <span class="tok-kw">return</span> m;
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">swap</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> i, <span class="tok-kw">int</span> j) {
+        <span class="tok-kw">int</span> tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-bfprt-idea" class="nav-item nav-def">1. Идея медианы медиан</a>
+                        <a href="#sec-bfprt-alg" class="nav-item nav-alg">2. Алгоритм выбора</a>
+                        <a href="#sec-ratio-proof" class="nav-item nav-proof">3. Оценка $7n/10$</a>
+                        <a href="#sec-recurrence-proof" class="nav-item nav-thm">4. Решение $T(n) \le 10cn$</a>
+                        <a href="#sec-why-five" class="nav-item nav-geo">5. Почему пятерки?</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
