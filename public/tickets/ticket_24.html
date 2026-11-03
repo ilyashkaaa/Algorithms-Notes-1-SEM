@@ -1,0 +1,313 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 24 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Splay-дерево: Основные операции, Split и Merge</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Реализация Find, Insert, Erase с использованием процедуры Splay. Выразимость операций Split и Merge через Splay за амортизированное $O(\log n)$. Элегантная схема модификации дерева.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">24</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-splay-find" class="nav-item nav-def">1. Операция Find и подъем</a>
+                        <a href="#sec-splay-split-merge" class="nav-item nav-alg">2. Split и Merge через Splay</a>
+                        <a href="#sec-splay-mod-ops" class="nav-item nav-thm">3. Insert и Erase через Split/Merge</a>
+                        <a href="#sec-splay-amort-proof" class="nav-item nav-proof">4. Амортизированный анализ</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Операция Find и подъем -->
+                    <section id="sec-splay-find" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Операция] Поиск Find(key) в Splay-дереве</span>
+                        <p>
+                            Поиск ключа выполняется как в классическом бинарном дереве поиска, но с обязательной процедурой перебалансировки в конце:
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li>Спускаемся от корня вниз, сравнивая $\mathrm{key}$ с ключами узлов.</li>
+                            <li><strong>Если ключ найден:</strong> вызываем $\mathrm{Splay}(\mathrm{найденный\ узел})$. Найденный элемент становится <em>новым корнем дерева</em>. Возвращаем $\mathrm{true}$.</li>
+                            <li><strong>Если ключ отсутствует:</strong> путь поиска завершается на $\mathrm{null}$. Вызываем $\mathrm{Splay}(\mathrm{последний\ посещенный\ узел})$ (непосредственный предок несостоявшегося ключа). Предок поднимается в корень, сжимая пройденный путь. Возвращаем $\mathrm{false}$.</li>
+                        </ul>
+                        <div style="background: rgba(56,189,248,0.06); border-left: 3px solid #38bdf8; padding: 8px 12px; margin-top: 8px; border-radius: 4px; font-size: 12.5px;">
+                            Благодаря операции Splay даже неудачные поиски укорачивают ветви дерева, предотвращая деградацию структуры.
+                        </div>
+                    </section>
+
+                    <!-- 2. Split и Merge через Splay -->
+                    <section id="sec-splay-split-merge" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритмы] Выразимость Split и Merge через Splay</span>
+                        <p>
+                            Операция $\mathrm{Splay}$ позволяет реализовать разделение и слияние деревьев предельно лаконично и без рекурсии:
+                        </p>
+
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Слияние: $\mathrm{Merge}(T_1, T_2)$</h4>
+                            <p>
+                                <em>Предусловие:</em> Все ключи дерева $T_1$ строго меньше любого ключа дерева $T_2$ ($\forall u \in T_1, v \in T_2: u.\mathrm{key} < v.\mathrm{key}$).
+                            </p>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Если одно из деревьев пусто — возвращаем второе.</li>
+                                <li>В дереве $T_1$ находим <strong>максимальный элемент</strong> (идем вправо до упора) и вызываем для него $\mathrm{Splay}(M)$ внутри дерева $T_1$.</li>
+                                <li>После подъема элемент $M$ становится корнем $T_1$. Так как $M$ был максимальным в $T_1$, у него <strong>гарантированно отсутствует правый ребенок</strong> ($M.\mathrm{right} == \mathrm{null}$)!</li>
+                                <li>Просто привязываем дерево $T_2$ в качестве правого ребенка $M$:
+                                    $$M.\mathrm{right} = T_2; \quad T_2.\mathrm{parent} = M;$$
+                                </li>
+                                <li>Возвращаем объединенное дерево с корнем $M$.</li>
+                            </ol>
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Разделение: $\mathrm{Split}(T, \mathrm{key}) \to (T_1, T_2)$</h4>
+                            <p>
+                                Разделяет дерево на $T_1$ (ключи $\le \mathrm{key}$) и $T_2$ (ключи $> \mathrm{key}$):
+                            </p>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Вызываем $\mathrm{Find}(\mathrm{key})$ в дереве $T$. В корне оказывается либо сам элемент с ключом $\mathrm{key}$, либо ближайший к нему предок.</li>
+                                <li>Если корень $R.\mathrm{key} \le \mathrm{key}$:
+                                    <br>Все элементы правого поддерева $R.\mathrm{right}$ строго больше $\mathrm{key}$. Отрезаем правое поддерево:
+                                    $$T_2 = R.\mathrm{right}; \quad R.\mathrm{right} = \mathrm{null}; \quad T_1 = R;$$
+                                </li>
+                                <li>Если корень $R.\mathrm{key} > \mathrm{key}$:
+                                    <br>Все элементы левого поддерева $R.\mathrm{left}$ меньше либо равны $\mathrm{key}$. Отрезаем левое поддерево:
+                                    $$T_1 = R.\mathrm{left}; \quad R.\mathrm{left} = \mathrm{null}; \quad T_2 = R;$$
+                                </li>
+                            </ol>
+                        </div>
+                    </section>
+
+                    <!-- 3. Insert и Erase через Split/Merge -->
+                    <section id="sec-splay-mod-ops" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Алгоритмы] Выразимость Insert и Erase через Split и Merge</span>
+                        <div style="margin-top: 8px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Вставка: $\mathrm{Insert}(\mathrm{key})$</h4>
+                            <p>
+                                Операция добавления выражается в 3 строки:
+                            </p>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Разрезаем текущее дерево: $(T_1, T_2) = \mathrm{Split}(T, \mathrm{key})$.</li>
+                                <li>Создаем новый узел $N = \mathrm{new\ Node}(\mathrm{key})$.</li>
+                                <li>Подвешиваем $T_1$ левым сыном, а $T_2$ — правым сыном $N$:
+                                    $$N.\mathrm{left} = T_1; \quad N.\mathrm{right} = T_2; \quad T = N;$$
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Удаление: $\mathrm{Erase}(\mathrm{key})$</h4>
+                            <p>
+                                Удаление без разбора частных случаев:
+                            </p>
+                            <ol style="margin-left: 20px; margin-top: 4px;">
+                                <li>Вызываем $\mathrm{Find}(\mathrm{key})$. Если ключа нет в дереве — завершаем работу.</li>
+                                <li>Если ключ есть, он находится непосредственно в корне дерева $R$!</li>
+                                <li>Отсоединяем поддеревья корня: $T_1 = R.\mathrm{left}, T_2 = R.\mathrm{right}$.</li>
+                                <li>Удаляем корневой узел $R$, а поддеревья объединяем:
+                                    $$T = \mathrm{Merge}(T_1, T_2)$$
+                                </li>
+                            </ol>
+                        </div>
+                    </section>
+
+                    <!-- 4. Амортизированный анализ -->
+                    <section id="sec-splay-amort-proof" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема] Амортизированная сложность всех операций $O(\log n)$</span>
+                        <p>
+                            <strong>Теорема (Лекция 7, Кулапин):</strong> Все базовые операции над Splay-деревом ($\mathrm{Find}$, $\mathrm{Insert}$, $\mathrm{Erase}$, $\mathrm{Split}$, $\mathrm{Merge}$) выполняются за <strong>амортизированное время $O(\log n)$</strong>.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>$\mathrm{Find}$ состоит из обычного спуска и одного вызова $\mathrm{Splay}$, чье амортизированное время по Лемме о доступе $\le 3 \log_2 n + 1 = O(\log n)$.</li>
+                            <li>$\mathrm{Split}$ состоит из одного вызова $\mathrm{Find}$ ($O(\log n)$) и отсоединения указателя за $O(1)$. Отделение поддерева только <em>уменьшает</em> размеры предков, следовательно, потенциал $\Phi$ уменьшается ($\Delta\Phi \le 0$).</li>
+                            <li>$\mathrm{Merge}$ выполняет поиск максимума и $\mathrm{Splay}$ в $T_1$ ($O(\log n)$), а последующее присоединение $T_2$ увеличивает ранг только одного узла (нового корня) не более чем на $\log_2 n$. Суммарная учетная стоимость: $O(\log n)$.</li>
+                            <li>$\mathrm{Insert}$ и $\mathrm{Erase}$ выражаются через один $\mathrm{Split}$ или $\mathrm{Merge}$, сохраняя амортизированную оценку $O(\log n)$.</li>
+                        </ul>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Операции Splay-дерева через Split и Merge</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Операция</th>
+                                    <th style="padding: 6px 8px;">Амортизированное время</th>
+                                    <th style="padding: 6px 8px;">Схема реализации</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Find(key)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 8px;">BST поиск + Splay найденного узла в корень</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Merge(T1, T2)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 8px;">Splay(max in T1), затем T1.right = T2</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Split(T, key)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 8px;">Find(key) + отрезание левого/правого сына корня</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Insert(key)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 8px;">Split(key) $\to$ новый узел корнем над T1 и T2</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Erase(key)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 8px;">Find(key) $\to$ удаление корня $\to$ Merge(left, right)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Полная реализация Splay-дерева (Split, Merge, Insert, Erase, Find) на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">SplayTree</span> {
+    <span class="tok-kw">static class</span> <span class="tok-type">Node</span> {
+        <span class="tok-kw">int</span> key;
+        <span class="tok-type">Node</span> left, right, parent;
+        <span class="tok-func">Node</span>(<span class="tok-kw">int</span> key) { <span class="tok-kw">this</span>.key = key; }
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> root = <span class="tok-kw">null</span>;
+
+    <span class="tok-kw">private void</span> <span class="tok-func">rotate</span>(<span class="tok-type">Node</span> x) {
+        <span class="tok-type">Node</span> p = x.parent, g = p.parent;
+        <span class="tok-kw">boolean</span> isLeft = (x == p.left);
+        <span class="tok-kw">if</span> (isLeft) {
+            p.left = x.right;
+            <span class="tok-kw">if</span> (x.right != <span class="tok-kw">null</span>) x.right.parent = p;
+            x.right = p;
+        } <span class="tok-kw">else</span> {
+            p.right = x.left;
+            <span class="tok-kw">if</span> (x.left != <span class="tok-kw">null</span>) x.left.parent = p;
+            x.left = p;
+        }
+        p.parent = x; x.parent = g;
+        <span class="tok-kw">if</span> (g != <span class="tok-kw">null</span>) {
+            <span class="tok-kw">if</span> (p == g.left) g.left = x; <span class="tok-kw">else</span> g.right = x;
+        }
+    }
+
+    <span class="tok-kw">private void</span> <span class="tok-func">splay</span>(<span class="tok-type">Node</span> x) {
+        <span class="tok-kw">if</span> (x == <span class="tok-kw">null</span>) <span class="tok-kw">return</span>;
+        <span class="tok-kw">while</span> (x.parent != <span class="tok-kw">null</span>) {
+            <span class="tok-type">Node</span> p = x.parent, g = p.parent;
+            <span class="tok-kw">if</span> (g == <span class="tok-kw">null</span>) <span class="tok-func">rotate</span>(x);
+            <span class="tok-kw">else if</span> ((x == p.left) == (p == g.left)) { <span class="tok-func">rotate</span>(p); <span class="tok-func">rotate</span>(x); }
+            <span class="tok-kw">else</span> { <span class="tok-func">rotate</span>(x); <span class="tok-func">rotate</span>(x); }
+        }
+        root = x;
+    }
+
+    <span class="tok-com">// Поиск элемента с подъемом в корень: O(log n) аморт.</span>
+    <span class="tok-kw">boolean</span> <span class="tok-func">find</span>(<span class="tok-kw">int</span> key) {
+        <span class="tok-type">Node</span> cur = root, last = <span class="tok-kw">null</span>;
+        <span class="tok-kw">while</span> (cur != <span class="tok-kw">null</span>) {
+            last = cur;
+            <span class="tok-kw">if</span> (key == cur.key) { <span class="tok-func">splay</span>(cur); <span class="tok-kw">return true</span>; }
+            cur = (key &lt; cur.key) ? cur.left : cur.right;
+        }
+        <span class="tok-func">splay</span>(last);
+        <span class="tok-kw">return false</span>;
+    }
+
+    <span class="tok-com">// Слияние двух деревьев: T1 < T2</span>
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">merge</span>(<span class="tok-type">Node</span> t1, <span class="tok-type">Node</span> t2) {
+        <span class="tok-kw">if</span> (t1 == <span class="tok-kw">null</span>) <span class="tok-kw">return</span> t2;
+        <span class="tok-kw">if</span> (t2 == <span class="tok-kw">null</span>) <span class="tok-kw">return</span> t1;
+        <span class="tok-type">Node</span> maxNode = t1;
+        <span class="tok-kw">while</span> (maxNode.right != <span class="tok-kw">null</span>) maxNode = maxNode.right;
+        <span class="tok-func">splay</span>(maxNode); <span class="tok-com">// maxNode стал корнем t1, у него нет правого сына!</span>
+        maxNode.right = t2;
+        t2.parent = maxNode;
+        <span class="tok-kw">return</span> maxNode;
+    }
+
+    <span class="tok-com">// Вставка ключа: O(log n) аморт.</span>
+    <span class="tok-kw">void</span> <span class="tok-func">insert</span>(<span class="tok-kw">int</span> key) {
+        <span class="tok-kw">if</span> (root == <span class="tok-kw">null</span>) { root = <span class="tok-kw">new</span> <span class="tok-type">Node</span>(key); <span class="tok-kw">return</span>; }
+        <span class="tok-func">find</span>(key); <span class="tok-com">// Поднимает ближайший узел в корень</span>
+        <span class="tok-kw">if</span> (root.key == key) <span class="tok-kw">return</span>; <span class="tok-com">// Уже есть</span>
+
+        <span class="tok-type">Node</span> node = <span class="tok-kw">new</span> <span class="tok-type">Node</span>(key);
+        <span class="tok-kw">if</span> (key &lt; root.key) {
+            node.right = root;
+            node.left = root.left;
+            <span class="tok-kw">if</span> (root.left != <span class="tok-kw">null</span>) root.left.parent = node;
+            root.left = <span class="tok-kw">null</span>;
+            root.parent = node;
+        } <span class="tok-kw">else</span> {
+            node.left = root;
+            node.right = root.right;
+            <span class="tok-kw">if</span> (root.right != <span class="tok-kw">null</span>) root.right.parent = node;
+            root.right = <span class="tok-kw">null</span>;
+            root.parent = node;
+        }
+        root = node;
+    }
+
+    <span class="tok-com">// Удаление ключа через Splay и Merge: O(log n) аморт.</span>
+    <span class="tok-kw">void</span> <span class="tok-func">erase</span>(<span class="tok-kw">int</span> key) {
+        <span class="tok-kw">if</span> (!<span class="tok-func">find</span>(key)) <span class="tok-kw">return</span>; <span class="tok-com">// Ключа нет</span>
+        <span class="tok-com">// Удаляемый элемент теперь в root!</span>
+        <span class="tok-type">Node</span> t1 = root.left, t2 = root.right;
+        <span class="tok-kw">if</span> (t1 != <span class="tok-kw">null</span>) t1.parent = <span class="tok-kw">null</span>;
+        <span class="tok-kw">if</span> (t2 != <span class="tok-kw">null</span>) t2.parent = <span class="tok-kw">null</span>;
+        root = <span class="tok-func">merge</span>(t1, t2);
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-splay-find" class="nav-item nav-def">1. Поиск Find</a>
+                        <a href="#sec-splay-split-merge" class="nav-item nav-alg">2. Split и Merge</a>
+                        <a href="#sec-splay-mod-ops" class="nav-item nav-thm">3. Insert и Erase</a>
+                        <a href="#sec-splay-amort-proof" class="nav-item nav-proof">4. Амортизация $O(\log n)$</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
