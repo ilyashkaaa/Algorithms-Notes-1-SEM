@@ -262,6 +262,7 @@ function initTicketSelection() {
 }
 
 async function loadTicket(ticketId) {
+    const paddedId = String(ticketId).padStart(2, '0');
     const items = document.querySelectorAll('.ticket-item');
     items.forEach(i => i.classList.toggle('active', i.getAttribute('data-ticket') === String(ticketId)));
 
@@ -269,52 +270,49 @@ async function loadTicket(ticketId) {
     const wip = document.getElementById('wip-placeholder');
     if (!container || !wip) return;
 
-    if (ticketId === '22') {
-        wip.style.display = 'none';
-        container.style.display = 'grid';
-
-        if (!loadedTicketsCache[ticketId]) {
-            try {
-                const res = await fetch(`tickets/ticket_${ticketId}.html`);
-                if (res.ok) {
-                    const html = await res.text();
-                    loadedTicketsCache[ticketId] = html;
-                    container.innerHTML = html;
-                } else {
-                    throw new Error(`HTTP ${res.status}`);
-                }
-            } catch (err) {
-                console.error(`Error loading ticket ${ticketId}:`, err);
+    if (!loadedTicketsCache[ticketId]) {
+        try {
+            let res = await fetch(`tickets/ticket_${ticketId}.html`);
+            if (!res.ok) {
+                res = await fetch(`tickets/ticket_${paddedId}.html`);
             }
-        } else {
-            container.innerHTML = loadedTicketsCache[ticketId];
+            if (res.ok) {
+                const html = await res.text();
+                loadedTicketsCache[ticketId] = html;
+            } else {
+                throw new Error(`Ticket ${ticketId} not found`);
+            }
+        } catch (err) {
+            container.style.display = 'none';
+            wip.style.display = 'block';
+            const item = document.querySelector(`.ticket-item[data-ticket="${ticketId}"]`);
+            const ticketTitle = item?.querySelector('.ticket-name')?.textContent || '';
+            const ticketNum = item?.querySelector('.ticket-num')?.textContent || paddedId;
+            document.getElementById('wip-title').textContent = `${ticketNum} ${ticketTitle}`;
+            window.history.replaceState(null, '', `#ticket-${ticketId}`);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
         }
-
-        // Close mobile accordion on link click
-        container.querySelectorAll('.mobile-toc-nav a').forEach(link => {
-            link.addEventListener('click', () => {
-                const acc = container.querySelector('.mobile-toc-accordion');
-                if (acc) acc.removeAttribute('open');
-            });
-        });
-
-        // Re-render MathJax equations
-        if (window.MathJax && window.MathJax.typesetPromise) {
-            window.MathJax.typesetPromise([container]);
-        }
-        window.history.replaceState(null, '', `#ticket-${ticketId}`);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-        container.style.display = 'none';
-        wip.style.display = 'block';
-
-        const item = document.querySelector(`.ticket-item[data-ticket="${ticketId}"]`);
-        const ticketTitle = item?.querySelector('.ticket-name')?.textContent || '';
-        const ticketNum = item?.querySelector('.ticket-num')?.textContent || '';
-        document.getElementById('wip-title').textContent = `${ticketNum} ${ticketTitle}`;
-        window.history.replaceState(null, '', `#ticket-${ticketId}`);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    wip.style.display = 'none';
+    container.style.display = 'grid';
+    container.innerHTML = loadedTicketsCache[ticketId];
+
+    // Close mobile accordion on link click
+    container.querySelectorAll('.mobile-toc-nav a').forEach(link => {
+        link.addEventListener('click', () => {
+            const acc = container.querySelector('.mobile-toc-accordion');
+            if (acc) acc.removeAttribute('open');
+        });
+    });
+
+    // Re-render MathJax equations
+    if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise([container]);
+    }
+    window.history.replaceState(null, '', `#ticket-${ticketId}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // 6. Download PDF Handler via Browser Native Print Engine

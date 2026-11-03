@@ -336,11 +336,11 @@ body {
 }
 
 .ticket-item .ticket-badge {
-    font-size: 9px;
-    padding: 2px 6px;
+    font-size: 8px;
+    padding: 2px 5px;
     border-radius: 4px;
-    font-weight: 700;
-    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.2px;
     white-space: nowrap;
     flex-shrink: 0;
     margin-top: 2px;
@@ -354,6 +354,11 @@ body {
 .badge-wip {
     background: var(--sidebar-badge-wip-bg);
     color: var(--sidebar-badge-wip-color);
+}
+
+.ticket-item.active .badge-wip {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
 }
 
 /* Sidebar Footer (Sole home of Contacts) */
