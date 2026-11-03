@@ -1,0 +1,293 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 18 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Линейные контейнеры и очередь на двух стеках</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Связные списки (односвязный и двусвязный). Стек, очередь, дек (на списках и кольцевом буфере Ring Buffer). Очередь с поддержкой произвольной ассоциативной операции (минимум, GCD, матрицы) на двух стеках за амортизированное $O(1)$.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">18</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-linked-lists" class="nav-item nav-def">1. Связные списки</a>
+                        <a href="#sec-adapters" class="nav-item nav-alg">2. Стек, очередь и дек</a>
+                        <a href="#sec-ring-buffer" class="nav-item nav-geo">3. Кольцевой буфер (Ring Buffer)</a>
+                        <a href="#sec-queue-stacks" class="nav-item nav-thm">4. Очередь на двух стеках</a>
+                        <a href="#sec-assoc-req" class="nav-item nav-proof">5. Требование ассоциативности</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Связные списки -->
+                    <section id="sec-linked-lists" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Односвязный и двусвязный списки</span>
+                        <p>
+                            <strong>Связный список</strong> — динамическая структура данных, состоящая из узлов (Nodes), каждый из которых содержит полезную нагрузку и указатели на соседние узлы в динамической памяти.
+                        </p>
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Односвязный список (Singly Linked List)</h4>
+                            <p>
+                                Узел содержит поле <code>val</code> и один указатель <code>next</code>.
+                            </p>
+                            <ul style="margin-left: 20px; margin-top: 4px;">
+                                <li>Вставка и удаление из головы (head): строго $O(1)$.</li>
+                                <li>Вставка/удаление после известного узла: $O(1)$.</li>
+                                <li>Доступ по порядковому номеру $k$: $\Theta(k) = O(n)$ последовательным проходом.</li>
+                                <li>Удаление узла по указателю на него: $O(n)$, так как необходимо найти предшествующий узел для переподвешивания указателя <code>next</code>.</li>
+                            </ul>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Двусвязный список (Doubly Linked List)</h4>
+                            <p>
+                                Узел содержит <code>val</code>, <code>next</code> и <code>prev</code>.
+                            </p>
+                            <ul style="margin-left: 20px; margin-top: 4px;">
+                                <li>Вставка и удаление в оба конца (head и tail): строго $O(1)$.</li>
+                                <li>Удаление <em>любого</em> известного узла за строго $O(1)$ без поиска:
+                                    <code>node.prev.next = node.next; node.next.prev = node.prev;</code>
+                                </li>
+                                <li><em>Минусы:</em> Расход памяти (2 указателя на каждый элемент = 16 байт оверхеда на 64-битных ОС) и плохая локальность данных в кэше процессора (cache misses).</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- 2. Стек, очередь и дек -->
+                    <section id="sec-adapters" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Концепции] Последовательные контейнеры: Стек, Очередь, Дек</span>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>Стек (Stack, LIFO — Last In, First Out):</strong> Доступен только последний добавленный элемент.
+                                <br><em>Реализация:</em> на динамическом массиве (вершина в конце, $O(1)$ аморт.) или на односвязном списке (вершина в голове, строго $O(1)$ худшего времени).
+                            </li>
+                            <li><strong>Очередь (Queue, FIFO — First In, First Out):</strong> Добавление в конец (`push`), извлечение из начала (`pop`).
+                                <br><em>Реализация:</em> на односвязном списке с указателями на `head` и `tail` (строго $O(1)$) или на кольцевом буфере.
+                            </li>
+                            <li><strong>Дек (Deque — Double-Ended Queue):</strong> Двусторонняя очередь, поддерживающая добавление и удаление с обоих концов за $O(1)$.
+                                <br><em>Реализация:</em> на двусвязном списке или на динамическом кольцевом буфере.
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- 3. Кольцевой буфер (Ring Buffer) -->
+                    <section id="sec-ring-buffer" class="vcard vcard-geo">
+                        <span class="vcard-title-pill">[Структура] Кольцевой буфер (Ring Buffer)</span>
+                        <p>
+                            <strong>Кольцевой буфер (циклический буфер)</strong> — массив фиксированного размера $C$, логически закольцованный с помощью двух индексов: <code>head</code> (начало очереди) и <code>tail</code> (место вставки следующего элемента).
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Инварианты и арифметика по модулю $C$:</strong>
+                        </p>
+                        $$\mathrm{push}(x): \quad A[\mathrm{tail}] = x, \quad \mathrm{tail} = (\mathrm{tail} + 1) \bmod C, \quad \mathrm{size}++$$
+                        $$\mathrm{pop}(): \quad x = A[\mathrm{head}], \quad \mathrm{head} = (\mathrm{head} + 1) \bmod C, \quad \mathrm{size}--$$
+                        <ul style="margin-left: 20px; margin-top: 8px;">
+                            <li><strong>Преимущество:</strong> Память переиспользуется по кругу без выделения новых узлов в куче и без сдвига элементов массива: операции занимают строго $O(1)$ худшего времени!</li>
+                            <li><strong>Контейнер <code>std::deque</code> в C++:</strong> Реализован как массив указателей на непрерывные блоки фиксированного размера (chunk ring buffer), что обеспечивает доступ по произвольному индексу за $O(1)$, вставку в оба конца за $O(1)$ и отсутствие инвалидации указателей на не удаляемые элементы при расширении.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 4. Очередь на двух стеках -->
+                    <section id="sec-queue-stacks" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Алгоритм] Очередь на двух стеках с поддержкой ассоциативной операции</span>
+                        <p>
+                            <strong>Задача:</strong> Реализовать очередь, поддерживающую добавление $\mathrm{push}(x)$, удаление $\mathrm{pop}()$ и вычисление результата произвольной операции над всеми элементами очереди $\mathrm{query}() = x_1 \circ x_2 \circ \dots \circ x_k$ за <strong>амортизированное $O(1)$</strong>.
+                        </p>
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Вспомогательный примитив: Стек с поддержкой операции</h4>
+                            <p>
+                                В каждом узле стека храним пару $(\mathrm{val}, \mathrm{agg})$, где $\mathrm{agg}$ — накопленный результат операции от дна стека до текущего элемента:
+                            </p>
+                            $$\mathrm{push}(x): \quad \mathrm{agg}_{\mathrm{new}} = \begin{cases} x, & \text{если стек пуст} \\ \mathrm{stack.top().agg} \circ x, & \text{иначе} \end{cases}$$
+                            <p style="margin-top: 4px;">
+                                Значение операции на всем стеке доступно в вершине за строго $O(1)$: $\mathrm{query}_{\mathrm{stack}} = \mathrm{stack.top().agg}$.
+                            </p>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Двухстековая очередь</h4>
+                            <p>
+                                Заводим два стека с поддержкой операции: <code>stack_in</code> (входной) и <code>stack_out</code> (выходной):
+                            </p>
+                            <ul style="margin-left: 20px; margin-top: 4px;">
+                                <li>$\mathrm{push}(x)$: Всегда добавляем элемент в <code>stack_in</code>. Время $O(1)$.</li>
+                                <li>$\mathrm{pop}()$:
+                                    <ul style="margin-left: 18px; margin-top: 2px;">
+                                        <li>Если <code>stack_out</code> не пуст, просто извлекаем вершину из <code>stack_out</code>.</li>
+                                        <li>Если <code>stack_out</code> пуст, последовательно извлекаем все элементы из <code>stack_in</code> и помещаем их в <code>stack_out</code> (порядок элементов естественным образом разворачивается в правильный FIFO!). Затем извлекаем вершину <code>stack_out</code>.</li>
+                                    </ul>
+                                </li>
+                                <li>$\mathrm{query}()$:
+                                    <ul style="margin-left: 18px; margin-top: 2px;">
+                                        <li>Если пуст <code>stack_in</code>: возвращаем $\mathrm{stack\_out.query()}$.</li>
+                                        <li>Если пуст <code>stack_out</code>: возвращаем $\mathrm{stack\_in.query()}$.</li>
+                                        <li>Если оба не пусты: объединяем их агрегаты в правильном хронологическом порядке:
+                                            $$\mathrm{result} = \mathrm{stack\_out.query()} \circ \mathrm{stack\_in.query()}$$
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div style="background: rgba(34,197,94,0.06); border-left: 3px solid #4ade80; padding: 8px 12px; margin-top: 10px; border-radius: 4px; font-size: 12.5px;">
+                            <strong>Амортизированный анализ:</strong> Каждый элемент попадает в <code>stack_in</code> (1 операция), единожды перекладывается в <code>stack_out</code> (1 операция) и один раз удаляется из <code>stack_out</code> (1 операция). Итого ровно 3 операции на элемент, поэтому амортизированная стоимость всех операций $\mathrm{push}$, $\mathrm{pop}$ и $\mathrm{query}$ равна <strong>$O(1)$</strong>!
+                        </div>
+                    </section>
+
+                    <!-- 5. Требование ассоциативности -->
+                    <section id="sec-assoc-req" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Алгебра] Какие требования накладываются на операцию?</span>
+                        <p>
+                            <strong>Ассоциативность — обязательное и достаточное условие:</strong>
+                        </p>
+                        $$(a \circ b) \circ c = a \circ (b \circ c)$$
+                        <p style="margin-top: 6px;">
+                            Очередь на двух стеках вычисляет:
+                        </p>
+                        $$\underbrace{(x_1 \circ \dots \circ x_k)}_{\text{агрегат в stack\_out}} \circ \underbrace{(x_{k+1} \circ \dots \circ x_m)}_{\text{агрегат в stack\_in}}$$
+                        <p style="margin-top: 6px;">
+                            Благодаря ассоциативности расстановка скобок не меняет результат вычисления.
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 8px;">
+                            <li><strong>Коммутативность НЕ требуется:</strong> Порядок элементов строго сохраняется ($\mathrm{stack\_out}$ идет chronologically раньше $\mathrm{stack\_in}$). Можно поддерживать перемножение матриц!</li>
+                            <li><strong>Обратимость НЕ требуется:</strong> В отличие от префиксных сумм, где для удаления элемента требовалось вычитание (обратный элемент), очередь на двух стеках работает с полугруппами: поиск минимума $\min(a, b)$, максимума $\max(a, b)$, наибольшего общего делителя $\gcd(a, b)$!</li>
+                        </ul>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные характеристики линейных контейнеров</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Контейнер / Реализация</th>
+                                    <th style="padding: 6px 8px;">Push Front / Back</th>
+                                    <th style="padding: 6px 8px;">Pop Front / Back</th>
+                                    <th style="padding: 6px 8px;">Query (min/op)</th>
+                                    <th style="padding: 6px 8px;">Память / Оверхед</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Односвязный список</strong></td>
+                                    <td style="padding: 6px 8px;">$O(1)$ / $O(1)$ (с tail)</td>
+                                    <td style="padding: 6px 8px;">$O(1)$ / $O(n)$</td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;">1 указатель на узел</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Двусвязный список</strong></td>
+                                    <td style="padding: 6px 8px;">$O(1)$ / $O(1)$</td>
+                                    <td style="padding: 6px 8px;">$O(1)$ / $O(1)$</td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;">2 указателя на узел</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Ring Buffer (массив)</strong></td>
+                                    <td style="padding: 6px 8px;">$O(1)$ / $O(1)$</td>
+                                    <td style="padding: 6px 8px;">$O(1)$ / $O(1)$</td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;">$O(1)$ оверхед, кэш-френдли</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Очередь на 2 стеках</strong></td>
+                                    <td style="padding: 6px 8px;">– / $O(1)$ аморт.</td>
+                                    <td style="padding: 6px 8px;">$O(1)$ аморт. / –</td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(1)$ строго</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n)$ под агрегаты стеков</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Очередь с поддержкой минимума / ассоциативной операции на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">MinQueue</span> {
+    <span class="tok-kw">static class</span> <span class="tok-type">StackNode</span> {
+        <span class="tok-kw">int</span> val;
+        <span class="tok-kw">int</span> minUnder;
+        <span class="tok-func">StackNode</span>(<span class="tok-kw">int</span> val, <span class="tok-kw">int</span> minUnder) {
+            <span class="tok-kw">this</span>.val = val;
+            <span class="tok-kw">this</span>.minUnder = minUnder;
+        }
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-type">ArrayList</span>&lt;<span class="tok-type">StackNode</span>&gt; stackIn = <span class="tok-kw">new</span> <span class="tok-type">ArrayList</span>&lt;&gt;();
+    <span class="tok-kw">private</span> <span class="tok-type">ArrayList</span>&lt;<span class="tok-type">StackNode</span>&gt; stackOut = <span class="tok-kw">new</span> <span class="tok-type">ArrayList</span>&lt;&gt;();
+
+    <span class="tok-com">// Добавление элемента: O(1)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">push</span>(<span class="tok-kw">int</span> x) {
+        <span class="tok-kw">int</span> curMin = stackIn.<span class="tok-func">isEmpty</span>() ? x : <span class="tok-type">Math</span>.<span class="tok-func">min</span>(x, stackIn.<span class="tok-func">get</span>(stackIn.<span class="tok-func">size</span>() - <span class="tok-num">1</span>).minUnder);
+        stackIn.<span class="tok-func">add</span>(<span class="tok-kw">new</span> <span class="tok-type">StackNode</span>(x, curMin));
+    }
+
+    <span class="tok-com">// Удаление элемента: амортизированно O(1)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">pop</span>() {
+        <span class="tok-kw">if</span> (stackOut.<span class="tok-func">isEmpty</span>()) {
+            <span class="tok-kw">while</span> (!stackIn.<span class="tok-func">isEmpty</span>()) {
+                <span class="tok-kw">int</span> val = stackIn.<span class="tok-func">remove</span>(stackIn.<span class="tok-func">size</span>() - <span class="tok-num">1</span>).val;
+                <span class="tok-kw">int</span> curMin = stackOut.<span class="tok-func">isEmpty</span>() ? val : <span class="tok-type">Math</span>.<span class="tok-func">min</span>(val, stackOut.<span class="tok-func">get</span>(stackOut.<span class="tok-func">size</span>() - <span class="tok-num">1</span>).minUnder);
+                stackOut.<span class="tok-func">add</span>(<span class="tok-kw">new</span> <span class="tok-type">StackNode</span>(val, curMin));
+            }
+        }
+        <span class="tok-kw">return</span> stackOut.<span class="tok-func">remove</span>(stackOut.<span class="tok-func">size</span>() - <span class="tok-num">1</span>).val;
+    }
+
+    <span class="tok-com">// Запрос ассоциативной операции (минимума) за строго O(1)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">getMin</span>() {
+        <span class="tok-kw">if</span> (stackIn.<span class="tok-func">isEmpty</span>()) {
+            <span class="tok-kw">return</span> stackOut.<span class="tok-func">get</span>(stackOut.<span class="tok-func">size</span>() - <span class="tok-num">1</span>).minUnder;
+        }
+        <span class="tok-kw">if</span> (stackOut.<span class="tok-func">isEmpty</span>()) {
+            <span class="tok-kw">return</span> stackIn.<span class="tok-func">get</span>(stackIn.<span class="tok-func">size</span>() - <span class="tok-num">1</span>).minUnder;
+        }
+        <span class="tok-kw">return</span> <span class="tok-type">Math</span>.<span class="tok-func">min</span>(
+            stackIn.<span class="tok-func">get</span>(stackIn.<span class="tok-func">size</span>() - <span class="tok-num">1</span>).minUnder,
+            stackOut.<span class="tok-func">get</span>(stackOut.<span class="tok-func">size</span>() - <span class="tok-num">1</span>).minUnder
+        );
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-linked-lists" class="nav-item nav-def">1. Связные списки</a>
+                        <a href="#sec-adapters" class="nav-item nav-alg">2. Стек, очередь, дек</a>
+                        <a href="#sec-ring-buffer" class="nav-item nav-geo">3. Кольцевой буфер</a>
+                        <a href="#sec-queue-stacks" class="nav-item nav-thm">4. Очередь на двух стеках</a>
+                        <a href="#sec-assoc-req" class="nav-item nav-proof">5. Требование ассоциативности</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
