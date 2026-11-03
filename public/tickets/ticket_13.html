@@ -1,0 +1,248 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 13 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Быстрая сортировка с использованием медианы медиан</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Детерминированный алгоритм быстрой сортировки с гарантией времени работы $O(n \log n)$ в наихудшем случае. Выбор опорного элемента через алгоритм медианы медиан и анализ рекуррентности.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">13</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-det-idea" class="nav-item nav-def">1. Идея детерминированного выбора</a>
+                        <a href="#sec-det-alg" class="nav-item nav-alg">2. Алгоритм сортировки</a>
+                        <a href="#sec-det-complexity" class="nav-item nav-thm">3. Оценка времени худшего случая $O(n \log n)$</a>
+                        <a href="#sec-comparison" class="nav-item nav-geo">4. Сравнение с рандомизированным QuickSort</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Идея и постановка проблемы -->
+                    <section id="sec-det-idea" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Мотивация] Устранение худшего случая $O(n^2)$</span>
+                        <p>
+                            Классическая быстрая сортировка с рандомизированным выбором опорного элемента работает за ожидаемое время $O(n \log n)$, однако в наихудшем случае деградирует до $O(n^2)$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Цель:</strong> Построить алгоритм быстрой сортировки, который <strong>строго детерминированно гарантирует время $O(n \log n)$ в абсолютно наихудшем случае</strong>, сохраняя структуру алгоритма QuickSort с процедурой $\mathrm{Partition}$.
+                        </p>
+                    </section>
+
+                    <!-- 2. Алгоритм сортировки -->
+                    <section id="sec-det-alg" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Быстрая сортировка с медианой медиан</span>
+                        <p>
+                            Для отрезка массива $[l, r]$ размера $n = r - l + 1$:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>База рекурсии:</strong> Если отрезок пуст или содержит один элемент ($l \ge r$), завершаем работу. Для малых отрезков ($n \le 16$) сортируем массив на месте за $O(1)$.</li>
+                            <li><strong>Выбор опорного элемента (Pivot):</strong>
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li>Разбиваем массив на группы по 5 элементов.</li>
+                                    <li>В каждой пятерке находим медиану за $O(1)$ (собираем $\lceil n/5 \rceil$ медиан).</li>
+                                    <li>Рекурсивно находим <em>медиану медиан</em> $M$ (или вызываем линейный детерминированный выбор точной медианы) за время $O(n)$.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Разбиение (Partition):</strong> Выполняем процедуру $\mathrm{Partition}$ массива вокруг найденного элемента $M$ на месте ($O(1)$ доп. памяти) за время $O(n)$.</li>
+                            <li><strong>Рекурсивный спуск:</strong>
+                                Так как медиана медиан гарантирует разделение массива в пропорции не хуже $3:7$ (а при выборе точной медианы — ровно $1:1$), ни один из подмассивов не содержит более $7n/10$ элементов. Рекурсивно вызываем сортировку для левой и правой частей.
+                            </li>
+                        </ol>
+                    </section>
+
+                    <!-- 3. Оценка времени в худшем случае -->
+                    <section id="sec-det-complexity" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теорема и Доказательство] Оценка времени работы $O(n \log n)$ в худшем случае</span>
+                        <p>
+                            <strong>Теорема:</strong> Быстрая сортировка с выбором опорного элемента алгоритмом медианы медиан работает в наихудшем случае за детерминированное время <strong>$O(n \log n)$</strong>.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство 1 (через выбор точной медианы за $O(n)$):</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li>Время нахождения точной медианы детерминированным линейным выбором: $O(n)$.</li>
+                            <li>Время выполнения Partition на отрезке размера $n$: $O(n)$.</li>
+                            <li>После разбиения массив делится на две равные части размером не более $n/2$.</li>
+                        </ul>
+                        $$T(n) = 2 \cdot T\left(\frac{n}{2}\right) + O(n)$$
+                        <p style="margin-top: 6px;">
+                            По теореме о рекуррентных соотношениях (или методом развертывания дерева рекурсии): глубина дерева $\log_2 n$, на каждом уровне суммарно выполняется $O(n)$ работы. Следовательно:
+                        </p>
+                        $$T(n) = O(n \log n) \quad \text{в наихудшем случае.}$$
+
+                        <hr style="border: none; border-top: 1px dashed var(--border-color); margin: 12px 0;">
+
+                        <p>
+                            <strong>Доказательство 2 (непосредственно с медианой медиан в качестве pivot):</strong>
+                        </p>
+                        <p style="margin-top: 4px;">
+                            Если в качестве pivot берется сама медиана медиан (без полного линейного поиска точной медианы):
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li>Нахождение медианы медиан занимает время $T_{\mathrm{MM}}(n) \le T(n/5) + O(n) = O(n)$.</li>
+                            <li>Разбиение $\mathrm{Partition}$ гарантирует, что максимальный размер любой из двух частей не превосходит $\frac{7}{10}n$.</li>
+                            <li>Максимальная глубина дерева рекурсии ограничена величиной $\log_{10/7} n = \frac{\ln n}{\ln(10/7)} = O(\log n)$.</li>
+                            <li>На каждом уровне глубины $k$ суммарная длина всех рассматриваемых подмассивов не превышает исходной длины $n$, поэтому суммарная работа на каждом уровне составляет $O(n)$.</li>
+                        </ul>
+                        $$T(n) \le \sum_{k=0}^{\log_{10/7} n} O(n) = O(n \log n)$$
+                    </section>
+
+                    <!-- 4. Сравнение с рандомизированным QuickSort -->
+                    <section id="sec-comparison" class="vcard vcard-geo">
+                        <span class="vcard-title-pill">[Сравнение] Рандомизированный vs Детерминированный QuickSort</span>
+                        <p>
+                            Сопоставление двух подходов к выбору опорного элемента:
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li style="margin-bottom: 6px;">
+                                <strong>Рандомизированный QuickSort:</strong>
+                                Опорный элемент выбирается случайно за $O(1)$. Ожидаемое время работы $\mathbb{E}[T(n)] = O(n \log n)$ с очень маленькой практической константой. Однако существует теоретический наихудший случай $O(n^2)$.
+                            </li>
+                            <li>
+                                <strong>Детерминированный QuickSort с медианой медиан:</strong>
+                                Обеспечивает строгую математическую гарантию $O(n \log n)$ в наихудшем случае без вероятностных предположений. Плата за это — необходимость разбиения на пятерки и нахождения медиан, что увеличивает скрытую константу времени.
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные характеристики алгоритмов</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Алгоритм</th>
+                                    <th style="padding: 6px 8px;">Среднее время</th>
+                                    <th style="padding: 6px 8px;">Худшее время</th>
+                                    <th style="padding: 6px 8px;">Доп. память</th>
+                                    <th style="padding: 6px 8px;">Особенность</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Randomized QuickSort</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 8px;">$O(n^2)$</td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$ (стек)</td>
+                                    <td style="padding: 6px 8px;">Малая константа, случайный пивот</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>QuickSort + Медиана медиан</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(n \log n)$</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$ (стек)</td>
+                                    <td style="padding: 6px 8px;">Детерминированная гарантия худшего случая</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>MergeSort</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                    <td style="padding: 6px 8px;">$O(n)$</td>
+                                    <td style="padding: 6px 8px;">Стабильная, требует $O(n)$ памяти</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация детерминированного QuickSort с медианой медиан на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">DeterministicQuickSort</span> {
+    <span class="tok-kw">private</span> <span class="tok-type">MedianOfMedians</span> mm = <span class="tok-kw">new</span> <span class="tok-type">MedianOfMedians</span>();
+
+    <span class="tok-com">// Гарантированное время O(n log n) в абсолютно худшем случае</span>
+    <span class="tok-kw">void</span> <span class="tok-func">sort</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">if</span> (l &gt;= r) <span class="tok-kw">return</span>;
+
+        <span class="tok-com">// Для малых отрезков используем сортировку вставками</span>
+        <span class="tok-kw">if</span> (r - l + <span class="tok-num">1</span> &lt;= <span class="tok-num">16</span>) {
+            <span class="tok-func">insertionSort</span>(a, l, r);
+            <span class="tok-kw">return</span>;
+        }
+
+        <span class="tok-com">// 1. Находим медиану за детерминированное O(n) через алгоритм медианы медиан</span>
+        <span class="tok-kw">int</span> midIdx = l + (r - l) / <span class="tok-num">2</span>;
+        <span class="tok-kw">int</span> medianValue = mm.<span class="tok-func">select</span>(a, l, r, midIdx);
+
+        <span class="tok-com">// 2. Partition вокруг гарантированного опорного элемента</span>
+        <span class="tok-kw">int</span> m = <span class="tok-func">partitionValue</span>(a, l, r, medianValue);
+
+        <span class="tok-com">// 3. Рекурсивные вызовы для половин размера <= n / 2</span>
+        <span class="tok-func">sort</span>(a, l, m - <span class="tok-num">1</span>);
+        <span class="tok-func">sort</span>(a, m + <span class="tok-num">1</span>, r);
+    }
+
+    <span class="tok-kw">int</span> <span class="tok-func">partitionValue</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r, <span class="tok-kw">int</span> pivot) {
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l; i &lt;= r; i++) {
+            <span class="tok-kw">if</span> (a[i] == pivot) { <span class="tok-func">swap</span>(a, i, r); <span class="tok-kw">break</span>; }
+        }
+        <span class="tok-kw">int</span> m = l;
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l; i &lt; r; i++) {
+            <span class="tok-kw">if</span> (a[i] &lt; pivot) { <span class="tok-func">swap</span>(a, m, i); m++; }
+        }
+        <span class="tok-func">swap</span>(a, m, r);
+        <span class="tok-kw">return</span> m;
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">insertionSort</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> l, <span class="tok-kw">int</span> r) {
+        <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l + <span class="tok-num">1</span>; i &lt;= r; i++) {
+            <span class="tok-kw">int</span> cur = a[i], j = i - <span class="tok-num">1</span>;
+            <span class="tok-kw">while</span> (j &gt;= l &amp;&amp; a[j] &gt; cur) {
+                a[j + <span class="tok-num">1</span>] = a[j];
+                j--;
+            }
+            a[j + <span class="tok-num">1</span>] = cur;
+        }
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">swap</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> i, <span class="tok-kw">int</span> j) {
+        <span class="tok-kw">int</span> tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-det-idea" class="nav-item nav-def">1. Идея детерминированного выбора</a>
+                        <a href="#sec-det-alg" class="nav-item nav-alg">2. Алгоритм сортировки</a>
+                        <a href="#sec-det-complexity" class="nav-item nav-thm">3. Оценка времени худшего случая</a>
+                        <a href="#sec-comparison" class="nav-item nav-geo">4. Сравнение с рандомизированным</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
