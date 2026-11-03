@@ -1,0 +1,229 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 11 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Поиск порядковой статистики (Quick Select)</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Определение $k$-й порядковой статистики. Рандомизированный алгоритм Quick Select. Оценка времени работы: среднее $O(n)$ и худшее $O(n^2)$. Итеративная реализация с $O(1)$ доп. памяти.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">11</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-stat-def" class="nav-item nav-def">1. Порядковая статистика</a>
+                        <a href="#sec-qselect-alg" class="nav-item nav-alg">2. Алгоритм Quick Select</a>
+                        <a href="#sec-complexity" class="nav-item nav-thm">3. Оценка времени со случайным пивотом</a>
+                        <a href="#sec-geometric-intuition" class="nav-item nav-proof">4. Интуиция сходящейся прогрессии</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Определение порядковой статистики -->
+                    <section id="sec-stat-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] $k$-я порядковая статистика и медиана</span>
+                        <p>
+                            <strong>$k$-я порядковая статистика ($k$-th Order Statistic)</strong> массива $A[0 \dots n-1]$ — это элемент, который оказался бы на $k$-й позиции ($0 \le k < n$), если бы массив был отсортирован в порядке неубывания.
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li>При $k = 0$ — минимальный элемент массива ($O(n)$ линейным сканированием).</li>
+                            <li>При $k = n - 1$ — максимальный элемент массива ($O(n)$ линейным сканированием).</li>
+                            <li>При $k = \lfloor n / 2 \rfloor$ — <strong>медиана массива</strong>.</li>
+                        </ul>
+                        <p style="margin-top: 8px;">
+                            <strong>Тривиальный подход:</strong> Отсортировать массив целиком (MergeSort или HeapSort) за $O(n \log n)$ и вернуть $A[k]$. Задача: научиться находить произвольную $k$-ю порядковую статистику быстрее, за <strong>линейное время $O(n)$</strong>.
+                        </p>
+                    </section>
+
+                    <!-- 2. Алгоритм Quick Select -->
+                    <section id="sec-qselect-alg" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритм] Рандомизированный алгоритм Quick Select</span>
+                        <p>
+                            Идея опирается на процедуру $\mathrm{Partition}$ из быстрой сортировки, но в отличие от нее, <strong>рекурсия спускается только в одну ветвь</strong>.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Шаги алгоритма поиска $k$-й статистики на отрезке $[l, r]$:</strong>
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li>Если $l = r$, отрезок состоит из одного элемента — возвращаем $A[l]$.</li>
+                            <li>Выбираем опорный элемент $\mathrm{pivot} = A[\mathrm{rnd}(l, r)]$.</li>
+                            <li>Выполняем процедуру $\mathrm{Partition}(A, l, r)$, которая расставляет элементы так, что опорный элемент встает на свою финальную позицию $m$, все элементы левее $m$ не превосходят его ($A[i] \le A[m]$), а правее — не меньше его ($A[j] \ge A[m]$).</li>
+                            <li><strong>Анализ индекса $m$:</strong>
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li>Если $k = m$, искомый элемент найден — возвращаем $A[m]$.</li>
+                                    <li>Если $k < m$, искомый элемент строго меньше $A[m]$ и обязан находиться в левом подмассиве $[l, m - 1]$ — рекурсивно ищем $k$-ю статистику на $[l, m - 1]$.</li>
+                                    <li>Если $k > m$, искомый элемент строго больше $A[m]$ и находится в правом подмассиве $[m + 1, r]$ — рекурсивно ищем $k$-ю статистику на $[m + 1, r]$.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </section>
+
+                    <!-- 3. Оценка времени работы -->
+                    <section id="sec-complexity" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теорема] Временная сложность Quick Select</span>
+                        <p>
+                            Время работы зависит от качества разбиения массива опорным элементом.
+                        </p>
+
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: #f87171;">1. Худший случай: $O(n^2)$</h4>
+                            <p>
+                                Если на каждом шаге в качестве пивота выбирается минимальный (или максимальный) элемент, а целевой индекс $k$ находится на другом конце массива, то размер задачи уменьшается всего на 1:
+                            </p>
+                            $$T(n) = T(n - 1) + O(n) = \sum_{i=1}^n O(i) = O(n^2)$$
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: #38bdf8;">2. Среднее время со случайным пивотом: $O(n)$</h4>
+                            <p>
+                                <strong>Теорема (без доказательства):</strong> Математическое ожидание времени работы алгоритма Quick Select при случайном равновероятном выборе опорного элемента $\mathrm{pivot} \in [l, r]$ составляет:
+                            </p>
+                            $$\mathbb{E}[T(n)] = \Theta(n)$$
+                        </div>
+                    </section>
+
+                    <!-- 4. Интуиция сходящейся геометрической прогрессии -->
+                    <section id="sec-geometric-intuition" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Интуиция] Сравнение с QuickSort и геометрическая прогрессия</span>
+                        <p>
+                            Почему среднее время QuickSort равно $O(n \log n)$, а QuickSelect — $O(n)$?
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>В QuickSort:</strong> алгоритм обязан рекурсивно обработать <em>обе</em> половины. На каждом из $\log_2 n$ уровней суммарный объем данных равен $n$, что суммируется в $\sum_{i=0}^{\log n} n = O(n \log n)$.</li>
+                            <li><strong>В QuickSelect:</strong> алгоритм отбрасывает одну из половин и спускается ровно в <em>одну</em> часть.</li>
+                        </ul>
+                        <p style="margin-top: 8px;">
+                            С вероятностью $1/2$ случайно выбранный пивот попадает в межквартильный диапазон (между 25% и 75%), деля массив не хуже чем $1:3$. В этом случае размер оставшейся части не превосходит $\frac{3}{4} n$.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            Тогда суммарное число операций оценивается суммой бесконечно убывающей геометрической прогрессии со знаменателем $q \le 3/4$:
+                        </p>
+                        $$T(n) \le C n + C \left(\frac{3}{4}\right) n + C \left(\frac{3}{4}\right)^2 n + \dots = C n \cdot \frac{1}{1 - 3/4} = 4 C n = O(n)$$
+                        <p style="margin-top: 8px;">
+                            Даже с учетом неудачных шагов, среднее число шагов до удачного разбиения равно $2$, что лишь увеличивает константу перед линейным слагаемым.
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводная таблица Quick Select</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Критерий</th>
+                                    <th style="padding: 6px 8px;">Quick Select</th>
+                                    <th style="padding: 6px 8px;">Полная сортировка + доступ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Среднее время</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(n)$</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Худшее время</strong></td>
+                                    <td style="padding: 6px 8px;">$O(n^2)$ (устраняется в BFPRT)</td>
+                                    <td style="padding: 6px 8px;">$O(n \log n)$ (Merge/HeapSort)</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Доп. память</strong></td>
+                                    <td style="padding: 6px 8px;"><strong>$O(1)$</strong> (итеративно)</td>
+                                    <td style="padding: 6px 8px;">$O(1)$ (HeapSort) или $O(n)$ (MergeSort)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Изменение массива</strong></td>
+                                    <td style="padding: 6px 8px;">Частично переставляет элементы</td>
+                                    <td style="padding: 6px 8px;">Полностью упорядочивает</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация Quick Select на Java++ (Итеративный вариант, $O(1)$ памяти)
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">QuickSelectAlgorithm</span> {
+    <span class="tok-kw">private</span> <span class="tok-type">Random</span> rnd = <span class="tok-kw">new</span> <span class="tok-type">Random</span>();
+
+    <span class="tok-com">// Поиск k-й порядковой статистики на отрезке [l, r]</span>
+    <span class="tok-com">// Среднее время O(n), память O(1)</span>
+    <span class="tok-kw">int</span> <span class="tok-func">quickSelect</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> k) {
+        <span class="tok-kw">int</span> l = <span class="tok-num">0</span>;
+        <span class="tok-kw">int</span> r = a.length - <span class="tok-num">1</span>;
+
+        <span class="tok-kw">while</span> (l &lt; r) {
+            <span class="tok-kw">int</span> pivotIdx = l + rnd.<span class="tok-func">nextInt</span>(r - l + <span class="tok-num">1</span>);
+            <span class="tok-kw">int</span> pivot = a[pivotIdx];
+
+            <span class="tok-com">// Схема разбиения Ломуто с вынесением pivot</span>
+            <span class="tok-func">swap</span>(a, pivotIdx, r);
+            <span class="tok-kw">int</span> m = l;
+            <span class="tok-kw">for</span> (<span class="tok-kw">int</span> i = l; i &lt; r; i++) {
+                <span class="tok-kw">if</span> (a[i] &lt; pivot) {
+                    <span class="tok-func">swap</span>(a, m, i);
+                    m++;
+                }
+            }
+            <span class="tok-func">swap</span>(a, m, r); <span class="tok-com">// pivot занял точную позицию m</span>
+
+            <span class="tok-kw">if</span> (m == k) {
+                <span class="tok-kw">return</span> a[m];
+            } <span class="tok-kw">else if</span> (k &lt; m) {
+                r = m - <span class="tok-num">1</span>; <span class="tok-com">// Идем в левую половину</span>
+            } <span class="tok-kw">else</span> {
+                l = m + <span class="tok-num">1</span>; <span class="tok-com">// Идем в правую половину</span>
+            }
+        }
+        <span class="tok-kw">return</span> a[l];
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">swap</span>(<span class="tok-kw">int</span>[] a, <span class="tok-kw">int</span> i, <span class="tok-kw">int</span> j) {
+        <span class="tok-kw">int</span> tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-stat-def" class="nav-item nav-def">1. Порядковая статистика</a>
+                        <a href="#sec-qselect-alg" class="nav-item nav-alg">2. Алгоритм Quick Select</a>
+                        <a href="#sec-complexity" class="nav-item nav-thm">3. Оценка времени</a>
+                        <a href="#sec-geometric-intuition" class="nav-item nav-proof">4. Геометрическая прогрессия</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
