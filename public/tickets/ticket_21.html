@@ -1,0 +1,296 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 21 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>AVL-дерево: Повороты и балансировка</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Определение AVL-дерева и баланс-фактор. Теорема о высоте $h = O(\log N)$ через числа Фибоначчи (доказательство из лекции). Малые и большие повороты (Left, Right, LR, RL). Операции Insert, Erase, Find за $O(\log n)$.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">21</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-avl-def" class="nav-item nav-def">1. Определение и инвариант AVL</a>
+                        <a href="#sec-height-proof" class="nav-item nav-proof">2. Теорема о высоте (Фибоначчи)</a>
+                        <a href="#sec-rotations" class="nav-item nav-alg">3. Малые и большие повороты</a>
+                        <a href="#sec-operations" class="nav-item nav-thm">4. Балансировка Insert и Erase</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Определение и инвариант AVL -->
+                    <section id="sec-avl-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] AVL-дерево</span>
+                        <p>
+                            <strong>AVL-дерево</strong> — самобалансирующееся бинарное дерево поиска, в каждом узле $x$ которого поддерживается инвариант сбалансированности:
+                        </p>
+                        <p style="margin-top: 6px;">
+                            <strong>Инвариант AVL:</strong> Для любой вершины $x$ высоты ее левого и правого поддеревьев отличаются не более чем на единицу:
+                        </p>
+                        $$|h(x.\mathrm{left}) - h(x.\mathrm{right})| \le 1$$
+                        <p style="margin-top: 6px;">
+                            <strong>Фактор баланса (Balance Factor):</strong>
+                        </p>
+                        $$\mathrm{bf}(x) = h(x.\mathrm{right}) - h(x.\mathrm{left}) \in \{-1, 0, 1\}$$
+                        <p style="margin-top: 4px; font-size: 12.5px; opacity: 0.9;">
+                            где высота пустого дерева считается равной $0$ (или $-1$, если у листа высота $0$), а высота узла равна $h(x) = 1 + \max(h(x.\mathrm{left}), h(x.\mathrm{right}))$.
+                        </p>
+                    </section>
+
+                    <!-- 2. Теорема о высоте (Фибоначчи) -->
+                    <section id="sec-height-proof" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема и Доказательство] Глубина AVL-дерева (из лекции 6, слайд 12)</span>
+                        <p>
+                            <strong>Теорема:</strong> Высота AVL-дерева равна $O(\log N)$.
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Доказательство:</strong>
+                            Рассмотрим такую величину как $S(h)$ — минимальное число вершин в AVL-дереве высоты $h$.
+                        </p>
+                        <p style="margin-top: 4px;">
+                            Заметим, что верно следующее соотношение:
+                        </p>
+                        $$S(h + 2) = S(h + 1) + S(h) + 1$$
+                        <p style="margin-top: 6px;">
+                            Докажем по индукции, что данную рекурренту можно выразить как:
+                        </p>
+                        $$S(h) = F_{h+2} - 1$$
+                        <p style="margin-top: 4px; font-size: 13px;">
+                            где $F_n$ — $n$-е число Фибоначчи ($F_1 = 1, F_2 = 1, F_3 = 2, F_4 = 3, F_5 = 5 \dots$).
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>База:</strong> Для $h = 1$ база верна ($S(1) = 1$, $F_{1+2} - 1 = F_3 - 1 = 2 - 1 = 1$).</li>
+                            <li><strong>Индукционный переход:</strong> Допустим, что $S(n) = F_{n+2} - 1$ для всех $n \le h$. Тогда:
+                                $$\begin{aligned}
+                                S(h + 1) &= S(h) + S(h - 1) + 1 \\
+                                &= F_{h+2} - 1 + F_{h+1} - 1 + 1 \\
+                                &= F_{h+2} + F_{h+1} - 1 \\
+                                &= F_{h+3} - 1
+                                \end{aligned}$$
+                            </li>
+                        </ul>
+                        <p style="margin-top: 8px;">
+                            Таким образом, так как числа Фибоначчи растут как геометрическая прогрессия $F_k = \Theta(\phi^k)$ (где $\phi = \frac{1 + \sqrt{5}}{2} \approx 1.618$ — золотое сечение):
+                        </p>
+                        $$N \ge S(h) = F_{h+2} - 1 = \Theta(\phi^h) \implies h = O(\log N)$$
+                    </section>
+
+                    <!-- 3. Малые и большие повороты -->
+                    <section id="sec-rotations" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Алгоритмы] 4 типа поворотов для восстановления баланса</span>
+                        <p>
+                            Если после вставки или удаления фактор баланса узла $x$ стал равен $+2$ или $-2$, баланс восстанавливается локальным переподвешиванием указателей (поворотом) за строго $O(1)$:
+                        </p>
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Малый правый поворот ($\mathrm{rotateRight}(P)$)</h4>
+                            <p>
+                                Применяется при $\mathrm{bf}(P) = -2$ и $\mathrm{bf}(P.\mathrm{left}) \le 0$ (перевес левого сына влево).
+                                Левый сын $L$ становится новым родителем, $P$ становится его правым сыном, а бывшее правое поддерево $L$ переходит в качестве левого поддерева $P$.
+                            </p>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Малый левый поворот ($\mathrm{rotateLeft}(P)$)</h4>
+                            <p>
+                                Применяется при $\mathrm{bf}(P) = +2$ и $\mathrm{bf}(P.\mathrm{right}) \ge 0$ (симметричен правому).
+                                Правый сын $R$ занимает место $P$, а $P$ уходит в левые сыновья $R$.
+                            </p>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">3. Большой правый поворот (Big Right / Left-Right Rotation)</h4>
+                            <p>
+                                Возникает при $\mathrm{bf}(P) = -2$, но у его левого сына $\mathrm{bf}(P.\mathrm{left}) = +1$ (зигзаг: левое поддерево перегружено своим правым потомком).
+                                Сводится к суперпозиции двух малых поворотов:
+                            </p>
+                            $$P.\mathrm{left} = \mathrm{rotateLeft}(P.\mathrm{left}); \quad \mathrm{return} \ \mathrm{rotateRight}(P);$$
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">4. Большой левый поворот (Big Left / Right-Left Rotation)</h4>
+                            <p>
+                                Возникает при $\mathrm{bf}(P) = +2$, но $\mathrm{bf}(P.\mathrm{right}) = -1$ (зигзаг вправо-влево). Сводится к:
+                            </p>
+                            $$P.\mathrm{right} = \mathrm{rotateRight}(P.\mathrm{right}); \quad \mathrm{return} \ \mathrm{rotateLeft}(P);$$
+                        </div>
+                    </section>
+
+                    <!-- 4. Балансировка Insert и Erase -->
+                    <section id="sec-operations" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Операции] Реализация и сложность Insert, Erase, Find</span>
+                        <ul style="margin-left: 20px; margin-top: 6px;">
+                            <li><strong>$\mathrm{Find}(\mathrm{key})$:</strong> Обычный спуск по бинарному дереву поиска. Так как высота $h = O(\log n)$, сложность строго $O(\log n)$.</li>
+                            <li><strong>$\mathrm{Insert}(\mathrm{key})$:</strong> Спускаемся вниз, вставляем лист, затем при возврате из рекурсии пересчитываем $h(x)$ и вызываем процедуру $\mathrm{balance}(x)$.
+                                <br><em>Замечание:</em> При вставке для восстановления инварианта во всем дереве достаточно <strong>не более одного поворота</strong> (малого или большого). Сложность: $O(\log n)$.
+                            </li>
+                            <li><strong>$\mathrm{Erase}(\mathrm{key})$:</strong> Удаляем узел как в обычном BST (заменяя на in-order преемника). При подъеме к корню пересчитываем высоты и балансируем вершины.
+                                <br><em>Замечание:</em> При удалении укорочение поддерева может вызвать каскадный дисбаланс, требуя до $O(\log n)$ поворотов вдоль пути к корню. Сложность: $O(\log n)$.
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНО
+                         ===================================================== -->
+                    <div id="sec-extra"></div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">[Summary] Сводные параметры AVL-дерева</span>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12.5px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 6px 8px;">Критерий</th>
+                                    <th style="padding: 6px 8px;">Значение</th>
+                                    <th style="padding: 6px 8px;">Пояснение</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Инвариант баланса</strong></td>
+                                    <td style="padding: 6px 8px;">$|h_L - h_R| \le 1$</td>
+                                    <td style="padding: 6px 8px;">Жесткий баланс по высоте</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Худшая высота $h$</strong></td>
+                                    <td style="padding: 6px 8px;"><strong style="color: #4ade80;">$O(\log n)$</strong></td>
+                                    <td style="padding: 6px 8px;">Деревья Фибоначчи $S(h) = F_{h+2} - 1$</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Число поворотов Insert</strong></td>
+                                    <td style="padding: 6px 8px;">$\le 1$</td>
+                                    <td style="padding: 6px 8px;">Один малый или большой поворот</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 6px 8px;"><strong>Число поворотов Erase</strong></td>
+                                    <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                    <td style="padding: 6px 8px;">Может каскадно подниматься к корню</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px 8px;"><strong>Время операций</strong></td>
+                                    <td style="padding: 6px 8px;"><strong>$O(\log n)$</strong> строго</td>
+                                    <td style="padding: 6px 8px;">Гарантия worst-case без рандомизации</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Код на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация AVL-дерева на Java++ (Повороты, Балансировка, Insert, Erase)
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">AVLTree</span> {
+    <span class="tok-kw">static class</span> <span class="tok-type">Node</span> {
+        <span class="tok-kw">int</span> key;
+        <span class="tok-kw">int</span> height = <span class="tok-num">1</span>;
+        <span class="tok-type">Node</span> left, right;
+        <span class="tok-func">Node</span>(<span class="tok-kw">int</span> key) { <span class="tok-kw">this</span>.key = key; }
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> root = <span class="tok-kw">null</span>;
+
+    <span class="tok-kw">private int</span> <span class="tok-func">h</span>(<span class="tok-type">Node</span> n) { <span class="tok-kw">return</span> n == <span class="tok-kw">null</span> ? <span class="tok-num">0</span> : n.height; }
+    <span class="tok-kw">private int</span> <span class="tok-func">bf</span>(<span class="tok-type">Node</span> n) { <span class="tok-kw">return</span> n == <span class="tok-kw">null</span> ? <span class="tok-num">0</span> : <span class="tok-func">h</span>(n.right) - <span class="tok-func">h</span>(n.left); }
+    <span class="tok-kw">private void</span> <span class="tok-func">updateH</span>(<span class="tok-type">Node</span> n) { n.height = <span class="tok-num">1</span> + <span class="tok-type">Math</span>.<span class="tok-func">max</span>(<span class="tok-func">h</span>(n.left), <span class="tok-func">h</span>(n.right)); }
+
+    <span class="tok-com">// Малый правый поворот</span>
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">rotateRight</span>(<span class="tok-type">Node</span> p) {
+        <span class="tok-type">Node</span> q = p.left;
+        p.left = q.right;
+        q.right = p;
+        <span class="tok-func">updateH</span>(p);
+        <span class="tok-func">updateH</span>(q);
+        <span class="tok-kw">return</span> q;
+    }
+
+    <span class="tok-com">// Малый левый поворот</span>
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">rotateLeft</span>(<span class="tok-type">Node</span> q) {
+        <span class="tok-type">Node</span> p = q.right;
+        q.right = p.left;
+        p.left = q;
+        <span class="tok-func">updateH</span>(q);
+        <span class="tok-func">updateH</span>(p);
+        <span class="tok-kw">return</span> p;
+    }
+
+    <span class="tok-com">// Балансировка узла: восстанавливает |bf| <= 1</span>
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">balance</span>(<span class="tok-type">Node</span> n) {
+        <span class="tok-func">updateH</span>(n);
+        <span class="tok-kw">if</span> (<span class="tok-func">bf</span>(n) == <span class="tok-num">2</span>) {
+            <span class="tok-kw">if</span> (<span class="tok-func">bf</span>(n.right) &lt; <span class="tok-num">0</span>) {
+                n.right = <span class="tok-func">rotateRight</span>(n.right); <span class="tok-com">// Большой левый поворот</span>
+            }
+            <span class="tok-kw">return</span> <span class="tok-func">rotateLeft</span>(n);
+        }
+        <span class="tok-kw">if</span> (<span class="tok-func">bf</span>(n) == -<span class="tok-num">2</span>) {
+            <span class="tok-kw">if</span> (<span class="tok-func">bf</span>(n.left) &gt; <span class="tok-num">0</span>) {
+                n.left = <span class="tok-func">rotateLeft</span>(n.left);   <span class="tok-com">// Большой правый поворот</span>
+            }
+            <span class="tok-kw">return</span> <span class="tok-func">rotateRight</span>(n);
+        }
+        <span class="tok-kw">return</span> n;
+    }
+
+    <span class="tok-com">// Вставка за O(log n)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">insert</span>(<span class="tok-kw">int</span> key) { root = <span class="tok-func">insertRec</span>(root, key); }
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">insertRec</span>(<span class="tok-type">Node</span> n, <span class="tok-kw">int</span> key) {
+        <span class="tok-kw">if</span> (n == <span class="tok-kw">null</span>) <span class="tok-kw">return new</span> <span class="tok-type">Node</span>(key);
+        <span class="tok-kw">if</span> (key &lt; n.key) n.left = <span class="tok-func">insertRec</span>(n.left, key);
+        <span class="tok-kw">else if</span> (key &gt; n.key) n.right = <span class="tok-func">insertRec</span>(n.right, key);
+        <span class="tok-kw">return</span> <span class="tok-func">balance</span>(n);
+    }
+
+    <span class="tok-com">// Удаление за O(log n)</span>
+    <span class="tok-kw">void</span> <span class="tok-func">erase</span>(<span class="tok-kw">int</span> key) { root = <span class="tok-func">eraseRec</span>(root, key); }
+    <span class="tok-kw">private</span> <span class="tok-type">Node</span> <span class="tok-func">eraseRec</span>(<span class="tok-type">Node</span> n, <span class="tok-kw">int</span> key) {
+        <span class="tok-kw">if</span> (n == <span class="tok-kw">null</span>) <span class="tok-kw">return null</span>;
+        <span class="tok-kw">if</span> (key &lt; n.key) n.left = <span class="tok-func">eraseRec</span>(n.left, key);
+        <span class="tok-kw">else if</span> (key &gt; n.key) n.right = <span class="tok-func">eraseRec</span>(n.right, key);
+        <span class="tok-kw">else</span> {
+            <span class="tok-kw">if</span> (n.left == <span class="tok-kw">null</span>) <span class="tok-kw">return</span> n.right;
+            <span class="tok-kw">if</span> (n.right == <span class="tok-kw">null</span>) <span class="tok-kw">return</span> n.left;
+            <span class="tok-type">Node</span> succ = n.right;
+            <span class="tok-kw">while</span> (succ.left != <span class="tok-kw">null</span>) succ = succ.left;
+            n.key = succ.key;
+            n.right = <span class="tok-func">eraseRec</span>(n.right, succ.key);
+        }
+        <span class="tok-kw">return</span> <span class="tok-func">balance</span>(n);
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-avl-def" class="nav-item nav-def">1. Инвариант AVL</a>
+                        <a href="#sec-height-proof" class="nav-item nav-proof">2. Теорема о высоте</a>
+                        <a href="#sec-rotations" class="nav-item nav-alg">3. Повороты</a>
+                        <a href="#sec-operations" class="nav-item nav-thm">4. Операции</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
