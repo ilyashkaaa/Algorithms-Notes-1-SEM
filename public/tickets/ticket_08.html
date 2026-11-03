@@ -1,0 +1,283 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 08 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Бинарная пирамида: базовые операции</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Определение двоичной кучи. Массивное представление. Поддержка свойства пирамиды: siftUp, siftDown. Операции Insert, ExtractMin.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">08</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-heap-def" class="nav-item nav-def">1. Определение кучи</a>
+                        <a href="#sec-array-repr" class="nav-item nav-geo">2. Массивное представление</a>
+                        <a href="#sec-sift" class="nav-item nav-alg">3. SiftUp и SiftDown</a>
+                        <a href="#sec-operations" class="nav-item nav-thm">4. Insert и ExtractMin</a>
+                        <a href="#sec-height-proof" class="nav-item nav-proof">5. Высота кучи $O(\log n)$</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Определение бинарной кучи -->
+                    <section id="sec-heap-def" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Бинарная пирамида (Двоичная куча)</span>
+                        <p>
+                            <strong>Бинарной пирамидой</strong> (<em>Binary Heap</em>) называется структура данных, удовлетворяющая двум инвариантам одновременно:
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li style="margin-bottom: 6px;">
+                                <strong>Свойство формы (структурное свойство):</strong> Дерево является почти полным бинарным деревом. Все уровни, кроме, возможно, последнего, полностью заполнены вершинами. На последнем уровне листья расположены максимально плотно слева направо без пропусков.
+                            </li>
+                            <li>
+                                <strong>Свойство кучи (Heap Property):</strong> Для любого узла $v$, отличного от корня:
+                                <ul style="margin-left: 18px; margin-top: 4px;">
+                                    <li>В <em>Min-Heap (куча на минимум):</em> значение в узле не меньше значения его родителя: $\mathrm{val}(v) \ge \mathrm{val}(\mathrm{parent}(v))$. В корне всегда минимум.</li>
+                                    <li>В <em>Max-Heap (куча на максимум):</em> значение в узле не превосходит значения его родителя: $\mathrm{val}(v) \le \mathrm{val}(\mathrm{parent}(v))$. В корне всегда максимум.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </section>
+
+                    <!-- 2. Массивное представление -->
+                    <section id="sec-array-repr" class="vcard vcard-geo">
+                        <span class="vcard-title-pill">♦ Представление почти полного дерева в виде массива</span>
+                        <p style="font-size: 13.5px;">
+                            Благодаря структурному свойству куча не требует хранения явных указателей на детей и родителей! Вершины нумеруются по уровням слева направо и размещаются в обычном непрерывном массиве $A[0 \dots n-1]$:
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 6px; font-size: 13px;">
+                            <li>Корень расположен в ячейке $A[0]$.</li>
+                            <li>Для узла с индексом $i$:
+                                <ul>
+                                    <li>Родитель: $\mathrm{parent}(i) = \left\lfloor \frac{i - 1}{2} \right\rfloor$ (при $i > 0$).</li>
+                                    <li>Левый сын: $\mathrm{left}(i) = 2i + 1$.</li>
+                                    <li>Правый сын: $\mathrm{right}(i) = 2i + 2$.</li>
+                                </ul>
+                            </li>
+                            <li>Узел является листом $\iff 2i + 1 \ge n$. Листья занимают ровно вторую половину массива: индексы от $\lfloor n/2 \rfloor$ до $n-1$.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 3. Поддержка свойства пирамиды: siftUp и siftDown -->
+                    <section id="sec-sift" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Процедуры] Поддержка свойства пирамиды: SiftUp и SiftDown</span>
+                        
+                        <p><strong>1. Просеивание вверх (SiftUp):</strong></p>
+                        <p style="font-size: 13.5px; margin-top: 4px;">
+                            Применяется, когда в позицию $i$ помещен элемент, нарушающий инвариант кучи со своим предком (в Min-Heap: $A[i] < A[\mathrm{parent}(i)]$).
+                            <br><em>Алгоритм:</em> Пока $i > 0$ и $A[i] < A[\mathrm{parent}(i)]$, меняем местами $A[i]$ и $A[\mathrm{parent}(i)]$, после чего переходим к родителю $i \gets \mathrm{parent}(i)$.
+                            <br>Время работы: $O(h) = O(\log n)$.
+                        </p>
+                        <hr style="border: none; border-top: 1px dashed var(--border-color); margin: 10px 0;">
+
+                        <p><strong>2. Просеивание вниз (SiftDown):</strong></p>
+                        <p style="font-size: 13.5px; margin-top: 4px;">
+                            Применяется, когда значение $A[i]$ больше значений своих сыновей, но поддеревья левого и правого сыновей являются корректными кучами.
+                            <br><em>Алгоритм:</em> Находим индекс наименьшего из сыновей $\mathrm{smallest} = \arg\min(A[i], A[2i+1], A[2i+2])$. Если $\mathrm{smallest} \ne i$, меняем местами $A[i]$ и $A[\mathrm{smallest}]$, и рекурсивно продолжаем просеивание от индекса $\mathrm{smallest}$.
+                            <br>Время работы: $O(h) = O(\log n)$.
+                        </p>
+                    </section>
+
+                    <!-- 4. Основные операции -->
+                    <section id="sec-operations" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Операции] Базовые операции очереди с приоритетом</span>
+                        
+                        <p><strong>1. GetMin():</strong> Вернуть значение в корне $A[0]$. Сложность: $O(1)$.</p>
+                        <p style="margin-top: 6px;"><strong>2. Insert(x):</strong></p>
+                        <ul style="margin-left: 20px; font-size: 13.5px;">
+                            <li>Добавляем элемент $x$ в конец массива в позицию $A[n]$ (на самое левое свободное место нижнего уровня).</li>
+                            <li>Увеличиваем размер кучи $n \gets n + 1$.</li>
+                            <li>Вызываем $\mathrm{siftUp}(n - 1)$. Сложность: $O(\log n)$.</li>
+                        </ul>
+                        
+                        <p style="margin-top: 8px;"><strong>3. ExtractMin():</strong></p>
+                        <ul style="margin-left: 20px; font-size: 13.5px;">
+                            <li>Сохраняем минимальный элемент $\mathrm{min\_val} = A[0]$.</li>
+                            <li>Переносим последний элемент массива на место корня: $A[0] = A[n - 1]$.</li>
+                            <li>Уменьшаем размер кучи $n \gets n - 1$.</li>
+                            <li>Восстанавливаем инвариант вызовом $\mathrm{siftDown}(0)$.</li>
+                            <li>Возвращаем сохраненный $\mathrm{min\_val}$. Сложность: $O(\log n)$.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 5. Теорема о высоте -->
+                    <section id="sec-height-proof" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Теорема] Логарифмическая высота бинарной пирамиды</span>
+                        <p>
+                            <strong>Теорема:</strong> Высота двоичной кучи из $n$ элементов равна:
+                        </p>
+                        $$h = \lfloor \log_2 n \rfloor = \Theta(\log n)$$
+                        <p style="margin-top: 6px;">
+                            <strong>Доказательство:</strong>
+                            В почти полном бинарном дереве уровни с номерами $0, 1, \dots, h-1$ полностью заполнены, причем на уровне $k$ находится ровно $2^k$ вершин. На последнем уровне $h$ находится от $1$ до $2^h$ вершин.
+                            Суммируя геометрическую прогрессию:
+                            $$n \ge 1 + 2 + 4 + \dots + 2^{h-1} + 1 = (2^h - 1) + 1 = 2^h$$
+                            $$n \le 1 + 2 + 4 + \dots + 2^{h-1} + 2^h = 2^{h+1} - 1 < 2^{h+1}$$
+                            Логарифмируя двойное неравенство $2^h \le n < 2^{h+1}$:
+                            $$h \le \log_2 n < h + 1 \implies h = \lfloor \log_2 n \rfloor$$
+                            Так как операции $\mathrm{siftUp}$ и $\mathrm{siftDown}$ проходят не более одного пути от корня до листа длины $\le h$, их сложность в худшем случае строго ограничена $O(\log n)$. $\blacksquare$
+                        </p>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ К БИЛЕТУ
+                         ===================================================== -->
+
+                    <div id="sec-extra" class="extra-divider-banner">
+                        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Часть II: Дополнительные материалы к билету
+                        </div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">
+                            Summary билета и реализация Min-Heap на Java++
+                        </div>
+                    </div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">★ Summary билета (ключевые факты)</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Сводная таблица операций двоичной кучи:</strong>
+                                <div style="overflow-x: auto; margin-top: 6px;">
+                                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1.5px solid var(--border-color); color: var(--text-muted);">
+                                                <th style="padding: 6px 8px;">Операция</th>
+                                                <th style="padding: 6px 8px;">Время работы</th>
+                                                <th style="padding: 6px 8px;">Память</th>
+                                                <th style="padding: 6px 8px;">Описание действия</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">$\mathrm{GetMin}()$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                                <td style="padding: 6px 8px;">Возврат элемента $A[0]$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">$\mathrm{Insert}(x)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$ аморт.</td>
+                                                <td style="padding: 6px 8px;">Добавление в конец + $\mathrm{siftUp}$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">$\mathrm{ExtractMin}()$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                                <td style="padding: 6px 8px;">Корень $\gets A[n-1]$ + $\mathrm{siftDown}$</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">$\mathrm{SiftUp}(i)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                                <td style="padding: 6px 8px;">Подъем элемента по дереву вверх</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">$\mathrm{SiftDown}(i)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$</td>
+                                                <td style="padding: 6px 8px;">Спуск элемента в поддерево вниз</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Реализация на Java++ -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Реализация Min-Heap на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">BinaryHeap</span> {
+    <span class="tok-kw">int</span>[] a;
+    <span class="tok-kw">int</span> size = <span class="tok-num">0</span>;
+
+    <span class="tok-type">BinaryHeap</span>(<span class="tok-kw">int</span> capacity) {
+        a = <span class="tok-kw">new</span> <span class="tok-kw">int</span>[capacity];
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">siftUp</span>(<span class="tok-kw">int</span> i) {
+        <span class="tok-kw">while</span> (i &gt; <span class="tok-num">0</span> &amp;&amp; a[i] &lt; a[(i - <span class="tok-num">1</span>) / <span class="tok-num">2</span>]) {
+            <span class="tok-func">swap</span>(i, (i - <span class="tok-num">1</span>) / <span class="tok-num">2</span>);
+            i = (i - <span class="tok-num">1</span>) / <span class="tok-num">2</span>;
+        }
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">siftDown</span>(<span class="tok-kw">int</span> i) {
+        <span class="tok-kw">while</span> (<span class="tok-num">2</span> * i + <span class="tok-num">1</span> &lt; size) {
+            <span class="tok-kw">int</span> left = <span class="tok-num">2</span> * i + <span class="tok-num">1</span>;
+            <span class="tok-kw">int</span> right = <span class="tok-num">2</span> * i + <span class="tok-num">2</span>;
+            <span class="tok-kw">int</span> smallest = left;
+
+            <span class="tok-kw">if</span> (right &lt; size &amp;&amp; a[right] &lt; a[left]) {
+                smallest = right;
+            }
+            <span class="tok-kw">if</span> (a[i] &lt;= a[smallest]) {
+                <span class="tok-kw">break</span>;
+            }
+            <span class="tok-func">swap</span>(i, smallest);
+            i = smallest;
+        }
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">insert</span>(<span class="tok-kw">int</span> val) {
+        a[size] = val;
+        size++;
+        <span class="tok-func">siftUp</span>(size - <span class="tok-num">1</span>);
+    }
+
+    <span class="tok-kw">int</span> <span class="tok-func">extractMin</span>() {
+        <span class="tok-kw">int</span> minVal = a[<span class="tok-num">0</span>];
+        a[<span class="tok-num">0</span>] = a[size - <span class="tok-num">1</span>];
+        size--;
+        <span class="tok-func">siftDown</span>(<span class="tok-num">0</span>);
+        <span class="tok-kw">return</span> minVal;
+    }
+
+    <span class="tok-kw">void</span> <span class="tok-func">swap</span>(<span class="tok-kw">int</span> i, <span class="tok-kw">int</span> j) {
+        <span class="tok-kw">int</span> tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+}</code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-heap-def" class="nav-item nav-def">1. Определение кучи</a>
+                        <a href="#sec-array-repr" class="nav-item nav-geo">2. Массивный вид</a>
+                        <a href="#sec-sift" class="nav-item nav-alg">3. SiftUp / SiftDown</a>
+                        <a href="#sec-operations" class="nav-item nav-thm">4. Insert / Extract</a>
+                        <a href="#sec-height-proof" class="nav-item nav-proof">5. Высота $O(\log n)$</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Код на Java++</a>
+                    </nav>
+                </aside>
