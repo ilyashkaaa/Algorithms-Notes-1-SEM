@@ -1,0 +1,241 @@
+                <!-- Ticket Header Banner -->
+                <div class="ticket-header-banner">
+                    <div>
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.85; margin-bottom: 4px;">
+                            Билет 06 • Коллоквиум по АиСД (1 семестр набора 2026)
+                        </div>
+                        <h1>Сортировки: нижняя граница и стабильность</h1>
+                        <p style="font-size: 13.5px; opacity: 0.95; margin-top: 4px;">
+                            Модель сравнений. Теорема о нижней границе $\Omega(n \log n)$ через дерево решений. Определение и роль стабильной сортировки.
+                        </p>
+                    </div>
+                    <div class="ticket-badge-pill">
+                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Билет</div>
+                        <div style="font-size: 26px; font-weight: 800; line-height: 1;">06</div>
+                    </div>
+                </div>
+
+                <!-- Mobile Navigation Accordion (Visible on Mobile <= 860px) -->
+                <details class="mobile-toc-accordion">
+                    <summary>📑 Содержание билета (быстрый переход)</summary>
+                    <nav class="mobile-toc-nav">
+                        <a href="#sec-model" class="nav-item nav-def">1. Модель сравнений</a>
+                        <a href="#sec-decision-tree" class="nav-item nav-def">2. Дерево решений</a>
+                        <a href="#sec-lower-bound" class="nav-item nav-thm">3. Теорема о нижней границе</a>
+                        <a href="#sec-proof" class="nav-item nav-proof">4. Доказательство $\Omega(n \log n)$</a>
+                        <a href="#sec-stable" class="nav-item nav-alg">5. Стабильная сортировка</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Примеры на Java++</a>
+                    </nav>
+                </details>
+
+                <!-- Main Column -->
+                <div class="ticket-main-col">
+
+                    <!-- =====================================================
+                         ЧАСТЬ I. ОСНОВНАЯ ПРОГРАММА БИЛЕТА
+                         ===================================================== -->
+
+                    <!-- 1. Модель сравнений -->
+                    <section id="sec-model" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Задача сортировки в модели сравнений</span>
+                        <p>
+                            <strong>Постановка задачи сортировки:</strong> Дан массив элементов $A = [a_1, a_2, \dots, a_n]$. Требуется найти такую перестановку индексов $\pi \in S_n$, для которой элементы упорядочены по неубыванию:
+                            $$a_{\pi(1)} \le a_{\pi(2)} \le \dots \le a_{\pi(n)}$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Модель сортировок на сравнениях:</strong> Алгоритм может получать информацию о взаимном расположении элементов исключительно с помощью бинарной операции сравнения:
+                            $$\text{«Правда ли, что } x < y \text{ (или } x \le y \text{)?»}$$
+                            Алгоритм не знает внутренней структуры элементов (их битового представления, диапазона значений) и не может использовать элементы в качестве индексов массива.
+                        </p>
+                    </section>
+
+                    <!-- 2. Дерево решений -->
+                    <section id="sec-decision-tree" class="vcard vcard-def">
+                        <span class="vcard-title-pill">[Определение] Дерево решений (Decision Tree)</span>
+                        <p>
+                            Работу любого алгоритма сортировки на сравнениях для фиксированного размера входа $n$ можно представить в виде <strong>дерева решений</strong> (двоичного дерева):
+                        </p>
+                        <ol style="margin-left: 20px; margin-top: 6px;">
+                            <li style="margin-bottom: 6px;">
+                                <strong>Внутренние вершины:</strong> Каждая нелистовая вершина помечена сравнением двух элементов $a_i \le a_j$.
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                <strong>Ребра:</strong> Из каждой внутренней вершины выходят ровно два ребра: левое соответствует исходу $a_i \le a_j$ ($\mathrm{yes}$), правое — $a_i > a_j$ ($\mathrm{no}$).
+                            </li>
+                            <li style="margin-bottom: 6px;">
+                                <strong>Листья:</strong> Каждый лист помечен перестановкой $\pi$, задающей итоговый отсортированный порядок элементов.
+                            </li>
+                            <li>
+                                <strong>Высота дерева $h$:</strong> Длина самого длинного пути от корня до листа соответствует <em>максимальному числу сравнений в худшем случае</em>.
+                            </li>
+                        </ol>
+                    </section>
+
+                    <!-- 3. Теорема о нижней границе -->
+                    <section id="sec-lower-bound" class="vcard vcard-thm">
+                        <span class="vcard-title-pill">[Теорема] Нижняя граница времени сортировки сравнениями</span>
+                        <p>
+                            Любой детерминированный или рандомизированный алгоритм сортировки $n$ элементов, основанный исключительно на сравнениях, в худшем случае требует не менее $\Omega(n \log n)$ операций сравнения:
+                        </p>
+                        $$T(n) = \Omega(n \log n)$$
+                    </section>
+
+                    <!-- 4. Доказательство теоремы -->
+                    <section id="sec-proof" class="vcard vcard-proof">
+                        <span class="vcard-title-pill">[Доказательство] Через число листьев дерева решений</span>
+                        <p>
+                            <strong>Шаг 1 (Число листьев):</strong> Всего существует $n!$ возможных перестановок из $n$ различных элементов. Чтобы алгоритм корректно сортировал любой входной массив, каждая из $n!$ перестановок должна присутствовать хотя бы в одном достижимом листе дерева решений (иначе для некоторого входа алгоритм не сможет выдать правильный ответ).
+                            Пусть $L$ — число листьев дерева решений. Тогда:
+                            $$L \ge n!$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Шаг 2 (Ограничение через высоту):</strong> В двоичном дереве высоты $h$ число листьев не превосходит $2^h$:
+                            $$L \le 2^h$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Шаг 3 (Логарифмирование):</strong>
+                            $$2^h \ge L \ge n! \implies h \ge \log_2(n!)$$
+                        </p>
+                        <p style="margin-top: 8px;">
+                            <strong>Шаг 4 (Оценка $\log_2(n!)$ снизу):</strong>
+                            $$\log_2(n!) = \sum_{i=1}^n \log_2 i \ge \sum_{i=\lceil n/2 \rceil}^n \log_2 i \ge \sum_{i=\lceil n/2 \rceil}^n \log_2\left(\frac{n}{2}\right) = \frac{n}{2} (\log_2 n - 1) = \frac{n}{2} \log_2 n - \frac{n}{2}$$
+                            Следовательно, $h \ge \frac{1}{2} n \log_2 n - O(n) = \Omega(n \log n)$.
+                        </p>
+                        <p style="margin-top: 6px;">
+                            Так как число сравнений в худшем случае равно высоте дерева $h$, то $T(n) \ge h = \Omega(n \log n)$. $\blacksquare$
+                        </p>
+                    </section>
+
+                    <!-- 5. Стабильная сортировка -->
+                    <section id="sec-stable" class="vcard vcard-alg">
+                        <span class="vcard-title-pill">[Определение] Стабильная (устойчивая) сортировка</span>
+                        <p>
+                            Сортировка называется <strong>стабильной</strong> (<em>stable</em>), если она сохраняет относительный порядок следования элементов с одинаковыми ключами:
+                        </p>
+                        $$i < j \quad \text{и} \quad \mathrm{key}(a_i) == \mathrm{key}(a_j) \implies \text{в отсортированном массиве элемент } a_i \text{ предшествует } a_j$$
+                        
+                        <p style="margin-top: 8px;">
+                            <strong>Зачем нужна стабильность?</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li><strong>Многоуровневая сортировка:</strong> Например, отсортировать список студентов сначала по фамилии, а затем по номеру группы. Если сортировка по группе стабильна, то внутри каждой группы студенты останутся отсортированы по фамилии!</li>
+                            <li><strong>Основа поразрядной сортировки (LSD Radix Sort):</strong> Алгоритм сортирует числа по разрядам от младшего к старшему. Корректность опирается исключительно на стабильность каждого прохода.</li>
+                        </ul>
+                        
+                        <p style="margin-top: 8px;">
+                            <strong>Классификация алгоритмов:</strong>
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 4px;">
+                            <li><strong>Стабильные:</strong> Merge Sort (при $\le$), Insertion Sort, Bubble Sort, Counting Sort (с префиксными суммами и проходом справа налево).</li>
+                            <li><strong>Нестабильные:</strong> QuickSort (далекие `swap` через пивот), HeapSort (переброска корня в конец массива), Selection Sort.</li>
+                        </ul>
+                    </section>
+
+                    <!-- =====================================================
+                         ЧАСТЬ II. ДОПОЛНИТЕЛЬНЫЕ МАТЕРИАЛЫ К БИЛЕТУ
+                         ===================================================== -->
+
+                    <div id="sec-extra" class="extra-divider-banner">
+                        <div style="font-size: 11px; font-weight: 800; color: #ea580c; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Часть II: Дополнительные материалы к билету
+                        </div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">
+                            Summary билета и наглядный пример стабильности
+                        </div>
+                    </div>
+
+                    <!-- Summary билета -->
+                    <section id="sec-summary" class="vcard vcard-blitz">
+                        <span class="vcard-title-pill">★ Summary билета (ключевые факты)</span>
+                        <ul style="margin-left: 20px;">
+                            <li style="margin-bottom: 8px;">
+                                <strong>Как обойти барьер $\Omega(n \log n)$?</strong>
+                                <br>Нижняя граница $\Omega(n \log n)$ доказана <em>только</em> для моделей сравнений! Несравнивающие алгоритмы (Counting Sort, Radix Sort, Bucket Sort) используют числовое значение элементов как индекс в массиве и работают за линейное время $O(n + k)$.
+                            </li>
+                            <li style="margin-bottom: 8px;">
+                                <strong>Сводная таблица алгоритмов:</strong>
+                                <div style="overflow-x: auto; margin-top: 6px;">
+                                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="border-bottom: 1.5px solid var(--border-color); color: var(--text-muted);">
+                                                <th style="padding: 6px 8px;">Алгоритм</th>
+                                                <th style="padding: 6px 8px;">Худшее время</th>
+                                                <th style="padding: 6px 8px;">Среднее время</th>
+                                                <th style="padding: 6px 8px;">Память</th>
+                                                <th style="padding: 6px 8px;">Стабильность</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Merge Sort</td>
+                                                <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n)$</td>
+                                                <td style="padding: 6px 8px; color: #10b981; font-weight: 700;">Стабильна</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">QuickSort</td>
+                                                <td style="padding: 6px 8px;">$O(n^2)$</td>
+                                                <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(\log n)$ стек</td>
+                                                <td style="padding: 6px 8px; color: #ef4444; font-weight: 700;">Нестабильна</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">HeapSort</td>
+                                                <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(n \log n)$</td>
+                                                <td style="padding: 6px 8px;">$O(1)$ на месте</td>
+                                                <td style="padding: 6px 8px; color: #ef4444; font-weight: 700;">Нестабильна</td>
+                                            </tr>
+                                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                                <td style="padding: 6px 8px; font-weight: 700;">Counting Sort</td>
+                                                <td style="padding: 6px 8px;">$O(n + k)$</td>
+                                                <td style="padding: 6px 8px;">$O(n + k)$</td>
+                                                <td style="padding: 6px 8px;">$O(k)$</td>
+                                                <td style="padding: 6px 8px; color: #10b981; font-weight: 700;">Стабильна</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- Код на Java++ демонстрации стабильности -->
+                    <section id="sec-code">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                💻 Иллюстрация сохранения порядка ключей на Java++
+                            </span>
+                        </div>
+                        <pre class="vcard-code"><code><span class="tok-kw">class</span> <span class="tok-type">Item</span> {
+    <span class="tok-kw">int</span> key;
+    <span class="tok-type">String</span> tag;
+    <span class="tok-type">Item</span>(<span class="tok-kw">int</span> key, <span class="tok-type">String</span> tag) { <span class="tok-kw">this</span>.key = key; <span class="tok-kw">this</span>.tag = tag; }
+}
+
+<span class="tok-com">// Пример: вход [(4, "A"), (2, "X"), (4, "B")]</span>
+<span class="tok-com">// Стабильная сортировка обязана вернуть: [(2, "X"), (4, "A"), (4, "B")]</span>
+<span class="tok-com">// Нестабильная сортировка может вернуть: [(2, "X"), (4, "B"), (4, "A")]</span></code></pre>
+                    </section>
+
+                </div>
+
+                <!-- Desktop Right Margin Column: Sticky TOC -->
+                <aside class="tufte-margin">
+                    <nav class="margin-nav-card">
+                        <div class="margin-nav-head">Содержание билета</div>
+                        <a href="#sec-model" class="nav-item nav-def">1. Модель сравнений</a>
+                        <a href="#sec-decision-tree" class="nav-item nav-def">2. Дерево решений</a>
+                        <a href="#sec-lower-bound" class="nav-item nav-thm">3. Нижняя граница</a>
+                        <a href="#sec-proof" class="nav-item nav-proof">4. Доказательство</a>
+                        <a href="#sec-stable" class="nav-item nav-alg">5. Стабильность</a>
+                        <div class="nav-divider"></div>
+                        <a href="#sec-extra" class="nav-item nav-extra">Часть II: Дополнительно</a>
+                        <a href="#sec-summary" class="nav-subitem nav-blitz">– Summary билета</a>
+                        <a href="#sec-code" class="nav-subitem nav-code">– Примеры на Java++</a>
+                    </nav>
+                </aside>
