@@ -1468,33 +1468,63 @@ mark.search-highlight {
         box-sizing: border-box !important;
     }
 
-    /* Formulas & Code Scrolling on Mobile */
+    /* Formulas & Code Scrolling on Mobile (Each block scrolls sideways independently) */
     mjx-container[jax="CHTML"][display="true"],
     .MathJax_Display {
+        display: block !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
         max-width: 100% !important;
         -webkit-overflow-scrolling: touch !important;
         touch-action: pan-x pan-y !important;
-        padding: 6px 2px !important;
+        padding: 8px 4px !important;
         margin: 10px 0 !important;
+        white-space: nowrap !important;
+    }
+
+    mjx-container[jax="CHTML"][display="true"] > mjx-math {
+        white-space: nowrap !important;
     }
 
     pre, code, .vcard-code {
+        display: block !important;
         max-width: 100% !important;
         overflow-x: auto !important;
+        overflow-y: hidden !important;
         -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-x pan-y !important;
         font-size: 12.5px !important;
         border-radius: 8px !important;
         padding: 12px 12px !important;
+        white-space: pre !important;
+        word-break: normal !important;
+        word-wrap: normal !important;
     }
 
-    /* Tables */
+    /* Tables: keep full column widths and scroll sideways smoothly */
     table {
         display: block !important;
+        min-width: 520px !important;
+        width: max-content !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-x pan-y !important;
+    }
+
+    .vcard div:has(> table),
+    .vcard [style*="overflow-x: auto"] {
         width: 100% !important;
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-x pan-y !important;
+    }
+
+    .vcard > p,
+    .vcard > ol,
+    .vcard > ul,
+    .vcard > div:not(.vcard-code) {
+        min-width: calc(100% * var(--ticket-font-scale, 1));
+        box-sizing: border-box;
     }
 
     /* Mobile Bottom Navigation Bar */

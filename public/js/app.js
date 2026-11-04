@@ -80,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileBottomBar();
     initBottomSheets();
     initGridSheetContent();
-    initSwipeGestures();
     initScrollTopButton();
     initSearch();
     initTicketSelection();
@@ -598,55 +597,8 @@ function updateGridSheetActiveState(ticketId) {
 }
 
 // ==============================================================================
-// 7. Touch Swipe Navigation Gestures
+// 7. Notification Toast System
 // ==============================================================================
-function initSwipeGestures() {
-    let startX = 0;
-    let startY = 0;
-    let startTime = 0;
-
-    const viewport = document.querySelector('.main-viewport') || document.body;
-
-    viewport.addEventListener('touchstart', (e) => {
-        if (e.touches.length !== 1) return;
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        startTime = Date.now();
-    }, { passive: true });
-
-    viewport.addEventListener('touchend', (e) => {
-        if (e.changedTouches.length !== 1) return;
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
-        const deltaX = endX - startX;
-        const deltaY = endY - startY;
-        const deltaTime = Date.now() - startTime;
-
-        // Don't trigger if swiping inside pre/code/formula/table
-        const target = e.target;
-        if (target.closest('pre') || target.closest('code') || target.closest('table') || target.closest('mjx-container') || target.closest('.mobile-sheet') || target.closest('.mobile-ticket-strip')) {
-            return;
-        }
-
-        // Don't trigger if swiping inside a .vcard that has horizontal scrollable content
-        const vcard = target.closest('.vcard');
-        if (vcard && vcard.scrollWidth > vcard.clientWidth + 5) {
-            return;
-        }
-
-        // Fast horizontal swipe criteria
-        if (deltaTime <= 500 && Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.6) {
-            if (deltaX < 0) {
-                // Swipe Left -> Next ticket
-                goToAdjacentTicket(1);
-            } else {
-                // Swipe Right -> Prev ticket
-                goToAdjacentTicket(-1);
-            }
-        }
-    }, { passive: true });
-}
-
 function showToast(message) {
     const toast = document.getElementById('swipeToast');
     if (!toast) return;
@@ -962,9 +914,9 @@ async function loadTicket(ticketId) {
 
     if (!loadedTicketsCache[ticketId]) {
         try {
-            let res = await fetch(`tickets/ticket_${ticketId}.html?v=2.2`);
+            let res = await fetch(`tickets/ticket_${ticketId}.html?v=2.3`);
             if (!res.ok) {
-                res = await fetch(`tickets/ticket_${paddedId}.html?v=2.2`);
+                res = await fetch(`tickets/ticket_${paddedId}.html?v=2.3`);
             }
             if (res.ok) {
                 const html = await res.text();
