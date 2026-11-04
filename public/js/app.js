@@ -74,6 +74,7 @@ const loadedTicketsCache = {};
 // Application Bootstrap
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
+    initFontScaleManager();
     initReadingProgress();
     initMobileTicketStrip();
     initMobileBottomBar();
@@ -86,6 +87,98 @@ document.addEventListener('DOMContentLoaded', () => {
     initSidebarToggle();
     initSidebarResizer();
 });
+
+// ==============================================================================
+// 0. Fluid Font Sizing & Pinch-To-Zoom Reflow Manager
+// ==============================================================================
+let currentFontScale = parseFloat(localStorage.getItem('algo_ticket_font_scale')) || 1.0;
+let initialFontScale = 1.0;
+let initialPinchDist = 0;
+
+function initFontScaleManager() {
+    applyFontScale(currentFontScale, false);
+
+    const ticketContainer = document.getElementById('ticketContainer');
+    if (!ticketContainer) return;
+
+    // 1. iOS Safari native gesturestart & gesturechange (prevents optical viewport zoom)
+    ticketContainer.addEventListener('gesturestart', (e) => {
+        e.preventDefault();
+        initialFontScale = currentFontScale;
+    }, { passive: false });
+
+    ticketContainer.addEventListener('gesturechange', (e) => {
+        e.preventDefault();
+        const newScale = initialFontScale * e.scale;
+        applyFontScale(newScale, false);
+    }, { passive: false });
+
+    ticketContainer.addEventListener('gestureend', (e) => {
+        e.preventDefault();
+        showToast(`Текст: ${Math.round(currentFontScale * 100)}%`);
+    }, { passive: false });
+
+    // 2. Android Chrome & Touch pinch distance calculation
+    ticketContainer.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            initialPinchDist = Math.hypot(dx, dy);
+            initialFontScale = currentFontScale;
+        }
+    }, { passive: true });
+
+    ticketContainer.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && initialPinchDist > 0) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const currentDist = Math.hypot(dx, dy);
+            const factor = currentDist / initialPinchDist;
+            const newScale = initialFontScale * factor;
+            applyFontScale(newScale, false);
+        }
+    }, { passive: true });
+
+    ticketContainer.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2 && initialPinchDist > 0) {
+            initialPinchDist = 0;
+            showToast(`Текст: ${Math.round(currentFontScale * 100)}%`);
+        }
+    }, { passive: true });
+
+    // 3. UI Buttons in Materials Sheet
+    const btnIncr = document.getElementById('btnFontIncr');
+    const btnDecr = document.getElementById('btnFontDecr');
+    const btnReset = document.getElementById('btnFontReset');
+
+    if (btnIncr) {
+        btnIncr.addEventListener('click', () => applyFontScale(currentFontScale + 0.1, true));
+    }
+    if (btnDecr) {
+        btnDecr.addEventListener('click', () => applyFontScale(currentFontScale - 0.1, true));
+    }
+    if (btnReset) {
+        btnReset.addEventListener('click', () => applyFontScale(1.0, true));
+    }
+}
+
+function applyFontScale(scale, notify) {
+    scale = Math.min(1.7, Math.max(0.8, scale));
+    scale = Math.round(scale * 100) / 100;
+    currentFontScale = scale;
+
+    document.documentElement.style.setProperty('--ticket-font-scale', scale);
+    localStorage.setItem('algo_ticket_font_scale', scale);
+
+    const display = document.getElementById('fontScaleDisplay');
+    if (display) {
+        display.textContent = `${Math.round(scale * 100)}%`;
+    }
+
+    if (notify) {
+        showToast(`Текст: ${Math.round(scale * 100)}%`);
+    }
+}
 
 // ==============================================================================
 // 1. Reading Progress Bar (Fixed Top)

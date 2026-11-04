@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>АиСД Коллоквиум — Конспекты билетов</title>
     <meta name="description" content="Структурированные академические конспекты всех 29 билетов программы коллоквиума по курсу «Алгоритмы и структуры данных» (1 семестр набора 2026 года, поток А. Кулапина).">
     <meta name="theme-color" content="#1e293b">
@@ -18,7 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Main CSS -->
-    <link rel="stylesheet" href="css/style.css?v=2.0">
+    <link rel="stylesheet" href="css/style.css?v=2.1">
 
     <!-- MathJax for KaTeX/LaTeX math rendering -->
     <script>
@@ -394,6 +394,19 @@
             <button class="sheet-close-btn" id="closeMaterialsSheet" aria-label="Закрыть">✕</button>
         </div>
         <div class="sheet-body">
+            <!-- Font Scale Controls -->
+            <div class="sheet-font-card">
+                <div class="sheet-font-header">
+                    <span class="sheet-font-title">🔍 Масштаб текста билета</span>
+                    <span class="sheet-font-value" id="fontScaleDisplay">100%</span>
+                </div>
+                <div class="sheet-font-buttons">
+                    <button class="sheet-font-btn" id="btnFontDecr" aria-label="Уменьшить шрифт">A−</button>
+                    <button class="sheet-font-btn sheet-font-btn-reset" id="btnFontReset" aria-label="Сбросить шрифт">100%</button>
+                    <button class="sheet-font-btn" id="btnFontIncr" aria-label="Увеличить шрифт">A+</button>
+                </div>
+            </div>
+
             <div class="sheet-materials-grid">
                 <a href="https://youtube.com/playlist?list=PLAM8d56z42bY&si=38UDroVBtadbTEy3" target="_blank" rel="noopener" class="sheet-mat-card">
                     <span class="sheet-mat-icon red">▶</span>
@@ -448,6 +461,6 @@
     <div id="swipeToast" class="swipe-toast"></div>
 
     <!-- App JavaScript -->
-    <script src="js/app.js?v=2.0"></script>
+    <script src="js/app.js?v=2.1"></script>
 </body>
 </html>
