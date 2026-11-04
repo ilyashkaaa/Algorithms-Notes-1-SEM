@@ -1,6 +1,39 @@
 // ==============================================================================
-// АиСД Коллоквиум — Frontend Application Logic
+// АиСД Коллоквиум — Frontend Application Logic & Modern Mobile Experience
 // ==============================================================================
+
+// 29 Tickets Full Catalog & Metadata
+const TICKETS_DATA = [
+    { id: 1,  num: "01", module: 1, title: "Сложность алгоритма, O, Θ, Ω", moduleName: "Модуль 1: Анализ, Поиск и Теория чисел" },
+    { id: 2,  num: "02", module: 1, title: "Бинарный поиск и вещественный бинпоиск", moduleName: "Модуль 1: Анализ, Поиск и Теория чисел" },
+    { id: 3,  num: "03", module: 1, title: "Префиксные суммы и обобщения", moduleName: "Модуль 1: Анализ, Поиск и Теория чисел" },
+    { id: 4,  num: "04", module: 1, title: "Факторизация, функция Эйлера, Zm", moduleName: "Модуль 1: Анализ, Поиск и Теория чисел" },
+    { id: 5,  num: "05", module: 1, title: "Классическое и линейное решето Эратосфена", moduleName: "Модуль 1: Анализ, Поиск и Теория чисел" },
+    { id: 6,  num: "06", module: 2, title: "Нижняя граница сортировок, стабильность", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 7,  num: "07", module: 2, title: "Сортировка слиянием, число инверсий", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 8,  num: "08", module: 2, title: "Бинарная пирамида: базовые операции", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 9,  num: "09", module: 2, title: "Heapify и пирамидальная сортировка", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 10, num: "10", module: 2, title: "Быстрая сортировка, Partition O(1)", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 11, num: "11", module: 2, title: "Порядковая статистика со случайным пивотом", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 12, num: "12", module: 2, title: "Алгоритм медианы медиан", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 13, num: "13", module: 2, title: "QuickSort с медианой медиан", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 14, num: "14", module: 2, title: "Порядковая статистика с медианой медиан", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 15, num: "15", module: 2, title: "Сортировка подсчетом, алгоритм LSD", moduleName: "Модуль 2: Сортировки и Пирамиды" },
+    { id: 16, num: "16", module: 3, title: "Амортизация: метод монеток, push_back", moduleName: "Модуль 3: Амортизация и Базовые контейнеры" },
+    { id: 17, num: "17", module: 3, title: "Амортизация: метод потенциалов", moduleName: "Модуль 3: Амортизация и Базовые контейнеры" },
+    { id: 18, num: "18", module: 3, title: "Линейные контейнеры, очередь со стеками", moduleName: "Модуль 3: Амортизация и Базовые контейнеры" },
+    { id: 19, num: "19", module: 4, title: "Бинарное дерево поиска (BST): Find, Insert, Erase", moduleName: "Модуль 4: Деревья поиска" },
+    { id: 20, num: "20", module: 4, title: "BST: Порядковая статистика, LowerBound", moduleName: "Модуль 4: Деревья поиска" },
+    { id: 21, num: "21", module: 4, title: "AVL-дерево: Повороты, балансировка", moduleName: "Модуль 4: Деревья поиска" },
+    { id: 22, num: "22", module: 4, title: "Декартово дерево (Treap)", moduleName: "Модуль 4: Деревья поиска" },
+    { id: 23, num: "23", module: 4, title: "Splay-дерево: zig, zig-zig, zig-zag", moduleName: "Модуль 4: Деревья поиска" },
+    { id: 24, num: "24", module: 4, title: "Splay-дерево: Split и Merge через Splay", moduleName: "Модуль 4: Деревья поиска" },
+    { id: 25, num: "25", module: 5, title: "RMQ, RSQ: online/offline, static/dynamic", moduleName: "Модуль 5: Запросы на отрезках и Неявные ключи" },
+    { id: 26, num: "26", module: 5, title: "Разреженная таблица (Sparse Table)", moduleName: "Модуль 5: Запросы на отрезках и Неявные ключи" },
+    { id: 27, num: "27", module: 5, title: "Дерево отрезков без групповых операций", moduleName: "Модуль 5: Запросы на отрезках и Неявные ключи" },
+    { id: 28, num: "28", module: 5, title: "Дерево отрезков с групповым обновлением", moduleName: "Модуль 5: Запросы на отрезках и Неявные ключи" },
+    { id: 29, num: "29", module: 5, title: "Treap по неявному ключу: разворот подотрезка", moduleName: "Модуль 5: Запросы на отрезках и Неявные ключи" }
+];
 
 // Keyword & content index for all 29 tickets (for comprehensive search)
 const TICKET_CONTENT_INDEX = {
@@ -35,15 +68,554 @@ const TICKET_CONTENT_INDEX = {
     29: "декартово дерево по неявному ключу implicit treap разворот подотрезка reverse перевернуть подотрезок массив супермассив size"
 };
 
+let currentTicketId = 22;
+const loadedTicketsCache = {};
+
+// Application Bootstrap
 document.addEventListener('DOMContentLoaded', () => {
-    initSearch();
     initTheme();
+    initReadingProgress();
+    initMobileTicketStrip();
+    initMobileBottomBar();
+    initBottomSheets();
+    initGridSheetContent();
+    initSwipeGestures();
+    initScrollTopButton();
+    initSearch();
     initTicketSelection();
     initSidebarToggle();
     initSidebarResizer();
 });
 
-// 1. Sidebar Toggle Logic (Desktop collapse + Mobile off-canvas drawer)
+// ==============================================================================
+// 1. Reading Progress Bar (Fixed Top)
+// ==============================================================================
+function initReadingProgress() {
+    const progressBar = document.getElementById('readingProgress');
+    if (!progressBar) return;
+
+    window.addEventListener('scroll', () => {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+        progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+    }, { passive: true });
+}
+
+// ==============================================================================
+// 2. Mobile Horizontal Ticket Strip (01..29 Quick Chips)
+// ==============================================================================
+function initMobileTicketStrip() {
+    const strip = document.getElementById('mobileTicketStrip');
+    if (!strip) return;
+
+    strip.innerHTML = '';
+    TICKETS_DATA.forEach(ticket => {
+        const chip = document.createElement('button');
+        chip.className = `strip-chip mod-${ticket.module}`;
+        chip.setAttribute('data-ticket', ticket.id);
+        chip.textContent = ticket.num;
+        chip.title = `${ticket.num}. ${ticket.title}`;
+        chip.addEventListener('click', () => {
+            loadTicket(ticket.id);
+        });
+        strip.appendChild(chip);
+    });
+}
+
+function updateMobileTicketStrip(ticketId) {
+    const strip = document.getElementById('mobileTicketStrip');
+    if (!strip) return;
+
+    const chips = strip.querySelectorAll('.strip-chip');
+    chips.forEach(chip => {
+        const isActive = chip.getAttribute('data-ticket') === String(ticketId);
+        chip.classList.toggle('active', isActive);
+        if (isActive) {
+            chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+    });
+}
+
+// ==============================================================================
+// 3. Mobile Bottom Navigation Bar
+// ==============================================================================
+function initMobileBottomBar() {
+    const prevBtn = document.getElementById('mobilePrevBtn');
+    const nextBtn = document.getElementById('mobileNextBtn');
+    const tocBtn = document.getElementById('mobileTocBtn');
+    const gridBtn = document.getElementById('mobileGridBtn');
+    const matBtnBottom = document.getElementById('mobileMaterialsBtnBottom');
+    const matBtnTop = document.getElementById('mobileMaterialsBtn');
+    const searchBtnTop = document.getElementById('mobileSearchBtn');
+    const navTitleBtn = document.getElementById('mobileNavTitle');
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => goToAdjacentTicket(-1));
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => goToAdjacentTicket(1));
+    }
+    if (tocBtn) {
+        tocBtn.addEventListener('click', () => openSheet('mobileTocSheet'));
+    }
+    if (gridBtn) {
+        gridBtn.addEventListener('click', () => openSheet('mobileGridSheet'));
+    }
+    if (matBtnBottom) {
+        matBtnBottom.addEventListener('click', () => openSheet('mobileMaterialsSheet'));
+    }
+    if (matBtnTop) {
+        matBtnTop.addEventListener('click', () => openSheet('mobileMaterialsSheet'));
+    }
+    if (navTitleBtn) {
+        navTitleBtn.addEventListener('click', () => openSheet('mobileGridSheet'));
+    }
+    if (searchBtnTop) {
+        searchBtnTop.addEventListener('click', () => {
+            openSheet('mobileGridSheet');
+            setTimeout(() => {
+                const searchInput = document.getElementById('mobileSheetSearchInput');
+                if (searchInput) searchInput.focus();
+            }, 300);
+        });
+    }
+}
+
+function goToAdjacentTicket(delta) {
+    const nextId = currentTicketId + delta;
+    if (nextId >= 1 && nextId <= 29) {
+        const dirText = delta > 0 ? `Билет ${String(nextId).padStart(2, '0')} →` : `← Билет ${String(nextId).padStart(2, '0')}`;
+        showToast(dirText);
+        loadTicket(nextId);
+    } else if (nextId < 1) {
+        showToast('Это первый билет (01)');
+    } else {
+        showToast('Это последний билет (29)');
+    }
+}
+
+function updateBottomBarState(ticketId) {
+    const prevBtn = document.getElementById('mobilePrevBtn');
+    const nextBtn = document.getElementById('mobileNextBtn');
+    const navNum = document.getElementById('mobileNavNum');
+    const padded = String(ticketId).padStart(2, '0');
+
+    if (navNum) navNum.textContent = padded;
+
+    if (prevBtn) {
+        const isFirst = ticketId <= 1;
+        prevBtn.disabled = isFirst;
+        prevBtn.classList.toggle('disabled', isFirst);
+    }
+    if (nextBtn) {
+        const isLast = ticketId >= 29;
+        nextBtn.disabled = isLast;
+        nextBtn.classList.toggle('disabled', isLast);
+    }
+}
+
+// ==============================================================================
+// 4. Bottom Sheets Architecture (Modal Drawers with Drag-to-Dismiss)
+// ==============================================================================
+function initBottomSheets() {
+    const backdrop = document.getElementById('sheetBackdrop');
+    const closeToc = document.getElementById('closeTocSheet');
+    const closeGrid = document.getElementById('closeGridSheet');
+    const closeMat = document.getElementById('closeMaterialsSheet');
+
+    if (backdrop) {
+        backdrop.addEventListener('click', closeAllSheets);
+    }
+    if (closeToc) closeToc.addEventListener('click', closeAllSheets);
+    if (closeGrid) closeGrid.addEventListener('click', closeAllSheets);
+    if (closeMat) closeMat.addEventListener('click', closeAllSheets);
+
+    // Escape key closes sheets
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeAllSheets();
+    });
+
+    // Touch swipe down on handle bar to dismiss
+    document.querySelectorAll('.mobile-sheet').forEach(sheet => {
+        const handle = sheet.querySelector('.sheet-handle-bar');
+        if (!handle) return;
+
+        let startY = 0;
+        let isDragging = false;
+
+        handle.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            isDragging = true;
+        }, { passive: true });
+
+        handle.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+            if (deltaY > 0) {
+                sheet.style.transform = `translateY(${deltaY}px)`;
+            }
+        }, { passive: true });
+
+        handle.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            const endY = e.changedTouches[0].clientY;
+            const deltaY = endY - startY;
+            sheet.style.transform = '';
+            if (deltaY > 60) {
+                closeAllSheets();
+            }
+        }, { passive: true });
+    });
+}
+
+function openSheet(sheetId) {
+    closeAllSheets();
+    const sheet = document.getElementById(sheetId);
+    const backdrop = document.getElementById('sheetBackdrop');
+    if (!sheet || !backdrop) return;
+
+    backdrop.classList.add('active');
+    sheet.classList.add('active');
+    document.body.classList.add('sheet-open');
+}
+
+function closeAllSheets() {
+    const backdrop = document.getElementById('sheetBackdrop');
+    if (backdrop) backdrop.classList.remove('active');
+
+    document.querySelectorAll('.mobile-sheet').forEach(sheet => {
+        sheet.classList.remove('active');
+        sheet.style.transform = '';
+    });
+    document.body.classList.remove('sheet-open');
+}
+
+// ==============================================================================
+// 5. Dynamic TOC Generator for Current Ticket
+// ==============================================================================
+function generateTocContent(container, ticketId) {
+    const tocBody = document.getElementById('sheetTocContent');
+    const tocNum = document.getElementById('sheetTocNum');
+    const tocTitle = document.getElementById('sheetTocTitle');
+    const ticketInfo = TICKETS_DATA.find(t => t.id === Number(ticketId));
+
+    if (tocNum) tocNum.textContent = ticketInfo ? ticketInfo.num : String(ticketId).padStart(2, '0');
+    if (tocTitle && ticketInfo) tocTitle.textContent = ticketInfo.title;
+    if (!tocBody) return;
+
+    tocBody.innerHTML = '';
+
+    // Collect all sections & headers
+    const sections = container.querySelectorAll('section[id], div.vcard[id], [id^="sec-"]');
+    if (sections.length === 0) {
+        tocBody.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">Разделы не найдены</div>';
+        return;
+    }
+
+    sections.forEach((sec, idx) => {
+        const secId = sec.getAttribute('id');
+        if (!secId) return;
+
+        // Determine title text and type
+        const pill = sec.querySelector('.vcard-title-pill');
+        let titleText = pill ? pill.textContent.trim() : (sec.querySelector('h1, h2, h3, h4')?.textContent.trim() || `Раздел ${idx + 1}`);
+
+        // Classify category
+        let itemClass = 'item-def';
+        let tagText = 'Раздел';
+        const lower = titleText.toLowerCase();
+
+        if (lower.includes('определение') || lower.includes('[определение]')) {
+            itemClass = 'item-def';
+            tagText = 'Определение';
+            titleText = titleText.replace(/\[определение\]/gi, '').trim();
+        } else if (lower.includes('теорема') || lower.includes('лемма') || lower.includes('свойство')) {
+            itemClass = 'item-thm';
+            tagText = 'Теорема';
+            titleText = titleText.replace(/\[теорема.*?\]/gi, '').trim();
+        } else if (lower.includes('алгоритм') || lower.includes('метод')) {
+            itemClass = 'item-alg';
+            tagText = 'Алгоритм';
+        } else if (lower.includes('код') || lower.includes('java')) {
+            itemClass = 'item-code';
+            tagText = 'Код';
+        } else if (lower.includes('summary') || lower.includes('блиц') || lower.includes('резюме')) {
+            itemClass = 'item-blitz';
+            tagText = 'Summary';
+        } else if (lower.includes('идея') || lower.includes('геометрия')) {
+            itemClass = 'item-geo';
+            tagText = 'Идея';
+        }
+
+        const btn = document.createElement('a');
+        btn.className = `sheet-toc-item ${itemClass}`;
+        btn.href = `#${secId}`;
+        btn.innerHTML = `
+            <span>${titleText}</span>
+            <span class="sheet-toc-tag">${tagText}</span>
+        `;
+
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeAllSheets();
+            const targetEl = document.getElementById(secId);
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                targetEl.classList.remove('highlight-pulse');
+                void targetEl.offsetWidth; // Trigger reflow
+                targetEl.classList.add('highlight-pulse');
+            }
+        });
+
+        tocBody.appendChild(btn);
+    });
+}
+
+// ==============================================================================
+// 6. Grid & Search Bottom Sheet Content
+// ==============================================================================
+function initGridSheetContent() {
+    const listBody = document.getElementById('mobileSheetListBody');
+    const searchInput = document.getElementById('mobileSheetSearchInput');
+    const clearBtn = document.getElementById('clearSheetSearch');
+    if (!listBody) return;
+
+    renderGridSheet();
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (clearBtn) clearBtn.style.display = query ? 'block' : 'none';
+            filterGridSheet(query);
+        });
+    }
+
+    if (clearBtn && searchInput) {
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            filterGridSheet('');
+            searchInput.focus();
+        });
+    }
+}
+
+function renderGridSheet() {
+    const listBody = document.getElementById('mobileSheetListBody');
+    if (!listBody) return;
+
+    listBody.innerHTML = '';
+
+    // 1. Fast Number Grid (1..29)
+    const gridWrap = document.createElement('div');
+    gridWrap.className = 'sheet-grid-strip';
+    gridWrap.id = 'sheetGridNumbers';
+
+    TICKETS_DATA.forEach(ticket => {
+        const chip = document.createElement('button');
+        chip.className = `sheet-grid-chip mod-${ticket.module}`;
+        chip.setAttribute('data-ticket', ticket.id);
+        chip.textContent = ticket.num;
+        chip.title = `${ticket.num}. ${ticket.title}`;
+        chip.addEventListener('click', () => {
+            closeAllSheets();
+            loadTicket(ticket.id);
+        });
+        gridWrap.appendChild(chip);
+    });
+    listBody.appendChild(gridWrap);
+
+    // 2. Grouped Module List
+    let currentModule = 0;
+    TICKETS_DATA.forEach(ticket => {
+        if (ticket.module !== currentModule) {
+            currentModule = ticket.module;
+            const modHeader = document.createElement('div');
+            modHeader.className = 'sheet-module-title';
+            modHeader.textContent = ticket.moduleName;
+            listBody.appendChild(modHeader);
+        }
+
+        const row = document.createElement('div');
+        row.className = 'sheet-ticket-row';
+        row.setAttribute('data-ticket', ticket.id);
+        row.innerHTML = `
+            <span class="sheet-ticket-num">${ticket.num}</span>
+            <span class="sheet-ticket-name">${ticket.title}</span>
+        `;
+        row.addEventListener('click', () => {
+            closeAllSheets();
+            loadTicket(ticket.id);
+        });
+        listBody.appendChild(row);
+    });
+}
+
+function filterGridSheet(query) {
+    const rows = document.querySelectorAll('.sheet-ticket-row');
+    const modHeaders = document.querySelectorAll('.sheet-module-title');
+    const gridChips = document.querySelectorAll('.sheet-grid-chip');
+
+    rows.forEach(row => {
+        const id = row.getAttribute('data-ticket');
+        const num = row.querySelector('.sheet-ticket-num')?.textContent.toLowerCase() || '';
+        const name = row.querySelector('.sheet-ticket-name')?.textContent.toLowerCase() || '';
+        const content = TICKET_CONTENT_INDEX[id] || '';
+
+        const matches = !query || num.includes(query) || name.includes(query) || content.includes(query);
+        row.style.display = matches ? 'flex' : 'none';
+    });
+
+    // Filter grid chips too
+    gridChips.forEach(chip => {
+        const id = chip.getAttribute('data-ticket');
+        const num = chip.textContent.toLowerCase();
+        const content = TICKET_CONTENT_INDEX[id] || '';
+        const ticket = TICKETS_DATA.find(t => t.id === Number(id));
+        const name = ticket ? ticket.title.toLowerCase() : '';
+
+        const matches = !query || num.includes(query) || name.includes(query) || content.includes(query);
+        chip.style.opacity = matches ? '1' : '0.25';
+    });
+
+    // Hide module headers if no visible rows
+    modHeaders.forEach(header => {
+        let sibling = header.nextElementSibling;
+        let hasVisible = false;
+        while (sibling && !sibling.classList.contains('sheet-module-title')) {
+            if (sibling.classList.contains('sheet-ticket-row') && sibling.style.display !== 'none') {
+                hasVisible = true;
+                break;
+            }
+            sibling = sibling.nextElementSibling;
+        }
+        header.style.display = (!query || hasVisible) ? 'block' : 'none';
+    });
+}
+
+function updateGridSheetActiveState(ticketId) {
+    document.querySelectorAll('.sheet-grid-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.getAttribute('data-ticket') === String(ticketId));
+    });
+    document.querySelectorAll('.sheet-ticket-row').forEach(row => {
+        row.classList.toggle('active', row.getAttribute('data-ticket') === String(ticketId));
+    });
+}
+
+// ==============================================================================
+// 7. Touch Swipe Navigation Gestures
+// ==============================================================================
+function initSwipeGestures() {
+    let startX = 0;
+    let startY = 0;
+    let startTime = 0;
+
+    const viewport = document.querySelector('.main-viewport') || document.body;
+
+    viewport.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startTime = Date.now();
+    }, { passive: true });
+
+    viewport.addEventListener('touchend', (e) => {
+        if (e.changedTouches.length !== 1) return;
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
+        const deltaTime = Date.now() - startTime;
+
+        // Don't trigger if swiping inside pre/code/formula/table
+        const target = e.target;
+        if (target.closest('pre') || target.closest('code') || target.closest('table') || target.closest('mjx-container') || target.closest('.mobile-sheet') || target.closest('.mobile-ticket-strip')) {
+            return;
+        }
+
+        // Fast horizontal swipe criteria
+        if (deltaTime <= 500 && Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.6) {
+            if (deltaX < 0) {
+                // Swipe Left -> Next ticket
+                goToAdjacentTicket(1);
+            } else {
+                // Swipe Right -> Prev ticket
+                goToAdjacentTicket(-1);
+            }
+        }
+    }, { passive: true });
+}
+
+function showToast(message) {
+    const toast = document.getElementById('swipeToast');
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 1200);
+}
+
+// ==============================================================================
+// 8. Floating Scroll-To-Top Button
+// ==============================================================================
+function initScrollTopButton() {
+    const btn = document.getElementById('scrollTopBtn');
+    if (!btn) return;
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    }, { passive: true });
+
+    btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
+
+// ==============================================================================
+// 9. Code Snippets Copy Buttons
+// ==============================================================================
+function injectCodeCopyButtons(container) {
+    const codeBlocks = container.querySelectorAll('pre');
+    codeBlocks.forEach(pre => {
+        if (pre.querySelector('.code-copy-btn')) return;
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.innerHTML = '📋 Копировать';
+        copyBtn.setAttribute('aria-label', 'Скопировать код');
+
+        copyBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const code = pre.querySelector('code')?.innerText || pre.innerText;
+            try {
+                await navigator.clipboard.writeText(code);
+                copyBtn.innerHTML = '✓ Скопировано!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.innerHTML = '📋 Копировать';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                copyBtn.innerHTML = '✓ Скопировано';
+            }
+        });
+
+        pre.appendChild(copyBtn);
+    });
+}
+
+// ==============================================================================
+// 10. Sidebar Toggle Logic (Desktop collapse + Mobile off-canvas drawer)
+// ==============================================================================
 function initSidebarToggle() {
     const toggleBtn = document.getElementById('sidebarToggle');
     const sidebar = document.querySelector('.app-sidebar');
@@ -51,20 +623,22 @@ function initSidebarToggle() {
     if (!toggleBtn || !sidebar) return;
 
     toggleBtn.addEventListener('click', () => {
+        const icon = toggleBtn.querySelector('.btn-icon');
         if (window.innerWidth <= 860) {
             const isOpen = document.body.classList.toggle('sidebar-open');
-            toggleBtn.innerHTML = isOpen ? '✕ Меню' : '☰ Меню';
+            if (icon) icon.textContent = isOpen ? '✕' : '☰';
         } else {
             const isCollapsed = sidebar.classList.toggle('collapsed');
             document.body.classList.toggle('sidebar-collapsed', isCollapsed);
-            toggleBtn.innerHTML = isCollapsed ? '☰ Меню' : '✕ Меню';
+            if (icon) icon.textContent = isCollapsed ? '☰' : '✕';
         }
     });
 
     if (backdrop) {
         backdrop.addEventListener('click', () => {
             document.body.classList.remove('sidebar-open');
-            toggleBtn.innerHTML = '☰ Меню';
+            const icon = toggleBtn.querySelector('.btn-icon');
+            if (icon) icon.textContent = '☰';
         });
     }
 
@@ -73,13 +647,16 @@ function initSidebarToggle() {
         item.addEventListener('click', () => {
             if (window.innerWidth <= 860) {
                 document.body.classList.remove('sidebar-open');
-                toggleBtn.innerHTML = '☰ Меню';
+                const icon = toggleBtn.querySelector('.btn-icon');
+                if (icon) icon.textContent = '☰';
             }
         });
     });
 }
 
-// 2. Sidebar Resizer (Drag right edge to change width, remembers in CSS variable & localStorage)
+// ==============================================================================
+// 11. Sidebar Resizer (Desktop drag-to-resize)
+// ==============================================================================
 function initSidebarResizer() {
     const resizer = document.getElementById('sidebarResizer');
     const sidebar = document.querySelector('.app-sidebar');
@@ -120,7 +697,9 @@ function initSidebarResizer() {
     });
 }
 
-// 3. Search Filter across tickets + content indexing + in-page highlighting
+// ==============================================================================
+// 12. Search System (Sidebar Search + Highlight in Page)
+// ==============================================================================
 function initSearch() {
     const searchInput = document.getElementById('ticketSearch');
     if (!searchInput) return;
@@ -143,9 +722,8 @@ function initSearch() {
     });
 }
 
-// Clean in-page text search highlighting
 function highlightInPage(query) {
-    const content = document.getElementById('ticket22-content');
+    const content = document.getElementById('ticketContainer');
     if (!content) return;
 
     const existingMarks = content.querySelectorAll('mark.search-highlight');
@@ -207,7 +785,9 @@ function escapeRegex(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// 4. Dark / Light Theme Toggle
+// ==============================================================================
+// 13. Dark / Light Theme Toggle
+// ==============================================================================
 function initTheme() {
     const themeBtn = document.getElementById('themeToggle');
     if (!themeBtn) return;
@@ -223,21 +803,25 @@ function initTheme() {
 }
 
 function applyTheme(theme) {
-    const themeBtn = document.getElementById('themeToggle');
+    const icon = document.getElementById('themeToggleIcon');
+    const text = document.getElementById('themeToggleText');
+
     if (theme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('algo_theme', 'dark');
-        if (themeBtn) themeBtn.innerHTML = '☀️ Светлая';
+        if (icon) icon.textContent = '☀️';
+        if (text) text.textContent = 'Светлая';
     } else {
         document.documentElement.removeAttribute('data-theme');
         localStorage.setItem('algo_theme', 'light');
-        if (themeBtn) themeBtn.innerHTML = '🌙 Темная';
+        if (icon) icon.textContent = '🌙';
+        if (text) text.textContent = 'Темная';
     }
 }
 
-// 5. Dynamic Ticket Loader & Selection (Variant A Architecture)
-const loadedTicketsCache = {};
-
+// ==============================================================================
+// 14. Dynamic Ticket Loader & Synchronizer
+// ==============================================================================
 function initTicketSelection() {
     const items = document.querySelectorAll('.ticket-item');
     items.forEach(item => {
@@ -262,9 +846,16 @@ function initTicketSelection() {
 }
 
 async function loadTicket(ticketId) {
+    currentTicketId = Number(ticketId);
     const paddedId = String(ticketId).padStart(2, '0');
+
+    // Update active states
     const items = document.querySelectorAll('.ticket-item');
     items.forEach(i => i.classList.toggle('active', i.getAttribute('data-ticket') === String(ticketId)));
+
+    updateMobileTicketStrip(currentTicketId);
+    updateBottomBarState(currentTicketId);
+    updateGridSheetActiveState(currentTicketId);
 
     const container = document.getElementById('ticketContainer');
     const wip = document.getElementById('wip-placeholder');
@@ -299,7 +890,13 @@ async function loadTicket(ticketId) {
     container.style.display = 'grid';
     container.innerHTML = loadedTicketsCache[ticketId];
 
-    // Close mobile accordion on link click
+    // Generate TOC content for mobile bottom sheet
+    generateTocContent(container, currentTicketId);
+
+    // Inject code copy buttons
+    injectCodeCopyButtons(container);
+
+    // Close mobile inline accordion on link click
     container.querySelectorAll('.mobile-toc-nav a').forEach(link => {
         link.addEventListener('click', () => {
             const acc = container.querySelector('.mobile-toc-accordion');
@@ -311,11 +908,12 @@ async function loadTicket(ticketId) {
     if (window.MathJax && window.MathJax.typesetPromise) {
         window.MathJax.typesetPromise([container]);
     }
+
     window.history.replaceState(null, '', `#ticket-${ticketId}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// 6. Download PDF Handler via Browser Native Print Engine
+// 15. Download PDF Handler via Browser Native Print Engine
 function downloadPdf() {
     window.print();
 }

@@ -2,10 +2,12 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
     <title>АиСД Коллоквиум — Конспекты билетов</title>
     <meta name="description" content="Структурированные академические конспекты всех 29 билетов программы коллоквиума по курсу «Алгоритмы и структуры данных» (1 семестр набора 2026 года, поток А. Кулапина).">
     <meta name="theme-color" content="#1e293b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,6 +34,9 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body class="tex2jax_process">
+    <!-- Reading Progress Bar (Fixed Top) -->
+    <div id="readingProgress" class="reading-progress-bar"></div>
+
     <!-- Mobile Backdrop Overlay -->
     <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
 
@@ -248,31 +253,46 @@
         <!-- Top Action Bar -->
         <header class="top-navbar">
             <div class="nav-left">
-                <button id="sidebarToggle" class="btn-action" title="Скрыть / показать каталог билетов">
-                    ☰ Меню
+                <button id="sidebarToggle" class="btn-action btn-menu" title="Скрыть / показать каталог билетов">
+                    <span class="btn-icon">☰</span> <span class="btn-text">Меню</span>
                 </button>
-                <a href="https://youtube.com/playlist?list=PLAM8d56z42bY&si=38UDroVBtadbTEy3" target="_blank" rel="noopener" class="btn-action btn-video" title="Смотреть видеолекции курса на YouTube">
+                <button class="mobile-nav-title" id="mobileNavTitle" title="Открыть список всех 29 билетов">
+                    <span class="mobile-nav-badge">Билет <span id="mobileNavNum">01</span></span>
+                    <span class="mobile-nav-total">/ 29 ▾</span>
+                </button>
+                <a href="https://youtube.com/playlist?list=PLAM8d56z42bY&si=38UDroVBtadbTEy3" target="_blank" rel="noopener" class="btn-action btn-video desktop-only" title="Смотреть видеолекции курса на YouTube">
                     ▶ Видеолекции
                 </a>
-                <a href="https://drive.google.com/drive/folders/1GRKVkyYCk9nyZl75-m70Ugd2w-BOqJSU?usp=sharing" target="_blank" rel="noopener" class="btn-action btn-drive" title="Google Диск: лекции 2026 года">
+                <a href="https://drive.google.com/drive/folders/1GRKVkyYCk9nyZl75-m70Ugd2w-BOqJSU?usp=sharing" target="_blank" rel="noopener" class="btn-action btn-drive desktop-only" title="Google Диск: лекции 2026 года">
                     📁 Диск 2026
                 </a>
-                <a href="https://drive.google.com/drive/folders/1y43gZ1cgyBBDyZ6r37FAlNu-2P7ZViZm?usp=drive_link" target="_blank" rel="noopener" class="btn-action btn-drive" title="Google Диск: лекции 2025 года">
+                <a href="https://drive.google.com/drive/folders/1y43gZ1cgyBBDyZ6r37FAlNu-2P7ZViZm?usp=drive_link" target="_blank" rel="noopener" class="btn-action btn-drive desktop-only" title="Google Диск: лекции 2025 года">
                     📁 Диск 2025
                 </a>
-                <a href="colloc.pdf" target="_blank" rel="noopener" class="btn-action" title="Официальная программа коллоквиума и правила проведения (PDF)">
+                <a href="colloc.pdf" target="_blank" rel="noopener" class="btn-action desktop-only" title="Официальная программа коллоквиума и правила проведения (PDF)">
                     📋 Программа
                 </a>
             </div>
             <div class="nav-actions">
-                <button class="btn-action btn-primary" onclick="downloadPdf()" title="Скачать PDF (светлый или темный в зависимости от выбранной темы)">
+                <button class="btn-action mobile-only" id="mobileSearchBtn" title="Поиск по билетам">
+                    🔍
+                </button>
+                <button class="btn-action mobile-only" id="mobileMaterialsBtn" title="Материалы и ссылки">
+                    📁
+                </button>
+                <button class="btn-action btn-primary desktop-only" onclick="downloadPdf()" title="Скачать PDF (светлый или темный в зависимости от выбранной темы)">
                     📥 Скачать PDF
                 </button>
                 <button class="btn-action" id="themeToggle" title="Переключить тему оформления">
-                    🌙 Темная
+                    <span id="themeToggleIcon">🌙</span> <span id="themeToggleText" class="desktop-only">Темная</span>
                 </button>
             </div>
         </header>
+
+        <!-- Mobile Horizontal Ticket Strip (Fast 1-Tap Switching) -->
+        <div class="mobile-ticket-strip" id="mobileTicketStrip" aria-label="Быстрый выбор билета">
+            <!-- Dynamically populated: chips 01 to 29 -->
+        </div>
 
         <!-- Body Content -->
         <div class="content-body">
@@ -298,6 +318,131 @@
 
         </div>
     </main>
+
+    <!-- Mobile Bottom Navigation Bar (Thumb-Zone Priority) -->
+    <nav class="mobile-bottom-bar" id="mobileBottomBar">
+        <button class="mobile-bar-btn" id="mobilePrevBtn" title="Предыдущий билет">
+            <span class="bar-icon">‹</span>
+            <span class="bar-label">Назад</span>
+        </button>
+        <button class="mobile-bar-btn" id="mobileTocBtn" title="Содержание билета">
+            <span class="bar-icon">📑</span>
+            <span class="bar-label">Разделы</span>
+        </button>
+        <button class="mobile-bar-btn mobile-bar-center" id="mobileGridBtn" title="Все 29 билетов">
+            <span class="bar-icon">🗂</span>
+            <span class="bar-label">Билеты</span>
+        </button>
+        <button class="mobile-bar-btn" id="mobileMaterialsBtnBottom" title="Материалы и файлы">
+            <span class="bar-icon">📁</span>
+            <span class="bar-label">Материалы</span>
+        </button>
+        <button class="mobile-bar-btn" id="mobileNextBtn" title="Следующий билет">
+            <span class="bar-icon">›</span>
+            <span class="bar-label">Вперёд</span>
+        </button>
+    </nav>
+
+    <!-- Bottom Sheets Backdrop -->
+    <div id="sheetBackdrop" class="sheet-backdrop"></div>
+
+    <!-- 1. TOC Bottom Sheet -->
+    <div id="mobileTocSheet" class="mobile-sheet" role="dialog" aria-modal="true" aria-labelledby="tocSheetHeading">
+        <div class="sheet-handle-bar"><div class="sheet-handle"></div></div>
+        <div class="sheet-header">
+            <div class="sheet-title-box">
+                <span class="sheet-title" id="tocSheetHeading">📑 Разделы билета <span id="sheetTocNum">01</span></span>
+                <span class="sheet-subtitle" id="sheetTocTitle">Быстрый переход к разделам конспекта</span>
+            </div>
+            <button class="sheet-close-btn" id="closeTocSheet" aria-label="Закрыть">✕</button>
+        </div>
+        <div class="sheet-body" id="sheetTocContent">
+            <!-- Dynamically populated from active ticket sections -->
+        </div>
+    </div>
+
+    <!-- 2. Grid & Search Bottom Sheet -->
+    <div id="mobileGridSheet" class="mobile-sheet" role="dialog" aria-modal="true" aria-labelledby="gridSheetHeading">
+        <div class="sheet-handle-bar"><div class="sheet-handle"></div></div>
+        <div class="sheet-header">
+            <div class="sheet-title-box">
+                <span class="sheet-title" id="gridSheetHeading">🗂 Все 29 билетов программы</span>
+                <span class="sheet-subtitle">Нажмите на номер или выберите из списка</span>
+            </div>
+            <button class="sheet-close-btn" id="closeGridSheet" aria-label="Закрыть">✕</button>
+        </div>
+        <div class="sheet-search-wrap">
+            <input type="text" id="mobileSheetSearchInput" placeholder="🔍 Поиск по номеру, теме, коду..." autocomplete="off">
+            <button id="clearSheetSearch" class="sheet-search-clear" style="display: none;">✕</button>
+        </div>
+        <div class="sheet-body" id="mobileSheetListBody">
+            <!-- Dynamic quick number chips grid + grouped ticket list -->
+        </div>
+    </div>
+
+    <!-- 3. Materials & Actions Bottom Sheet -->
+    <div id="mobileMaterialsSheet" class="mobile-sheet" role="dialog" aria-modal="true" aria-labelledby="matSheetHeading">
+        <div class="sheet-handle-bar"><div class="sheet-handle"></div></div>
+        <div class="sheet-header">
+            <div class="sheet-title-box">
+                <span class="sheet-title" id="matSheetHeading">📚 Материалы и инструменты</span>
+                <span class="sheet-subtitle">Официальные ресурсы и настройки</span>
+            </div>
+            <button class="sheet-close-btn" id="closeMaterialsSheet" aria-label="Закрыть">✕</button>
+        </div>
+        <div class="sheet-body">
+            <div class="sheet-materials-grid">
+                <a href="https://youtube.com/playlist?list=PLAM8d56z42bY&si=38UDroVBtadbTEy3" target="_blank" rel="noopener" class="sheet-mat-card">
+                    <span class="sheet-mat-icon red">▶</span>
+                    <div class="sheet-mat-text">
+                        <div class="sheet-mat-heading">Видеолекции курса</div>
+                        <div class="sheet-mat-desc">YouTube плейлист лекций АиСД</div>
+                    </div>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1GRKVkyYCk9nyZl75-m70Ugd2w-BOqJSU?usp=sharing" target="_blank" rel="noopener" class="sheet-mat-card">
+                    <span class="sheet-mat-icon blue">📁</span>
+                    <div class="sheet-mat-text">
+                        <div class="sheet-mat-heading">Google Диск 2026</div>
+                        <div class="sheet-mat-desc">Лекции и материалы текущего потока</div>
+                    </div>
+                </a>
+                <a href="https://drive.google.com/drive/folders/1y43gZ1cgyBBDyZ6r37FAlNu-2P7ZViZm?usp=drive_link" target="_blank" rel="noopener" class="sheet-mat-card">
+                    <span class="sheet-mat-icon sky">📁</span>
+                    <div class="sheet-mat-text">
+                        <div class="sheet-mat-heading">Google Диск 2025</div>
+                        <div class="sheet-mat-desc">Архив конспектов прошлого года</div>
+                    </div>
+                </a>
+                <a href="colloc.pdf" target="_blank" rel="noopener" class="sheet-mat-card">
+                    <span class="sheet-mat-icon amber">📋</span>
+                    <div class="sheet-mat-text">
+                        <div class="sheet-mat-heading">Программа коллоквиума</div>
+                        <div class="sheet-mat-desc">Официальный PDF регламент и билеты</div>
+                    </div>
+                </a>
+                <button onclick="downloadPdf(); closeAllSheets();" class="sheet-mat-card sheet-mat-btn">
+                    <span class="sheet-mat-icon indigo">📥</span>
+                    <div class="sheet-mat-text">
+                        <div class="sheet-mat-heading">Скачать конспект в PDF</div>
+                        <div class="sheet-mat-desc">Печатная версия текущего билета</div>
+                    </div>
+                </button>
+            </div>
+            <div class="sheet-author-row">
+                <span>Автор конспектов:</span>
+                <a href="https://t.me/ilyashka" target="_blank" rel="noopener" class="sheet-author-link">✈️ @ilyashka</a>
+                <a href="https://github.com/ilyashkaaa" target="_blank" rel="noopener" class="sheet-author-link">🐙 @ilyashkaaa</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Scroll To Top Button -->
+    <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Наверх" title="Наверх">
+        ↑
+    </button>
+
+    <!-- Swipe Toast Indicator -->
+    <div id="swipeToast" class="swipe-toast"></div>
 
     <!-- App JavaScript -->
     <script src="js/app.js"></script>
