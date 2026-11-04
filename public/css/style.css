@@ -1354,18 +1354,15 @@ mark.search-highlight {
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
-        overflow-x: hidden !important;
     }
 
+    /* Paragraphs and list items with fluid font scaling */
     .ticket-main-col p,
     .ticket-main-col li,
     .ticket-main-col .vcard > p,
     .ticket-main-col .vcard > div:not(.vcard-code) {
         font-size: calc(15px * var(--ticket-font-scale, 1)) !important;
         line-height: 1.65 !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
-        word-wrap: break-word !important;
     }
 
     .ticket-main-col [style*="font-size: 13.5px"],
@@ -1377,34 +1374,25 @@ mark.search-highlight {
     .ticket-main-col h1 {
         font-size: calc(20px * var(--ticket-font-scale, 1)) !important;
         line-height: 1.3 !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
     }
 
     .ticket-main-col h2 {
         font-size: calc(18px * var(--ticket-font-scale, 1)) !important;
         line-height: 1.35 !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
     }
 
     .ticket-main-col h3,
     .ticket-main-col h4 {
         font-size: calc(16px * var(--ticket-font-scale, 1)) !important;
         line-height: 1.4 !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
     }
 
     .ticket-main-col .vcard {
         font-size: calc(14.5px * var(--ticket-font-scale, 1)) !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
     }
 
     .ticket-main-col .vcard-title-pill {
         font-size: calc(10.5px * var(--ticket-font-scale, 1)) !important;
-        white-space: normal !important;
         line-height: 1.35 !important;
     }
 
@@ -1417,39 +1405,67 @@ mark.search-highlight {
 
     .ticket-header-banner p {
         font-size: calc(13.5px * var(--ticket-font-scale, 1)) !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
     }
 
-    /* Zero horizontal scroll for content cards & lists */
+    /* =========================================================
+       INDIVIDUAL BLOCK HORIZONTAL SCROLLING:
+       Каждый блок можно листать вбок отдельно,
+       страница целиком скроллится строго только вверх-вниз!
+       ========================================================= */
     .vcard {
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-x pan-y !important;
     }
 
     .ticket-header-banner {
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-x pan-y !important;
+    }
+
+    /* Custom subtle scrollbar for horizontally scrollable blocks */
+    .vcard::-webkit-scrollbar,
+    .ticket-header-banner::-webkit-scrollbar,
+    pre::-webkit-scrollbar,
+    table::-webkit-scrollbar,
+    mjx-container::-webkit-scrollbar {
+        height: 3px !important;
+    }
+
+    .vcard::-webkit-scrollbar-thumb,
+    .ticket-header-banner::-webkit-scrollbar-thumb,
+    pre::-webkit-scrollbar-thumb,
+    table::-webkit-scrollbar-thumb,
+    mjx-container::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.45) !important;
+        border-radius: 3px !important;
+    }
+
+    .vcard::-webkit-scrollbar-track,
+    .ticket-header-banner::-webkit-scrollbar-track,
+    pre::-webkit-scrollbar-track,
+    table::-webkit-scrollbar-track,
+    mjx-container::-webkit-scrollbar-track {
+        background: transparent !important;
     }
 
     ol, ul {
         box-sizing: border-box !important;
-        max-width: 100% !important;
         padding-left: 20px !important;
         margin-left: 0 !important;
     }
 
     li {
         box-sizing: border-box !important;
-        max-width: 100% !important;
-        overflow-wrap: break-word !important;
-        word-break: break-word !important;
     }
 
     /* Formulas & Code Scrolling on Mobile */
@@ -1459,6 +1475,7 @@ mark.search-highlight {
         overflow-y: hidden !important;
         max-width: 100% !important;
         -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-x pan-y !important;
         padding: 6px 2px !important;
         margin: 10px 0 !important;
     }

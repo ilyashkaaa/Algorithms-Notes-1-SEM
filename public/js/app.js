@@ -628,6 +628,12 @@ function initSwipeGestures() {
             return;
         }
 
+        // Don't trigger if swiping inside a .vcard that has horizontal scrollable content
+        const vcard = target.closest('.vcard');
+        if (vcard && vcard.scrollWidth > vcard.clientWidth + 5) {
+            return;
+        }
+
         // Fast horizontal swipe criteria
         if (deltaTime <= 500 && Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.6) {
             if (deltaX < 0) {
@@ -956,9 +962,9 @@ async function loadTicket(ticketId) {
 
     if (!loadedTicketsCache[ticketId]) {
         try {
-            let res = await fetch(`tickets/ticket_${ticketId}.html?v=2.0`);
+            let res = await fetch(`tickets/ticket_${ticketId}.html?v=2.2`);
             if (!res.ok) {
-                res = await fetch(`tickets/ticket_${paddedId}.html?v=2.0`);
+                res = await fetch(`tickets/ticket_${paddedId}.html?v=2.2`);
             }
             if (res.ok) {
                 const html = await res.text();
