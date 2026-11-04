@@ -863,9 +863,9 @@ async function loadTicket(ticketId) {
 
     if (!loadedTicketsCache[ticketId]) {
         try {
-            let res = await fetch(`tickets/ticket_${ticketId}.html`);
+            let res = await fetch(`tickets/ticket_${ticketId}.html?v=2.0`);
             if (!res.ok) {
-                res = await fetch(`tickets/ticket_${paddedId}.html`);
+                res = await fetch(`tickets/ticket_${paddedId}.html?v=2.0`);
             }
             if (res.ok) {
                 const html = await res.text();
