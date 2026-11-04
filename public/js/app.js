@@ -914,9 +914,9 @@ async function loadTicket(ticketId) {
 
     if (!loadedTicketsCache[ticketId]) {
         try {
-            let res = await fetch(`tickets/ticket_${ticketId}.html?v=2.3`);
+            let res = await fetch(`tickets/ticket_${ticketId}.html?v=2.5`);
             if (!res.ok) {
-                res = await fetch(`tickets/ticket_${paddedId}.html?v=2.3`);
+                res = await fetch(`tickets/ticket_${paddedId}.html?v=2.5`);
             }
             if (res.ok) {
                 const html = await res.text();
@@ -941,6 +941,9 @@ async function loadTicket(ticketId) {
     container.style.display = 'grid';
     container.innerHTML = loadedTicketsCache[ticketId];
 
+    // Prepare independently scrollable blocks (.vcard, tables, etc.)
+    prepareScrollableBlocks(container);
+
     // Generate TOC content for mobile bottom sheet
     generateTocContent(container, currentTicketId);
 
@@ -957,11 +960,92 @@ async function loadTicket(ticketId) {
 
     // Re-render MathJax equations
     if (window.MathJax && window.MathJax.typesetPromise) {
-        window.MathJax.typesetPromise([container]);
+        window.MathJax.typesetPromise([container]).then(() => {
+            enableMouseDragScroll(container);
+        }).catch(() => {});
     }
 
     window.history.replaceState(null, '', `#ticket-${ticketId}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 14. Independent Horizontal Scroll Manager for Blocks on Mobile & Desktop
+function prepareScrollableBlocks(container) {
+    if (!container) return;
+
+    // Wrap each .vcard inner content into .vcard-scroll-wrap if not already wrapped
+    const vcards = container.querySelectorAll('.vcard');
+    vcards.forEach(card => {
+        if (!card.querySelector(':scope > .vcard-scroll-wrap')) {
+            const wrap = document.createElement('div');
+            wrap.className = 'vcard-scroll-wrap';
+            while (card.firstChild) {
+                wrap.appendChild(card.firstChild);
+            }
+            card.appendChild(wrap);
+        }
+    });
+
+    // Ensure any table is in a scroll wrapper
+    const tables = container.querySelectorAll('table');
+    tables.forEach(table => {
+        const parent = table.parentElement;
+        if (!parent || (!parent.classList.contains('table-scroll-wrap') && !parent.getAttribute('style')?.includes('overflow-x'))) {
+            const wrap = document.createElement('div');
+            wrap.className = 'table-scroll-wrap';
+            table.parentNode.insertBefore(wrap, table);
+            wrap.appendChild(table);
+        }
+    });
+
+    // Enable drag-to-scroll for mouse / desktop users
+    enableMouseDragScroll(container);
+}
+
+function enableMouseDragScroll(container) {
+    const scrollables = container.querySelectorAll('.vcard, .table-scroll-wrap, pre, mjx-container[jax="CHTML"][display="true"], [style*="overflow-x: auto"]');
+    scrollables.forEach(el => {
+        if (el.__dragScrollAttached) return;
+        el.__dragScrollAttached = true;
+
+        let isDown = false;
+        let startX = 0;
+        let scrollLeft = 0;
+        let hasMoved = false;
+
+        el.addEventListener('mousedown', (e) => {
+            if (e.button !== 0 || e.target.closest('a, button, input, summary, details')) return;
+            isDown = true;
+            hasMoved = false;
+            startX = e.pageX - el.offsetLeft;
+            scrollLeft = el.scrollLeft;
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDown) {
+                isDown = false;
+                el.classList.remove('is-dragging');
+            }
+        });
+
+        el.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            const x = e.pageX - el.offsetLeft;
+            const walk = (x - startX);
+            if (Math.abs(walk) > 4) {
+                hasMoved = true;
+                el.classList.add('is-dragging');
+                el.scrollLeft = scrollLeft - walk;
+            }
+        });
+
+        el.addEventListener('click', (e) => {
+            if (hasMoved) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+    });
 }
 
 // 15. Download PDF Handler via Browser Native Print Engine
