@@ -18,7 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Main CSS -->
-    <link rel="stylesheet" href="css/style.css?v=2.5">
+    <link rel="stylesheet" href="css/style.css?v=2.6">
 
     <!-- MathJax for KaTeX/LaTeX math rendering -->
     <script>
@@ -283,9 +283,6 @@
                 <button class="btn-action mobile-only" id="mobileMaterialsBtn" title="Материалы и ссылки">
                     📁
                 </button>
-                <button class="btn-action btn-primary desktop-only" onclick="downloadPdf()" title="Скачать PDF (светлый или темный в зависимости от выбранной темы)">
-                    📥 Скачать PDF
-                </button>
                 <button class="btn-action" id="themeToggle" title="Переключить тему оформления">
                     <span id="themeToggleIcon">🌙</span> <span id="themeToggleText" class="desktop-only">Темная</span>
                 </button>
@@ -394,19 +391,6 @@
             <button class="sheet-close-btn" id="closeMaterialsSheet" aria-label="Закрыть">✕</button>
         </div>
         <div class="sheet-body">
-            <!-- Font Scale Controls -->
-            <div class="sheet-font-card">
-                <div class="sheet-font-header">
-                    <span class="sheet-font-title">🔍 Масштаб текста билета</span>
-                    <span class="sheet-font-value" id="fontScaleDisplay">100%</span>
-                </div>
-                <div class="sheet-font-buttons">
-                    <button class="sheet-font-btn" id="btnFontDecr" aria-label="Уменьшить шрифт">A−</button>
-                    <button class="sheet-font-btn sheet-font-btn-reset" id="btnFontReset" aria-label="Сбросить шрифт">100%</button>
-                    <button class="sheet-font-btn" id="btnFontIncr" aria-label="Увеличить шрифт">A+</button>
-                </div>
-            </div>
-
             <div class="sheet-materials-grid">
                 <a href="https://youtube.com/playlist?list=PLAM8d56z42bY&si=38UDroVBtadbTEy3" target="_blank" rel="noopener" class="sheet-mat-card">
                     <span class="sheet-mat-icon red">▶</span>
@@ -436,13 +420,6 @@
                         <div class="sheet-mat-desc">Официальный PDF регламент и билеты</div>
                     </div>
                 </a>
-                <button onclick="downloadPdf(); closeAllSheets();" class="sheet-mat-card sheet-mat-btn">
-                    <span class="sheet-mat-icon indigo">📥</span>
-                    <div class="sheet-mat-text">
-                        <div class="sheet-mat-heading">Скачать конспект в PDF</div>
-                        <div class="sheet-mat-desc">Печатная версия текущего билета</div>
-                    </div>
-                </button>
             </div>
             <div class="sheet-author-row">
                 <span>Автор конспектов:</span>
@@ -461,6 +438,6 @@
     <div id="swipeToast" class="swipe-toast"></div>
 
     <!-- App JavaScript -->
-    <script src="js/app.js?v=2.5"></script>
+    <script src="js/app.js?v=2.6"></script>
 </body>
 </html>

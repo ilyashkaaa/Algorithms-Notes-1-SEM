@@ -895,7 +895,6 @@ mark.search-highlight {
    ========================================================= */
 
 :root {
-    --ticket-font-scale: 1;
     --bottom-bar-height: 60px;
     --sheet-bg: #ffffff;
     --sheet-border: #e2e8f0;
@@ -1353,9 +1352,9 @@ mark.search-highlight {
         margin-bottom: 10px !important;
     }
 
-    /* Fluid Font Sizing for Ticket Text (Pinch-To-Zoom Reflow) */
+    /* Mobile Ticket Typography */
     .ticket-container {
-        font-size: calc(15px * var(--ticket-font-scale, 1));
+        font-size: 15px;
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
@@ -1368,55 +1367,55 @@ mark.search-highlight {
         box-sizing: border-box !important;
     }
 
-    /* Paragraphs and list items with fluid font scaling */
+    /* Paragraphs and list items */
     .ticket-main-col p,
     .ticket-main-col li,
     .ticket-main-col .vcard > p,
     .ticket-main-col .vcard > div:not(.vcard-code) {
-        font-size: calc(15px * var(--ticket-font-scale, 1)) !important;
+        font-size: 15px !important;
         line-height: 1.65 !important;
     }
 
     .ticket-main-col [style*="font-size: 13.5px"],
     .ticket-main-col [style*="font-size: 13px"],
     .ticket-main-col [style*="font-size: 14px"] {
-        font-size: calc(14px * var(--ticket-font-scale, 1)) !important;
+        font-size: 14px !important;
     }
 
     .ticket-main-col h1 {
-        font-size: calc(20px * var(--ticket-font-scale, 1)) !important;
+        font-size: 20px !important;
         line-height: 1.3 !important;
     }
 
     .ticket-main-col h2 {
-        font-size: calc(18px * var(--ticket-font-scale, 1)) !important;
+        font-size: 18px !important;
         line-height: 1.35 !important;
     }
 
     .ticket-main-col h3,
     .ticket-main-col h4 {
-        font-size: calc(16px * var(--ticket-font-scale, 1)) !important;
+        font-size: 16px !important;
         line-height: 1.4 !important;
     }
 
     .ticket-main-col .vcard {
-        font-size: calc(14.5px * var(--ticket-font-scale, 1)) !important;
+        font-size: 14.5px !important;
     }
 
     .ticket-main-col .vcard-title-pill {
-        font-size: calc(10.5px * var(--ticket-font-scale, 1)) !important;
+        font-size: 10.5px !important;
         line-height: 1.35 !important;
     }
 
     .ticket-main-col pre,
     .ticket-main-col code,
     .ticket-main-col .vcard-code {
-        font-size: calc(12.5px * var(--ticket-font-scale, 1)) !important;
+        font-size: 12.5px !important;
         line-height: 1.5 !important;
     }
 
     .ticket-header-banner p {
-        font-size: calc(13.5px * var(--ticket-font-scale, 1)) !important;
+        font-size: 13.5px !important;
     }
 
     /* =========================================================
@@ -1455,7 +1454,7 @@ mark.search-highlight {
     .vcard-scroll-wrap {
         display: block !important;
         width: max-content !important;
-        min-width: calc(520px * var(--ticket-font-scale, 1)) !important;
+        min-width: 520px !important;
         max-width: none !important;
         box-sizing: border-box !important;
         padding-right: 14px !important;
@@ -1474,8 +1473,8 @@ mark.search-highlight {
     .vcard-scroll-wrap > div:not(.vcard-code),
     .vcard-scroll-wrap > h4,
     .vcard-scroll-wrap > blockquote {
-        width: calc(500px * var(--ticket-font-scale, 1)) !important;
-        min-width: calc(480px * var(--ticket-font-scale, 1)) !important;
+        width: 500px !important;
+        min-width: 480px !important;
         box-sizing: border-box !important;
     }
 
@@ -1535,13 +1534,13 @@ mark.search-highlight {
         display: block !important;
         max-width: 100% !important;
         width: max-content !important;
-        min-width: calc(480px * var(--ticket-font-scale, 1)) !important;
+        min-width: 480px !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
         -webkit-overflow-scrolling: touch !important;
         touch-action: pan-x pan-y !important;
         overscroll-behavior-x: contain !important;
-        font-size: calc(12.5px * var(--ticket-font-scale, 1)) !important;
+        font-size: 12.5px !important;
         border-radius: 8px !important;
         padding: 12px 14px !important;
         white-space: pre !important;
@@ -1972,69 +1971,6 @@ mark.search-highlight {
     }
 
     /* Materials Sheet Cards */
-    /* Font Scale Control Card in Materials Sheet */
-    .sheet-font-card {
-        background: var(--bg-page);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 12px 14px;
-        margin-bottom: 12px;
-    }
-
-    .sheet-font-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 10px;
-    }
-
-    .sheet-font-title {
-        font-size: 13.5px;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    .sheet-font-value {
-        font-size: 13px;
-        font-weight: 800;
-        color: var(--accent);
-    }
-
-    .sheet-font-buttons {
-        display: flex;
-        gap: 8px;
-    }
-
-    .sheet-font-btn {
-        flex: 1;
-        height: 38px;
-        background: var(--bg-surface);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 700;
-        color: var(--text-primary);
-        cursor: pointer;
-        transition: all 0.15s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-        font-family: inherit;
-    }
-
-    .sheet-font-btn:active {
-        transform: scale(0.94);
-        background: var(--accent-light);
-        border-color: var(--accent);
-    }
-
-    .sheet-font-btn-reset {
-        font-size: 12px;
-        color: var(--text-muted);
-    }
-
     .sheet-materials-grid {
         display: flex;
         flex-direction: column;
