@@ -74,88 +74,71 @@
                             </li>
                         </ul>
 
-                        <div class="tree-diagram-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; margin: 12px 0 6px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-color); margin-bottom: 6px;">
-                                Схема: Двумерные префиксные суммы и принцип включений-исключений
+                        <div class="diagram-card">
+                            <div class="diagram-title">
+                                <span>📐</span> Двумерные префиксные суммы и принцип включений-исключений
                             </div>
-                            <svg viewBox="0 0 720 280" width="720" height="280" style="min-width: 580px; max-width: 720px; width: 100%; height: auto; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
-                              <defs>
-                                <marker id="pref-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                                  <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
-                                </marker>
-                              </defs>
-                            
-                              <!-- ================= LEFT: 2D BUILD INCLUSION-EXCLUSION ================= -->
-                              <g transform="translate(20, 20)">
-                                <text x="140" y="0" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent-color, #6366f1)" font-family="system-ui, sans-serif">1. Построение префикса: P[i, j]</text>
-                            
-                                <!-- Base Grid (0,0) to (i,j) -->
-                                <rect x="20" y="20" width="240" height="180" rx="6" fill="rgba(255,255,255,0.02)" stroke="#475569" stroke-width="1.5" />
-                            
-                                <!-- Overlap P[i-1, j-1] (Purple, counted in both) -->
-                                <rect x="20" y="20" width="140" height="100" rx="4" fill="rgba(168,85,247,0.25)" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="3 2" />
-                                <text x="90" y="72" text-anchor="middle" font-size="11" font-weight="700" fill="#c084fc" font-family="system-ui, sans-serif">P[i-1, j-1]</text>
-                                <text x="90" y="88" text-anchor="middle" font-size="9" font-weight="600" fill="#e9d5ff" font-family="system-ui, sans-serif">(пересечение: -1)</text>
-                            
-                                <!-- Top strip extension P[i-1, j] (Orange border) -->
-                                <rect x="20" y="20" width="200" height="100" rx="4" fill="rgba(249,115,22,0.12)" stroke="#f97316" stroke-width="1.5" />
-                                <text x="180" y="72" text-anchor="middle" font-size="10.5" font-weight="600" fill="#fb923c" font-family="system-ui, sans-serif">P[i-1, j]</text>
-                            
-                                <!-- Left strip extension P[i, j-1] (Blue border) -->
-                                <rect x="20" y="20" width="140" height="160" rx="4" fill="rgba(14,165,233,0.12)" stroke="#0ea5e9" stroke-width="1.5" />
-                                <text x="90" y="145" text-anchor="middle" font-size="10.5" font-weight="600" fill="#38bdf8" font-family="system-ui, sans-serif">P[i, j-1]</text>
-                            
-                                <!-- New cell A[i, j] -->
-                                <rect x="160" y="120" width="60" height="60" rx="4" fill="rgba(34,197,94,0.3)" stroke="#22c55e" stroke-width="2" />
-                                <text x="190" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#4ade80" font-family="system-ui, sans-serif">+ A[i, j]</text>
-                                <text x="190" y="164" text-anchor="middle" font-size="9" font-weight="500" fill="var(--text-muted, #94a3b8)" font-family="system-ui, sans-serif">ячейка (i, j)</text>
-                            
-                                <!-- Labels for coordinates -->
-                                <text x="20" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text-muted, #94a3b8)" font-family="system-ui, sans-serif">(0,0)</text>
-                                <text x="220" y="196" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text-muted, #94a3b8)" font-family="system-ui, sans-serif">(i, j)</text>
-                            
-                                <!-- Bottom formula text -->
-                                <text x="140" y="232" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text-primary, #f1f5f9)" font-family="system-ui, sans-serif">P[i,j] = P[i-1,j] + P[i,j-1] - P[i-1,j-1] + A[i,j]</text>
-                              </g>
-                            
-                              <!-- Divider line -->
-                              <line x1="360" y1="15" x2="360" y2="265" stroke="#334155" stroke-width="1" stroke-dasharray="4 4" />
-                            
-                              <!-- ================= RIGHT: 2D QUERY RECTANGLE ================= -->
-                              <g transform="translate(380, 20)">
-                                <text x="150" y="0" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent-color, #6366f1)" font-family="system-ui, sans-serif">2. Запрос суммы в [x1, y1] .. [x2, y2]</text>
-                            
-                                <!-- Total Area P[x2, y2] (Base) -->
-                                <rect x="30" y="20" width="250" height="180" rx="6" fill="rgba(99,102,241,0.06)" stroke="#6366f1" stroke-width="2" />
-                            
-                                <!-- Minus Top strip P[x1-1, y2] (Red/Pink overlay) -->
-                                <rect x="30" y="20" width="250" height="60" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="1.5" />
-                                <text x="200" y="45" text-anchor="middle" font-size="10" font-weight="700" fill="#f87171" font-family="system-ui, sans-serif">- P[x1-1, y2]</text>
-                            
-                                <!-- Minus Left strip P[x2, y1-1] (Yellow/Amber overlay) -->
-                                <rect x="30" y="20" width="70" height="180" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="1.5" />
-                                <text x="65" y="150" text-anchor="middle" font-size="10" font-weight="700" fill="#fbbf24" font-family="system-ui, sans-serif">- P[x2, y1-1]</text>
-                            
-                                <!-- Twice Subtracted Corner + P[x1-1, y1-1] (Violet return) -->
-                                <rect x="30" y="20" width="70" height="60" rx="4" fill="rgba(168,85,247,0.35)" stroke="#a855f7" stroke-width="1.5" />
-                                <text x="65" y="46" text-anchor="middle" font-size="9" font-weight="700" fill="#c084fc" font-family="system-ui, sans-serif">+ P[x1-1,y1-1]</text>
-                                <text x="65" y="60" text-anchor="middle" font-size="7.5" font-weight="600" fill="#e9d5ff" font-family="system-ui, sans-serif">(вернули назад)</text>
-                            
-                                <!-- Target Rectangle Sum (Bright Green) -->
-                                <rect x="100" y="80" width="180" height="120" rx="4" fill="rgba(34,197,94,0.25)" stroke="#22c55e" stroke-width="2.5" />
-                                <text x="190" y="135" text-anchor="middle" font-size="13" font-weight="800" fill="#4ade80" font-family="system-ui, sans-serif">Сумма подотрезка [x1, y1] .. [x2, y2]</text>
-                                <text x="190" y="155" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--text-primary, #f1f5f9)" font-family="system-ui, sans-serif">Ответ за O(1)</text>
-                            
-                                <!-- Point labels -->
-                                <text x="100" y="74" text-anchor="end" font-size="9.5" font-weight="700" fill="#22c55e" font-family="system-ui, sans-serif">(x1, y1)</text>
-                                <text x="280" y="214" text-anchor="end" font-size="9.5" font-weight="700" fill="#6366f1" font-family="system-ui, sans-serif">(x2, y2)</text>
-                            
-                                <!-- Bottom formula text -->
-                                <text x="155" y="232" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--text-primary, #f1f5f9)" font-family="system-ui, sans-serif">Sum = P[x2,y2] - P[x1-1,y2] - P[x2,y1-1] + P[x1-1,y1-1]</text>
-                              </g>
-                            </svg>
-                            <div style="font-size: 11.5px; opacity: 0.85; text-align: center; margin-top: 6px;">
-                                Формула включений-исключений для 2D-префиксов: построение за $O(NM)$, ответ на любой прямоугольный запрос за $O(1)$.
+
+                            <div class="prefix-2d-layout">
+                                <!-- 1. Build -->
+                                <div class="prefix-2d-card">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 6px;">
+                                        1. Построение префиксной матрицы: $P[i, j]$ за $O(NM)$
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 4px; height: 160px; max-width: 300px; margin: 8px auto; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 4px; background: rgba(148,163,184,0.04);">
+                                        <div style="background: rgba(168,85,247,0.2); border: 1px dashed #a855f7; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #9333ea; padding: 4px; text-align: center;">
+                                            <span>$P[i-1, j-1]$</span>
+                                            <span style="font-size: 9.5px; opacity: 0.85;">(вычитаем угол)</span>
+                                        </div>
+                                        <div style="background: rgba(249,115,22,0.15); border: 1px solid #f97316; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #ea580c; padding: 4px; text-align: center;">
+                                            <span>$P[i-1, j]$</span>
+                                            <span style="font-size: 9.5px; opacity: 0.85;">(верхняя часть)</span>
+                                        </div>
+                                        <div style="background: rgba(14,165,233,0.15); border: 1px solid #0ea5e9; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #0284c7; padding: 4px; text-align: center;">
+                                            <span>$P[i, j-1]$</span>
+                                            <span style="font-size: 9.5px; opacity: 0.85;">(левая часть)</span>
+                                        </div>
+                                        <div style="background: rgba(34,197,94,0.25); border: 2px solid #22c55e; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #16a34a; padding: 4px; text-align: center;">
+                                            <span>$+ A[i, j]$</span>
+                                            <span style="font-size: 9.5px; opacity: 0.85;">ячейка $(i, j)$</span>
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 11.5px; text-align: center; margin-top: 8px; font-weight: 600;">
+                                        $$P[i, j] = P[i-1, j] + P[i, j-1] - P[i-1, j-1] + A[i, j]$$
+                                    </div>
+                                </div>
+
+                                <!-- 2. Query -->
+                                <div class="prefix-2d-card">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 6px;">
+                                        2. Запрос суммы в прямоугольнике $[x_1, y_1] \dots [x_2, y_2]$ за $O(1)$
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 2fr; grid-template-rows: 1fr 2fr; gap: 4px; height: 160px; max-width: 300px; margin: 8px auto; border: 1.5px solid var(--border-color); border-radius: 6px; padding: 4px; background: rgba(148,163,184,0.04);">
+                                        <div style="background: rgba(168,85,247,0.25); border: 1.5px solid #a855f7; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; color: #9333ea; padding: 4px; text-align: center;">
+                                            <span>$+ P[x_1-1, y_1-1]$</span>
+                                            <span style="font-size: 9px; opacity: 0.85;">(вернули назад)</span>
+                                        </div>
+                                        <div style="background: rgba(239,68,68,0.15); border: 1px solid #ef4444; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #dc2626; padding: 4px; text-align: center;">
+                                            <span>$- P[x_1-1, y_2]$</span>
+                                            <span style="font-size: 9px; opacity: 0.85;">(вычли верхнюю полосу)</span>
+                                        </div>
+                                        <div style="background: rgba(245,158,11,0.15); border: 1px solid #f59e0b; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #d97706; padding: 4px; text-align: center;">
+                                            <span>$- P[x_2, y_1-1]$</span>
+                                            <span style="font-size: 9px; opacity: 0.85;">(вычли левую полосу)</span>
+                                        </div>
+                                        <div style="background: rgba(34,197,94,0.25); border: 2.5px solid #22c55e; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #16a34a; padding: 6px; text-align: center;">
+                                            <span style="font-size: 12.5px;">🎯 Искомая сумма</span>
+                                            <span style="font-size: 10px; font-weight: 600;">в $[x_1, y_1] \dots [x_2, y_2]$</span>
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 11px; text-align: center; margin-top: 8px; font-weight: 600;">
+                                        $$\text{Sum} = P[x_2, y_2] - P[x_1-1, y_2] - P[x_2, y_1-1] + P[x_1-1, y_1-1]$$
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="diagram-caption">
+                                Принцип включений-исключений для 2D-префиксов: построение матрицы за $O(NM)$, ответ на любой прямоугольный запрос за $O(1)$.
                             </div>
                         </div>
                     </div>
