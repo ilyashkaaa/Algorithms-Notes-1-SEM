@@ -56,17 +56,179 @@
                     <section id="sec-splay-steps" class="vcard vcard-alg">
                         <span class="vcard-title-pill">[Алгоритм] 3 типа шагов операции Splay(x)</span>
                         <p>
-                            Пусть $p$ — родитель узла $x$, а $g$ — родитель $p$ (дедушка $x$). Подъем $x$ в корень состоит из последовательности шагов трех типов:
+                            Пусть $p$ — родитель узла $x$, а $g$ — родитель $p$ (дедушка $x$). Подъем $x$ в корень состоит из последовательности шагов трех типов, которые строятся из базовых локальных поворотов двоичного дерева поиска:
                         </p>
 
+                        <!-- 0. Базовые повороты дерева -->
+                        <div style="margin-top: 10px;">
+                            <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">0. Базовые малые повороты дерева (rotateLeft / rotateRight)</h4>
+                            <p>
+                                Все шаги в Splay-дереве сводятся к элементарным поворотам ребер за $O(1)$. Поворот переподвешивает вершины, изменяя глубины родителя и ребенка, но <strong>строго сохраняет симметричный порядок ключей (инвариант BST)</strong>:
+                            </p>
+                            <div class="tree-diagram-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; margin: 10px 0 16px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-color); margin-bottom: 6px;">
+                                    Схема: Малый правый и малый левый поворот дерева
+                                </div>
+                                <svg viewBox="0 0 520 220" width="520" height="220" style="min-width: 480px; max-width: 540px; width: 100%; height: auto; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+                                  <defs>
+                                    <marker id="rot-arr-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                      <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
+                                    </marker>
+                                  </defs>
+
+                                  <!-- LEFT TREE -->
+                                  <g>
+                                    <line x1="110" y1="45" x2="60" y2="100" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="110" y1="45" x2="155" y2="90" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="60" y1="100" x2="35" y2="140" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="60" y1="100" x2="85" y2="140" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="35,140 15,185 55,185" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="35" y="170" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="85,140 65,185 105,185" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="85" y="170" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="155,90 135,145 175,145" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="155" y="126" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <circle cx="110" cy="45" r="16" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="110" y="45" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="13" font-family="system-ui, sans-serif">y</text>
+
+                                    <circle cx="60" cy="100" r="16" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="60" y="100" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="13" font-family="system-ui, sans-serif">x</text>
+
+                                    <text x="95" y="206" text-anchor="middle" font-size="11" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">До правого поворота</text>
+                                  </g>
+
+                                  <!-- MIDDLE ARROWS -->
+                                  <g>
+                                    <line x1="205" y1="85" x2="285" y2="85" stroke="#6366f1" stroke-width="2" marker-end="url(#rot-arr-r)" />
+                                    <text x="245" y="74" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1" font-family="system-ui, sans-serif">rotateRight(y)</text>
+
+                                    <line x1="285" y1="120" x2="205" y2="120" stroke="#6366f1" stroke-width="2" marker-end="url(#rot-arr-r)" />
+                                    <text x="245" y="139" text-anchor="middle" font-size="11" font-weight="600" fill="#6366f1" font-family="system-ui, sans-serif">rotateLeft(x)</text>
+                                  </g>
+
+                                  <!-- RIGHT TREE -->
+                                  <g>
+                                    <line x1="380" y1="45" x2="335" y2="90" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="380" y1="45" x2="430" y2="100" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="430" y1="100" x2="405" y2="140" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="430" y1="100" x2="455" y2="140" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="335,90 315,145 355,145" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="335" y="126" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="405,140 385,185 425,185" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="405" y="170" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="455,140 435,185 475,185" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="455" y="170" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <circle cx="380" cy="45" r="16" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="380" y="45" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="13" font-family="system-ui, sans-serif">x</text>
+
+                                    <circle cx="430" cy="100" r="16" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="430" y="100" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="13" font-family="system-ui, sans-serif">y</text>
+
+                                    <text x="405" y="206" text-anchor="middle" font-size="11" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">После правого поворота</text>
+                                  </g>
+                                </svg>
+                                <div style="font-size: 11.5px; opacity: 0.85; text-align: center; margin-top: 6px;">
+                                    Инвариант двоичного дерева поиска строго сохраняется: $A \lt x \lt B \lt y \lt C$. Сложность: $O(1)$.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 1. Шаг zig -->
                         <div style="margin-top: 10px;">
                             <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">1. Шаг zig (одиночный поворот)</h4>
                             <p>
                                 Применяется, когда родитель $p$ уже является корнем дерева ($g = \mathrm{null}$).
                                 Выполняется ровно один поворот ребра $(x, p)$ (правый или левый). Применяется не более одного раза в самом конце процедуры $\mathrm{Splay}$, если исходная глубина $x$ была нечетной.
                             </p>
+                            <div class="tree-diagram-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; margin: 10px 0 16px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-color); margin-bottom: 6px;">
+                                    Схема шага Zig: подъем вершины x в корень
+                                </div>
+                                <svg viewBox="0 0 500 220" width="500" height="220" style="min-width: 480px; max-width: 520px; width: 100%; height: auto; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+                                  <defs>
+                                    <marker id="zig-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                      <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
+                                    </marker>
+                                  </defs>
+
+                                  <!-- LEFT: BEFORE ZIG -->
+                                  <g>
+                                    <line x1="100" y1="45" x2="50" y2="100" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="100" y1="45" x2="145" y2="90" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="50" y1="100" x2="25" y2="140" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="50" y1="100" x2="75" y2="140" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="25,140 5,185 45,185" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="25" y="170" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="75,140 55,185 95,185" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="75" y="170" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="145,90 125,145 165,145" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="145" y="126" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <!-- Node p (Корень) -->
+                                    <circle cx="100" cy="45" r="16" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="100" y="45" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="13" font-family="system-ui, sans-serif">p</text>
+                                    <text x="100" y="20" text-anchor="middle" font-size="10" font-weight="600" fill="#0284c7" font-family="system-ui, sans-serif">корень</text>
+
+                                    <!-- Node x (Цель) -->
+                                    <circle cx="50" cy="100" r="16" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="50" y="100" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="13" font-family="system-ui, sans-serif">x</text>
+
+                                    <text x="85" y="206" text-anchor="middle" font-size="11" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">До шага zig</text>
+                                  </g>
+
+                                  <!-- TRANSITION -->
+                                  <g>
+                                    <line x1="190" y1="100" x2="270" y2="100" stroke="#6366f1" stroke-width="2" marker-end="url(#zig-arr)" />
+                                    <text x="230" y="88" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6366f1" font-family="system-ui, sans-serif">rotate(x)</text>
+                                    <text x="230" y="118" text-anchor="middle" font-size="10" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">1 поворот</text>
+                                  </g>
+
+                                  <!-- RIGHT: AFTER ZIG -->
+                                  <g>
+                                    <line x1="370" y1="45" x2="325" y2="90" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="370" y1="45" x2="420" y2="100" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="420" y1="100" x2="395" y2="140" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="420" y1="100" x2="445" y2="140" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="325,90 305,145 345,145" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="325" y="126" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="395,140 375,185 415,185" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="395" y="170" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="445,140 425,185 465,185" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="445" y="170" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <!-- Node x (Новый корень) -->
+                                    <circle cx="370" cy="45" r="16" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="370" y="45" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="13" font-family="system-ui, sans-serif">x</text>
+                                    <text x="370" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#6366f1" font-family="system-ui, sans-serif">новый корень</text>
+
+                                    <!-- Node p -->
+                                    <circle cx="420" cy="100" r="16" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="420" y="100" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="13" font-family="system-ui, sans-serif">p</text>
+
+                                    <text x="395" y="206" text-anchor="middle" font-size="11" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">После шага zig</text>
+                                  </g>
+                                </svg>
+                                <div style="font-size: 11.5px; opacity: 0.85; text-align: center; margin-top: 6px;">
+                                    Вершина $x$ становится новым корнем дерева. Шаг применяется не более одного раза в конце спуска.
+                                </div>
+                            </div>
                         </div>
 
+                        <!-- 2. Шаг zig-zig -->
                         <div style="margin-top: 10px;">
                             <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">2. Шаг zig-zig (однонаправленный двойной поворот)</h4>
                             <p>
@@ -77,14 +239,271 @@
                                 Сначала поворачиваем $p$ вокруг дедушки $g$, и только затем $x$ вокруг $p$!
                                 <br><em>Почему это критично:</em> Именно такой порядок располовинивает длину пути от $g$ до корня, превращая вырожденный бамбук в сбалансированное дерево. Если наивно повернуть сначала $x$, а потом $p$, длина ветви не уменьшится.
                             </div>
+                            <div class="tree-diagram-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; margin: 10px 0 16px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-color); margin-bottom: 6px;">
+                                    Схема шага Zig-Zig: двухэтапное сжатие пути
+                                </div>
+                                <svg viewBox="0 0 740 230" width="740" height="230" style="min-width: 600px; max-width: 740px; width: 100%; height: auto; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+                                  <defs>
+                                    <marker id="zigzig-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                      <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
+                                    </marker>
+                                  </defs>
+
+                                  <!-- STAGE 1: BAMBOO g -> p -> x -->
+                                  <g>
+                                    <line x1="115" y1="35" x2="155" y2="75" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="115" y1="35" x2="75" y2="85" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="75" y1="85" x2="110" y2="130" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="75" y1="85" x2="35" y2="140" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="35" y1="140" x2="15" y2="180" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="35" y1="140" x2="55" y2="180" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="15,180 0,215 30,215" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="15" y="202" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="55,180 40,215 70,215" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="55" y="202" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="110,130 92,170 128,170" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="110" y="156" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <polygon points="155,75 137,115 173,115" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="155" y="101" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">D</text>
+
+                                    <circle cx="115" cy="35" r="15" fill="#64748b" stroke="#475569" stroke-width="2" />
+                                    <text x="115" y="35" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">g</text>
+
+                                    <circle cx="75" cy="85" r="15" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="75" y="85" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">p</text>
+
+                                    <circle cx="35" cy="140" r="15" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="35" y="140" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">x</text>
+
+                                    <text x="85" y="226" text-anchor="middle" font-size="10.5" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">1. Исходный бамбук</text>
+                                  </g>
+
+                                  <!-- ARROW 1: rotate(p) -->
+                                  <g>
+                                    <line x1="188" y1="105" x2="232" y2="105" stroke="#6366f1" stroke-width="2" marker-end="url(#zigzig-arr)" />
+                                    <text x="210" y="92" text-anchor="middle" font-size="10" font-weight="700" fill="#6366f1" font-family="system-ui, sans-serif">rotate(p)</text>
+                                    <text x="210" y="122" text-anchor="middle" font-size="9" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">вокруг g</text>
+                                  </g>
+
+                                  <!-- STAGE 2: AFTER rotate(p) -->
+                                  <g>
+                                    <line x1="330" y1="40" x2="285" y2="95" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="330" y1="40" x2="375" y2="95" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="285" y1="95" x2="265" y2="135" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="285" y1="95" x2="305" y2="135" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="375" y1="95" x2="355" y2="135" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="375" y1="95" x2="395" y2="135" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="265,135 247,175 283,175" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="265" y="161" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="305,135 287,175 323,175" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="305" y="161" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="355,135 337,175 373,175" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="355" y="161" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <polygon points="395,135 377,175 413,175" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="395" y="161" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">D</text>
+
+                                    <circle cx="330" cy="40" r="15" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="330" y="40" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">p</text>
+
+                                    <circle cx="285" cy="95" r="15" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="285" y="95" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">x</text>
+
+                                    <circle cx="375" cy="95" r="15" fill="#64748b" stroke="#475569" stroke-width="2" />
+                                    <text x="375" y="95" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">g</text>
+
+                                    <text x="330" y="226" text-anchor="middle" font-size="10.5" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">2. После поворота p</text>
+                                  </g>
+
+                                  <!-- ARROW 2: rotate(x) -->
+                                  <g>
+                                    <line x1="435" y1="105" x2="485" y2="105" stroke="#6366f1" stroke-width="2" marker-end="url(#zigzig-arr)" />
+                                    <text x="460" y="92" text-anchor="middle" font-size="10" font-weight="700" fill="#6366f1" font-family="system-ui, sans-serif">rotate(x)</text>
+                                    <text x="460" y="122" text-anchor="middle" font-size="9" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">вокруг p</text>
+                                  </g>
+
+                                  <!-- STAGE 3: AFTER rotate(x) - FINAL -->
+                                  <g>
+                                    <line x1="595" y1="35" x2="555" y2="75" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="595" y1="35" x2="635" y2="85" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="635" y1="85" x2="600" y2="130" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="635" y1="85" x2="675" y2="140" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="675" y1="140" x2="655" y2="180" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="675" y1="140" x2="695" y2="180" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="555,75 537,115 573,115" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="555" y="101" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="600,130 582,170 618,170" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="600" y="156" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="655,180 640,215 670,215" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="655" y="202" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <polygon points="695,180 680,215 710,215" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="695" y="202" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">D</text>
+
+                                    <circle cx="595" cy="35" r="15" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="595" y="35" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">x</text>
+
+                                    <circle cx="635" cy="85" r="15" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="635" y="85" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">p</text>
+
+                                    <circle cx="675" cy="140" r="15" fill="#64748b" stroke="#475569" stroke-width="2" />
+                                    <text x="675" y="140" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">g</text>
+
+                                    <text x="640" y="226" text-anchor="middle" font-size="10.5" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">3. Итог: x в корне</text>
+                                  </g>
+                                </svg>
+                                <div style="font-size: 11.5px; opacity: 0.85; text-align: center; margin-top: 6px;">
+                                    Обратите внимание: исходное поддерево $x$ (узлы $x, A, B$) и новое поддерево $g$ (узлы $g, C, D$) не пересекаются и лежат внутри нового поддерева $x$, что обеспечивает $s(x) + s'(g) \le s'(x)$ в доказательстве теоремы.
+                                </div>
+                            </div>
                         </div>
 
+                        <!-- 3. Шаг zig-zag -->
                         <div style="margin-top: 10px;">
                             <h4 style="margin: 0 0 4px; font-size: 13.5px; color: var(--accent-color);">3. Шаг zig-zag (разнонаправленный двойной поворот)</h4>
                             <p>
                                 Применяется, когда $x$ и $p$ лежат по разные стороны: например, $x$ — правый сын $p$, а $p$ — левый сын $g$ (зигзаг).
                                 Сначала поворачиваем $x$ вокруг $p$, а затем $x$ вокруг $g$ (аналог большого поворота в AVL).
                             </p>
+                            <div class="tree-diagram-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; margin: 10px 0 16px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-color); margin-bottom: 6px;">
+                                    Схема шага Zig-Zag: распрямление и центрирование узла x
+                                </div>
+                                <svg viewBox="0 0 680 230" width="680" height="230" style="min-width: 580px; max-width: 680px; width: 100%; height: auto; display: block; margin: 0 auto;" xmlns="http://www.w3.org/2000/svg">
+                                  <defs>
+                                    <marker id="zigzag-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                      <path d="M 0 1 L 8 5 L 0 9 z" fill="#6366f1" />
+                                    </marker>
+                                  </defs>
+
+                                  <!-- STAGE 1: ZIG-ZAG -->
+                                  <g>
+                                    <line x1="115" y1="35" x2="155" y2="75" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="115" y1="35" x2="65" y2="85" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="65" y1="85" x2="35" y2="130" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="65" y1="85" x2="95" y2="135" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="95" y1="135" x2="75" y2="180" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="95" y1="135" x2="115" y2="180" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="35,130 17,170 53,170" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="35" y="156" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="75,180 60,215 90,215" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="75" y="202" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="115,180 100,215 130,215" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="115" y="202" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <polygon points="155,75 137,115 173,115" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="155" y="101" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">D</text>
+
+                                    <circle cx="115" cy="35" r="15" fill="#64748b" stroke="#475569" stroke-width="2" />
+                                    <text x="115" y="35" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">g</text>
+
+                                    <circle cx="65" cy="85" r="15" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="65" y="85" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">p</text>
+
+                                    <circle cx="95" cy="135" r="15" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="95" y="135" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">x</text>
+
+                                    <text x="85" y="226" text-anchor="middle" font-size="10.5" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">1. Зигзаг (x = p.right)</text>
+                                  </g>
+
+                                  <!-- ARROW 1: rotate(x) around p -->
+                                  <g>
+                                    <line x1="188" y1="105" x2="232" y2="105" stroke="#6366f1" stroke-width="2" marker-end="url(#zigzag-arr)" />
+                                    <text x="210" y="92" text-anchor="middle" font-size="10" font-weight="700" fill="#6366f1" font-family="system-ui, sans-serif">rotate(x)</text>
+                                    <text x="210" y="122" text-anchor="middle" font-size="9" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">вокруг p</text>
+                                  </g>
+
+                                  <!-- STAGE 2: AFTER rotate(x) around p (STRAIGHT LINE g -> x -> p) -->
+                                  <g>
+                                    <line x1="345" y1="35" x2="385" y2="75" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="345" y1="35" x2="305" y2="85" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="305" y1="85" x2="340" y2="130" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="305" y1="85" x2="265" y2="140" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="265" y1="140" x2="245" y2="180" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="265" y1="140" x2="285" y2="180" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="245,180 230,215 260,215" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="245" y="202" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="285,180 270,215 300,215" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="285" y="202" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="340,130 322,170 358,170" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="340" y="156" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <polygon points="385,75 367,115 403,115" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="385" y="101" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">D</text>
+
+                                    <circle cx="345" cy="35" r="15" fill="#64748b" stroke="#475569" stroke-width="2" />
+                                    <text x="345" y="35" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">g</text>
+
+                                    <circle cx="305" cy="85" r="15" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="305" y="85" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">x</text>
+
+                                    <circle cx="265" cy="140" r="15" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="265" y="140" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">p</text>
+
+                                    <text x="315" y="226" text-anchor="middle" font-size="10.5" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">2. Выпрямление ветви</text>
+                                  </g>
+
+                                  <!-- ARROW 2: rotate(x) around g -->
+                                  <g>
+                                    <line x1="418" y1="105" x2="462" y2="105" stroke="#6366f1" stroke-width="2" marker-end="url(#zigzag-arr)" />
+                                    <text x="440" y="92" text-anchor="middle" font-size="10" font-weight="700" fill="#6366f1" font-family="system-ui, sans-serif">rotate(x)</text>
+                                    <text x="440" y="122" text-anchor="middle" font-size="9" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">вокруг g</text>
+                                  </g>
+
+                                  <!-- STAGE 3: AFTER rotate(x) around g - FINAL BALANCED -->
+                                  <g>
+                                    <line x1="560" y1="40" x2="515" y2="95" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="560" y1="40" x2="605" y2="95" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="515" y1="95" x2="495" y2="135" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="515" y1="95" x2="535" y2="135" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="605" y1="95" x2="585" y2="135" stroke="#94a3b8" stroke-width="2" />
+                                    <line x1="605" y1="95" x2="625" y2="135" stroke="#94a3b8" stroke-width="2" />
+
+                                    <polygon points="495,135 477,175 513,175" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="495" y="161" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">A</text>
+
+                                    <polygon points="535,135 517,175 553,175" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="535" y="161" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">B</text>
+
+                                    <polygon points="585,135 567,175 603,175" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="585" y="161" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">C</text>
+
+                                    <polygon points="625,135 607,175 643,175" fill="rgba(99,102,241,0.08)" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 2" />
+                                    <text x="625" y="161" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="600" fill="var(--text-primary, #334155)" font-family="system-ui, sans-serif">D</text>
+
+                                    <circle cx="560" cy="40" r="15" fill="#6366f1" stroke="#4f46e5" stroke-width="2" />
+                                    <text x="560" y="40" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">x</text>
+
+                                    <circle cx="515" cy="95" r="15" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+                                    <text x="515" y="95" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">p</text>
+
+                                    <circle cx="605" cy="95" r="15" fill="#64748b" stroke="#475569" stroke-width="2" />
+                                    <text x="605" y="95" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-weight="700" font-size="12" font-family="system-ui, sans-serif">g</text>
+
+                                    <text x="560" y="226" text-anchor="middle" font-size="10.5" font-weight="500" fill="var(--text-muted, #64748b)" font-family="system-ui, sans-serif">3. Итог: x в корне (баланс)</text>
+                                  </g>
+                                </svg>
+                                <div style="font-size: 11.5px; opacity: 0.85; text-align: center; margin-top: 6px;">
+                                    Два последовательных поворота узла $x$ приводят к идеально сбалансированному локальному поддереву, где $x$ находится в корне.
+                                </div>
+                            </div>
                         </div>
                     </section>
 
@@ -116,7 +535,7 @@
                         </p>
                         $$\hat{C}_{\mathrm{Splay}} \le 3(r(t) - r(x)) + 1 \le 3 \log_2 n + 1 = O(\log n)$$
                         <p style="margin-top: 8px;">
-                            <strong>Доказательство леммы по шагам (Лекция 7, Кулапин):</strong>
+                            <strong>Доказательство леммы по шагам:</strong>
                             Пусть $r(u)$ и $r'(u)$ — ранги вершины $u$ до и после шага соответственно.
                         </p>
                         <ul style="margin-left: 20px; margin-top: 6px;">
